@@ -20,7 +20,7 @@ interface ToolbarProps {
   onChangePreset: (preset: CanvasPreset) => void;
 }
 
-export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate }: ToolbarProps) {
+export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, currentPreset, onChangePreset }: ToolbarProps) {
   return (
     <header className="h-12 border-b bg-card flex items-center px-3 gap-1">
       <div className="flex items-center gap-2 mr-3">
