@@ -150,56 +150,96 @@ export function DesignElementRenderer({
               className="cursor-text"
             />
 
-            {/* 첨삭 버튼 */}
+            {/* AI 첨삭 버튼 */}
             <div className="absolute right-0 flex items-center gap-1 z-50" style={{ top: -36 }}>
-              {analysisErrors.length > 0 && (
-                <button
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium shadow-md transition-all ${
-                    showCorrections
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-card border text-foreground hover:bg-accent'
-                  }`}
-                  onMouseDown={e => e.preventDefault()}
-                  onClick={() => setShowCorrections(!showCorrections)}
-                >
-                  <Wand2 className="w-3 h-3" />
-                  첨삭 ({analysisErrors.length})
-                </button>
-              )}
+              <button
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium shadow-md transition-all ${
+                  showCorrections
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-card border text-foreground hover:bg-accent'
+                }`}
+                onMouseDown={e => e.preventDefault()}
+                onClick={async () => {
+                  if (showCorrections) {
+                    setShowCorrections(false);
+                    return;
+                  }
+                  if (!element.text?.trim()) return;
+                  setIsCorrectingAI(true);
+                  setShowCorrections(true);
+                  try {
+                    const result = await correctText(element.text);
+                    setAiCorrected(result.corrected);
+                    setAiChanges(result.changes);
+                  } catch (err: any) {
+                    toast.error(err.message || '첨삭에 실패했습니다.');
+                    setShowCorrections(false);
+                  } finally {
+                    setIsCorrectingAI(false);
+                  }
+                }}
+                disabled={isCorrectingAI}
+              >
+                {isCorrectingAI ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <Sparkles className="w-3 h-3" />
+                )}
+                AI 첨삭
+              </button>
             </div>
 
-            {/* 대체어 버튼들 - 텍스트 위에 표시 */}
-            {showCorrections && analysisErrors.length > 0 && (
+            {/* AI 첨삭 결과 패널 */}
+            {showCorrections && (
               <div
-                className="absolute left-0 right-0 flex flex-wrap gap-1.5 z-50 p-2 rounded-lg bg-card/95 backdrop-blur-sm border shadow-xl overflow-y-auto"
-                style={{ bottom: '100%', marginBottom: 4, maxHeight: 200 }}
+                className="absolute left-0 right-0 z-50 rounded-lg bg-card/95 backdrop-blur-sm border shadow-xl overflow-y-auto"
+                style={{ bottom: '100%', marginBottom: 4, maxHeight: 260 }}
                 onMouseDown={e => e.preventDefault()}
               >
-                {analysisErrors.map((err, i) => (
-                  <div key={i} className="flex items-center gap-1 flex-wrap">
-                    <span
-                      className="inline-flex items-center px-2 py-1 rounded text-xs line-through opacity-60"
-                      style={{ backgroundColor: err.severity === 'error' ? 'hsl(var(--destructive) / 0.15)' : 'hsl(var(--warning) / 0.15)' }}
-                    >
-                      {err.original}
-                    </span>
-                    <span className="text-muted-foreground text-xs">→</span>
-                    {err.suggestions.map((s, j) => (
+                {isCorrectingAI ? (
+                  <div className="flex items-center justify-center gap-2 p-4 text-sm text-muted-foreground">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    AI가 첨삭 중...
+                  </div>
+                ) : aiCorrected ? (
+                  <div className="p-3 space-y-3">
+                    {/* 교정된 문장 전체 적용 버튼 */}
+                    <div className="space-y-2">
+                      <div className="text-xs font-medium text-muted-foreground">교정된 문장</div>
+                      <div className="p-2.5 rounded-md bg-primary/5 border border-primary/20 text-sm leading-relaxed">
+                        {aiCorrected}
+                      </div>
                       <button
-                        key={j}
-                        className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-colors border border-primary/20"
+                        className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                         onClick={() => {
-                          if (element.text) {
-                            onTextChange(element.id, element.text.replace(err.original, s));
-                          }
+                          onTextChange(element.id, aiCorrected);
+                          setShowCorrections(false);
+                          setAiCorrected(null);
+                          setAiChanges([]);
+                          toast.success('교정된 문장이 적용되었습니다.');
                         }}
                       >
-                        {s}
+                        <Sparkles className="w-3 h-3" />
+                        전체 적용
                       </button>
-                    ))}
-                    {i < analysisErrors.length - 1 && <div className="w-px h-4 bg-border mx-1" />}
+                    </div>
+
+                    {/* 변경 사항 목록 */}
+                    {aiChanges.length > 0 && (
+                      <div className="space-y-1.5">
+                        <div className="text-xs font-medium text-muted-foreground">변경 사항</div>
+                        {aiChanges.map((change, i) => (
+                          <div key={i} className="flex items-start gap-2 text-xs p-1.5 rounded bg-muted/50">
+                            <span className="line-through text-destructive/70 shrink-0">{change.original}</span>
+                            <span className="text-muted-foreground shrink-0">→</span>
+                            <span className="text-primary font-medium shrink-0">{change.corrected}</span>
+                            <span className="text-muted-foreground ml-auto text-right">{change.reason}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                ))}
+                ) : null}
               </div>
             )}
           </div>
