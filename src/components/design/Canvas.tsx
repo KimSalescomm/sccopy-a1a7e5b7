@@ -1,12 +1,12 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import type { Page, DesignElement } from '@/types/design';
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from '@/types/design';
+import type { Page, DesignElement, CanvasPreset } from '@/types/design';
 import { DesignElementRenderer } from './DesignElementRenderer';
 
 interface CanvasProps {
   page: Page;
   selectedId: string | null;
   editingId: string | null;
+  canvasPreset: CanvasPreset;
   onSelectElement: (id: string | null) => void;
   onUpdateElement: (id: string, updates: Partial<DesignElement>) => void;
   onDoubleClickElement: (id: string) => void;
@@ -15,7 +15,7 @@ interface CanvasProps {
 }
 
 export function Canvas({
-  page, selectedId, editingId,
+  page, selectedId, editingId, canvasPreset,
   onSelectElement, onUpdateElement, onDoubleClickElement,
   onTextChange, onFinishEditing,
 }: CanvasProps) {
@@ -26,10 +26,10 @@ export function Canvas({
     if (!containerRef.current) return;
     const { clientWidth, clientHeight } = containerRef.current;
     const padding = 48;
-    const sx = (clientWidth - padding) / CANVAS_WIDTH;
-    const sy = (clientHeight - padding) / CANVAS_HEIGHT;
+    const sx = (clientWidth - padding) / canvasPreset.width;
+    const sy = (clientHeight - padding) / canvasPreset.height;
     setScale(Math.min(sx, sy, 1));
-  }, []);
+  }, [canvasPreset]);
 
   useEffect(() => {
     updateScale();
@@ -53,8 +53,8 @@ export function Canvas({
       <div
         className="relative shadow-2xl"
         style={{
-          width: CANVAS_WIDTH,
-          height: CANVAS_HEIGHT,
+          width: canvasPreset.width,
+          height: canvasPreset.height,
           transform: `scale(${scale})`,
           transformOrigin: 'center center',
           ...bgStyle,

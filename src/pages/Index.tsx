@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
-import type { Page, DesignElement } from '@/types/design';
-import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId } from '@/types/design';
+import type { Page, DesignElement, CanvasPreset } from '@/types/design';
+import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId, DEFAULT_PRESET } from '@/types/design';
 import { getTemplatePages } from '@/lib/templates';
 import { Toolbar } from '@/components/design/Toolbar';
 import { PageSidebar } from '@/components/design/PageSidebar';
@@ -13,6 +13,7 @@ const Index = () => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [canvasPreset, setCanvasPreset] = useState<CanvasPreset>(DEFAULT_PRESET);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
   const currentPage = pages[currentPageIndex];
@@ -145,6 +146,8 @@ const Index = () => {
         onAddShape={handleAddShape}
         onAddImage={handleAddImage}
         onApplyTemplate={handleApplyTemplate}
+        currentPreset={canvasPreset}
+        onChangePreset={setCanvasPreset}
       />
       <div className="flex-1 flex overflow-hidden">
         <PageSidebar
@@ -158,6 +161,7 @@ const Index = () => {
           page={currentPage}
           selectedId={selectedId}
           editingId={editingId}
+          canvasPreset={canvasPreset}
           onSelectElement={setSelectedId}
           onUpdateElement={handleUpdateElement}
           onDoubleClickElement={handleDoubleClick}

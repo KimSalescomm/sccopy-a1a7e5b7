@@ -9,14 +9,18 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { TEMPLATES } from '@/lib/templates';
 
+import { CANVAS_PRESETS, type CanvasPreset } from '@/types/design';
+
 interface ToolbarProps {
   onAddText: () => void;
   onAddShape: (shape: 'rectangle' | 'circle') => void;
   onAddImage: () => void;
   onApplyTemplate: (templateId: string) => void;
+  currentPreset: CanvasPreset;
+  onChangePreset: (preset: CanvasPreset) => void;
 }
 
-export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate }: ToolbarProps) {
+export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, currentPreset, onChangePreset }: ToolbarProps) {
   return (
     <header className="h-12 border-b bg-card flex items-center px-3 gap-1">
       <div className="flex items-center gap-2 mr-3">
@@ -79,7 +83,25 @@ export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate }: 
 
       <div className="flex-1" />
 
-      <span className="text-[10px] text-muted-foreground hidden md:inline">1080 × 1350 (4:5)</span>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="text-xs gap-1.5 h-7">
+            {currentPreset.width} × {currentPreset.height} ({currentPreset.ratio})
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {CANVAS_PRESETS.map(p => (
+            <DropdownMenuItem
+              key={p.id}
+              onClick={() => onChangePreset(p)}
+              className={p.id === currentPreset.id ? 'bg-accent' : ''}
+            >
+              <span className="text-xs font-medium mr-2">{p.ratio}</span>
+              <span className="text-[10px] text-muted-foreground">{p.label} ({p.width}×{p.height})</span>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   );
 }
