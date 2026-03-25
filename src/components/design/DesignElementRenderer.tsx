@@ -25,6 +25,7 @@ export function DesignElementRenderer({
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number; handle: string } | null>(null);
   const isEditing = editingId === element.id;
   const [analysisErrors, setAnalysisErrors] = useState<AnalysisError[]>([]);
+  const [showCorrections, setShowCorrections] = useState(false);
 
   // Analyze text for writing errors
   useEffect(() => {
