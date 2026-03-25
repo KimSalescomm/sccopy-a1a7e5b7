@@ -1,12 +1,12 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import type { Page, DesignElement } from '@/types/design';
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from '@/types/design';
+import type { Page, DesignElement, CanvasPreset } from '@/types/design';
 import { DesignElementRenderer } from './DesignElementRenderer';
 
 interface CanvasProps {
   page: Page;
   selectedId: string | null;
   editingId: string | null;
+  canvasPreset: CanvasPreset;
   onSelectElement: (id: string | null) => void;
   onUpdateElement: (id: string, updates: Partial<DesignElement>) => void;
   onDoubleClickElement: (id: string) => void;
