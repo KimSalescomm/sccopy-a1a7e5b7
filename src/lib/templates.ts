@@ -1,10 +1,12 @@
 import { type Template, type Page, createId } from '@/types/design';
 
 export const TEMPLATES: Template[] = [
+  // ─── 기본 (세일즈톡) ───
   {
-    id: 'cover-bold',
-    name: '표지 — 볼드',
-    description: '큰 제목과 부제목이 중앙 배치된 표지',
+    id: 'basic-cover',
+    category: 'basic',
+    name: '표지',
+    description: '키 비주얼 + Key Claim 표지',
     thumbnail: '📰',
     pages: [
       {
@@ -16,18 +18,23 @@ export const TEMPLATES: Template[] = [
             shapeStyle: { fill: '#1a1a2e', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
           },
           {
+            id: createId(), type: 'text', position: { x: 60, y: 60 }, size: { width: 960, height: 50 },
+            rotation: 0, locked: false, text: '사내교육용 / 대외비',
+            textStyle: { fontSize: 22, fontWeight: 400, color: '#ff6b6b', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Pretendard' },
+          },
+          {
             id: createId(), type: 'shape', position: { x: 60, y: 520 }, size: { width: 960, height: 4 },
             rotation: 0, locked: false, shapeType: 'rectangle',
             shapeStyle: { fill: '#ffffff', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 0.3 },
           },
           {
             id: createId(), type: 'text', position: { x: 60, y: 540 }, size: { width: 960, height: 200 },
-            rotation: 0, locked: false, text: '카드뉴스\n제목을 입력하세요',
+            rotation: 0, locked: false, text: 'KEY VISUAL\n제품명을 입력하세요',
             textStyle: { fontSize: 72, fontWeight: 700, color: '#ffffff', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Pretendard' },
           },
           {
             id: createId(), type: 'text', position: { x: 60, y: 780 }, size: { width: 960, height: 80 },
-            rotation: 0, locked: false, text: '부제목 또는 날짜를 입력하세요',
+            rotation: 0, locked: false, text: 'Key Claim을 입력하세요',
             textStyle: { fontSize: 32, fontWeight: 300, color: '#aaaacc', textAlign: 'left', lineHeight: 1.5, fontFamily: 'Pretendard' },
           },
         ],
@@ -36,9 +43,10 @@ export const TEMPLATES: Template[] = [
     ],
   },
   {
-    id: 'content-clean',
-    name: '본문 — 클린',
-    description: '제목 + 본문 + 이미지 영역이 깔끔하게 배치',
+    id: 'basic-usp',
+    category: 'basic',
+    name: 'USP 본문',
+    description: 'USP 포인트 3개 정리 레이아웃',
     thumbnail: '📝',
     pages: [
       {
@@ -46,7 +54,7 @@ export const TEMPLATES: Template[] = [
         elements: [
           {
             id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 80 },
-            rotation: 0, locked: false, text: '제목을 입력하세요',
+            rotation: 0, locked: false, text: 'USP 핵심 포인트',
             textStyle: { fontSize: 52, fontWeight: 700, color: '#1a1a1a', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Pretendard' },
           },
           {
@@ -55,14 +63,19 @@ export const TEMPLATES: Template[] = [
             shapeStyle: { fill: '#4361ee', borderRadius: 2, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
           },
           {
-            id: createId(), type: 'shape', position: { x: 80, y: 220 }, size: { width: 920, height: 520 },
-            rotation: 0, locked: false, shapeType: 'rectangle',
-            shapeStyle: { fill: '#f0f0f5', borderRadius: 16, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
+            id: createId(), type: 'text', position: { x: 80, y: 230 }, size: { width: 920, height: 100 },
+            rotation: 0, locked: false, text: '① USP #1 제목\n설명을 입력하세요',
+            textStyle: { fontSize: 34, fontWeight: 500, color: '#333333', textAlign: 'left', lineHeight: 1.6, fontFamily: 'Pretendard' },
           },
           {
-            id: createId(), type: 'text', position: { x: 80, y: 800 }, size: { width: 920, height: 400 },
-            rotation: 0, locked: false, text: '본문 내용을 입력하세요.\n\n고객이 쉽게 이해할 수 있는 문장으로 작성해보세요.',
-            textStyle: { fontSize: 34, fontWeight: 400, color: '#333333', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Pretendard' },
+            id: createId(), type: 'text', position: { x: 80, y: 400 }, size: { width: 920, height: 100 },
+            rotation: 0, locked: false, text: '② USP #2 제목\n설명을 입력하세요',
+            textStyle: { fontSize: 34, fontWeight: 500, color: '#333333', textAlign: 'left', lineHeight: 1.6, fontFamily: 'Pretendard' },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 570 }, size: { width: 920, height: 100 },
+            rotation: 0, locked: false, text: '③ USP #3 제목\n설명을 입력하세요',
+            textStyle: { fontSize: 34, fontWeight: 500, color: '#333333', textAlign: 'left', lineHeight: 1.6, fontFamily: 'Pretendard' },
           },
         ],
         background: { type: 'solid', color: '#ffffff' },
@@ -70,44 +83,53 @@ export const TEMPLATES: Template[] = [
     ],
   },
   {
-    id: 'content-highlight',
-    name: '본문 — 강조',
-    description: '숫자/핵심 메시지를 크게 강조하는 레이아웃',
-    thumbnail: '💡',
+    id: 'basic-compare',
+    category: 'basic',
+    name: '비교/가격표',
+    description: '비교 데이터 또는 가격표 삽입용',
+    thumbnail: '📊',
     pages: [
       {
         id: createId(),
         elements: [
           {
-            id: createId(), type: 'text', position: { x: 80, y: 120 }, size: { width: 920, height: 60 },
-            rotation: 0, locked: false, text: '핵심 포인트',
-            textStyle: { fontSize: 28, fontWeight: 600, color: '#4361ee', textAlign: 'center', lineHeight: 1.5, fontFamily: 'Pretendard' },
+            id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 80 },
+            rotation: 0, locked: false, text: '비교 / 가격표',
+            textStyle: { fontSize: 48, fontWeight: 700, color: '#1a1a1a', textAlign: 'center', lineHeight: 1.3, fontFamily: 'Pretendard' },
           },
           {
-            id: createId(), type: 'text', position: { x: 80, y: 300 }, size: { width: 920, height: 250 },
-            rotation: 0, locked: false, text: '핵심 숫자나\n메시지를 입력',
-            textStyle: { fontSize: 96, fontWeight: 800, color: '#1a1a1a', textAlign: 'center', lineHeight: 1.2, fontFamily: 'Pretendard' },
-          },
-          {
-            id: createId(), type: 'shape', position: { x: 340, y: 590 }, size: { width: 400, height: 4 },
+            id: createId(), type: 'shape', position: { x: 80, y: 200 }, size: { width: 440, height: 500 },
             rotation: 0, locked: false, shapeType: 'rectangle',
-            shapeStyle: { fill: '#4361ee', borderRadius: 2, borderWidth: 0, borderColor: 'transparent', opacity: 0.5 },
+            shapeStyle: { fill: '#f0f0f5', borderRadius: 16, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
           },
           {
-            id: createId(), type: 'text', position: { x: 100, y: 660 }, size: { width: 880, height: 400 },
-            rotation: 0, locked: false, text: '부연 설명을 입력하세요.\n고객에게 왜 이 숫자가 중요한지 알려주세요.',
-            textStyle: { fontSize: 32, fontWeight: 400, color: '#666666', textAlign: 'center', lineHeight: 1.7, fontFamily: 'Pretendard' },
+            id: createId(), type: 'text', position: { x: 100, y: 220 }, size: { width: 400, height: 460 },
+            rotation: 0, locked: false, text: '항목 A\n\n• 사양 1\n• 사양 2\n• 사양 3\n\n가격: ₩0,000,000',
+            textStyle: { fontSize: 28, fontWeight: 400, color: '#333333', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Pretendard' },
+          },
+          {
+            id: createId(), type: 'shape', position: { x: 560, y: 200 }, size: { width: 440, height: 500 },
+            rotation: 0, locked: false, shapeType: 'rectangle',
+            shapeStyle: { fill: '#4361ee', borderRadius: 16, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 580, y: 220 }, size: { width: 400, height: 460 },
+            rotation: 0, locked: false, text: '항목 B (추천)\n\n• 사양 1\n• 사양 2\n• 사양 3\n\n가격: ₩0,000,000',
+            textStyle: { fontSize: 28, fontWeight: 400, color: '#ffffff', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Pretendard' },
           },
         ],
-        background: { type: 'solid', color: '#fafafa' },
+        background: { type: 'solid', color: '#ffffff' },
       },
     ],
   },
+
+  // ─── 이슈 (카드형) ───
   {
-    id: 'closing',
-    name: '마무리',
-    description: 'CTA와 마무리 메시지',
-    thumbnail: '🎯',
+    id: 'issue-card-1',
+    category: 'issueCard',
+    name: '이슈 카드 1장',
+    description: '이슈 포인트 + 데이터 + 결론',
+    thumbnail: '🃏',
     pages: [
       {
         id: createId(),
@@ -115,30 +137,246 @@ export const TEMPLATES: Template[] = [
           {
             id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1080, height: 1350 },
             rotation: 0, locked: true, shapeType: 'rectangle',
-            shapeStyle: { fill: '#4361ee', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
+            shapeStyle: { fill: '#0f172a', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
           },
           {
-            id: createId(), type: 'text', position: { x: 80, y: 450 }, size: { width: 920, height: 180 },
-            rotation: 0, locked: false, text: '지금 바로\n시작하세요',
-            textStyle: { fontSize: 80, fontWeight: 700, color: '#ffffff', textAlign: 'center', lineHeight: 1.3, fontFamily: 'Pretendard' },
+            id: createId(), type: 'text', position: { x: 80, y: 100 }, size: { width: 920, height: 60 },
+            rotation: 0, locked: false, text: 'ISSUE',
+            textStyle: { fontSize: 24, fontWeight: 600, color: '#f59e0b', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Pretendard' },
           },
           {
-            id: createId(), type: 'text', position: { x: 140, y: 680 }, size: { width: 800, height: 80 },
-            rotation: 0, locked: false, text: 'CTA 또는 연락처를 입력하세요',
-            textStyle: { fontSize: 30, fontWeight: 400, color: '#ffffffcc', textAlign: 'center', lineHeight: 1.5, fontFamily: 'Pretendard' },
+            id: createId(), type: 'text', position: { x: 80, y: 170 }, size: { width: 920, height: 120 },
+            rotation: 0, locked: false, text: '이슈 제목을\n입력하세요',
+            textStyle: { fontSize: 56, fontWeight: 700, color: '#ffffff', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Pretendard' },
           },
           {
-            id: createId(), type: 'shape', position: { x: 340, y: 820 }, size: { width: 400, height: 70 },
+            id: createId(), type: 'text', position: { x: 80, y: 320 }, size: { width: 920, height: 60 },
+            rotation: 0, locked: false, text: '핵심 요약 1~2줄을 입력하세요',
+            textStyle: { fontSize: 28, fontWeight: 400, color: '#94a3b8', textAlign: 'left', lineHeight: 1.5, fontFamily: 'Pretendard' },
+          },
+          {
+            id: createId(), type: 'shape', position: { x: 80, y: 420 }, size: { width: 920, height: 4 },
             rotation: 0, locked: false, shapeType: 'rectangle',
-            shapeStyle: { fill: '#ffffff', borderRadius: 35, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
+            shapeStyle: { fill: '#ffffff', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 0.1 },
           },
           {
-            id: createId(), type: 'text', position: { x: 340, y: 830 }, size: { width: 400, height: 50 },
-            rotation: 0, locked: false, text: '자세히 보기 →',
-            textStyle: { fontSize: 28, fontWeight: 600, color: '#4361ee', textAlign: 'center', lineHeight: 1.5, fontFamily: 'Pretendard' },
+            id: createId(), type: 'text', position: { x: 80, y: 460 }, size: { width: 920, height: 250 },
+            rotation: 0, locked: false, text: '• 이슈 포인트\n• 데이터 / 수치\n• 한 줄 결론',
+            textStyle: { fontSize: 32, fontWeight: 400, color: '#e2e8f0', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Pretendard' },
           },
         ],
-        background: { type: 'solid', color: '#4361ee' },
+        background: { type: 'solid', color: '#0f172a' },
+      },
+    ],
+  },
+  {
+    id: 'issue-card-3',
+    category: 'issueCard',
+    name: '이슈 카드 3장 세트',
+    description: '포인트/영향/대응 3장 구성',
+    thumbnail: '📇',
+    pages: [
+      {
+        id: createId(),
+        elements: [
+          {
+            id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1080, height: 1350 },
+            rotation: 0, locked: true, shapeType: 'rectangle',
+            shapeStyle: { fill: '#0f172a', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 50 },
+            rotation: 0, locked: false, text: 'CARD 1 — 이슈 포인트',
+            textStyle: { fontSize: 24, fontWeight: 600, color: '#f59e0b', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Pretendard' },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 160 }, size: { width: 920, height: 300 },
+            rotation: 0, locked: false, text: '• 이슈 포인트\n• 데이터 / 수치\n• 한 줄 결론',
+            textStyle: { fontSize: 36, fontWeight: 400, color: '#ffffff', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Pretendard' },
+          },
+        ],
+        background: { type: 'solid', color: '#0f172a' },
+      },
+      {
+        id: createId(),
+        elements: [
+          {
+            id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1080, height: 1350 },
+            rotation: 0, locked: true, shapeType: 'rectangle',
+            shapeStyle: { fill: '#0f172a', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 50 },
+            rotation: 0, locked: false, text: 'CARD 2 — 영향도',
+            textStyle: { fontSize: 24, fontWeight: 600, color: '#f59e0b', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Pretendard' },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 160 }, size: { width: 920, height: 300 },
+            rotation: 0, locked: false, text: '• 영향도 분석\n• 고객 Pain Point\n• 시나리오',
+            textStyle: { fontSize: 36, fontWeight: 400, color: '#ffffff', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Pretendard' },
+          },
+        ],
+        background: { type: 'solid', color: '#0f172a' },
+      },
+      {
+        id: createId(),
+        elements: [
+          {
+            id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1080, height: 1350 },
+            rotation: 0, locked: true, shapeType: 'rectangle',
+            shapeStyle: { fill: '#0f172a', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 50 },
+            rotation: 0, locked: false, text: 'CARD 3 — 대응 요약',
+            textStyle: { fontSize: 24, fontWeight: 600, color: '#f59e0b', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Pretendard' },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 160 }, size: { width: 920, height: 300 },
+            rotation: 0, locked: false, text: '• 대응 요약\n• 핵심 해결 키\n• 실행 계획',
+            textStyle: { fontSize: 36, fontWeight: 400, color: '#ffffff', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Pretendard' },
+          },
+        ],
+        background: { type: 'solid', color: '#0f172a' },
+      },
+    ],
+  },
+
+  // ─── 이슈 (일반) ───
+  {
+    id: 'issue-default-overview',
+    category: 'issueDefault',
+    name: '이슈 개요',
+    description: '배경/원인/영향 범위 정리',
+    thumbnail: '📋',
+    pages: [
+      {
+        id: createId(),
+        elements: [
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 80 },
+            rotation: 0, locked: false, text: '이슈 제목',
+            textStyle: { fontSize: 52, fontWeight: 700, color: '#1a1a1a', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Pretendard' },
+          },
+          {
+            id: createId(), type: 'shape', position: { x: 80, y: 180 }, size: { width: 120, height: 4 },
+            rotation: 0, locked: false, shapeType: 'rectangle',
+            shapeStyle: { fill: '#e11d48', borderRadius: 2, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 220 }, size: { width: 920, height: 700 },
+            rotation: 0, locked: false, text: '■ 이슈 개요\n\n배경:\n\n원인:\n\n영향 범위:',
+            textStyle: { fontSize: 32, fontWeight: 400, color: '#333333', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Pretendard' },
+          },
+        ],
+        background: { type: 'solid', color: '#ffffff' },
+      },
+    ],
+  },
+  {
+    id: 'issue-default-analysis',
+    category: 'issueDefault',
+    name: '세부 분석 + 대응',
+    description: '원인/고객/시장 분석 + 전략',
+    thumbnail: '🔍',
+    pages: [
+      {
+        id: createId(),
+        elements: [
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 80 },
+            rotation: 0, locked: false, text: '세부 분석',
+            textStyle: { fontSize: 48, fontWeight: 700, color: '#1a1a1a', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Pretendard' },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 180 }, size: { width: 920, height: 500 },
+            rotation: 0, locked: false, text: '1) 원인 분석\n2) 고객 영향\n3) 제품 영향\n4) 시장/경쟁 영향',
+            textStyle: { fontSize: 32, fontWeight: 400, color: '#333333', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Pretendard' },
+          },
+          {
+            id: createId(), type: 'shape', position: { x: 80, y: 720 }, size: { width: 920, height: 4 },
+            rotation: 0, locked: false, shapeType: 'rectangle',
+            shapeStyle: { fill: '#e11d48', borderRadius: 2, borderWidth: 0, borderColor: 'transparent', opacity: 0.5 },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 760 }, size: { width: 920, height: 400 },
+            rotation: 0, locked: false, text: '■ 대응 전략\n• 단기 전략:\n• 중기 전략:\n• 장기 전략:\n\n■ 기대 효과\n• 개선 포인트:',
+            textStyle: { fontSize: 30, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Pretendard' },
+          },
+        ],
+        background: { type: 'solid', color: '#ffffff' },
+      },
+    ],
+  },
+
+  // ─── 심화 ───
+  {
+    id: 'deep-cover',
+    category: 'deep',
+    name: '심화 표지',
+    description: '문서 제목/버전/목차 표지',
+    thumbnail: '📘',
+    pages: [
+      {
+        id: createId(),
+        elements: [
+          {
+            id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1080, height: 1350 },
+            rotation: 0, locked: true, shapeType: 'rectangle',
+            shapeStyle: { fill: '#1e293b', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
+          },
+          {
+            id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 8, height: 1350 },
+            rotation: 0, locked: true, shapeType: 'rectangle',
+            shapeStyle: { fill: '#3b82f6', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 300 }, size: { width: 920, height: 180 },
+            rotation: 0, locked: false, text: '심화 콘텐츠\n문서 제목',
+            textStyle: { fontSize: 64, fontWeight: 700, color: '#ffffff', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Pretendard' },
+          },
+          {
+            id: createId(), type: 'shape', position: { x: 80, y: 510 }, size: { width: 200, height: 4 },
+            rotation: 0, locked: false, shapeType: 'rectangle',
+            shapeStyle: { fill: '#3b82f6', borderRadius: 2, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 550 }, size: { width: 920, height: 400 },
+            rotation: 0, locked: false, text: '버전: v1.0\n작성일: 2025.01.01\n작성자:\n\n목차:\n1. 서론\n2. 본론\n3. 전략 제안\n4. 결론',
+            textStyle: { fontSize: 28, fontWeight: 400, color: '#94a3b8', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Pretendard' },
+          },
+        ],
+        background: { type: 'solid', color: '#1e293b' },
+      },
+    ],
+  },
+  {
+    id: 'deep-body',
+    category: 'deep',
+    name: '심화 본문',
+    description: '서론/본론/전략/결론 구조',
+    thumbnail: '📗',
+    pages: [
+      {
+        id: createId(),
+        elements: [
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 80 },
+            rotation: 0, locked: false, text: '1. 서론',
+            textStyle: { fontSize: 48, fontWeight: 700, color: '#1e293b', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Pretendard' },
+          },
+          {
+            id: createId(), type: 'shape', position: { x: 80, y: 170 }, size: { width: 60, height: 4 },
+            rotation: 0, locked: false, shapeType: 'rectangle',
+            shapeStyle: { fill: '#3b82f6', borderRadius: 2, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
+          },
+          {
+            id: createId(), type: 'text', position: { x: 80, y: 210 }, size: { width: 920, height: 900 },
+            rotation: 0, locked: false, text: '배경:\n\n문제 정의:\n\n\n2. 본론\n\n2-1. 분석\n2-2. 데이터/도표/사례\n2-3. 핵심 인사이트\n\n\n3. 전략 제안\n• 전략 1:\n• 전략 2:\n• 전략 3:\n\n\n4. 결론\n• 전체 요약\n• 실행 시나리오\n• 기대효과',
+            textStyle: { fontSize: 28, fontWeight: 400, color: '#333333', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Pretendard' },
+          },
+        ],
+        background: { type: 'solid', color: '#ffffff' },
       },
     ],
   },
@@ -147,7 +385,6 @@ export const TEMPLATES: Template[] = [
 export function getTemplatePages(templateId: string): Page[] {
   const template = TEMPLATES.find(t => t.id === templateId);
   if (!template) return [];
-  // Deep clone to avoid reference issues
   return JSON.parse(JSON.stringify(template.pages)).map((p: Page) => ({
     ...p,
     id: createId(),
