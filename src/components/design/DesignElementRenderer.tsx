@@ -1,8 +1,10 @@
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import type { DesignElement, Position, Size } from '@/types/design';
 import { analyzeText, type AnalysisError } from '@/lib/analysis-engine';
+import { correctText, type CorrectionChange } from '@/lib/ai-correction';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Wand2 } from 'lucide-react';
+import { AlertTriangle, Wand2, Loader2, Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface DesignElementRendererProps {
   element: DesignElement;
