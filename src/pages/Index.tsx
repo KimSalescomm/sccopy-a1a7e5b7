@@ -161,6 +161,7 @@ const Index = () => {
           page={currentPage}
           selectedId={selectedId}
           editingId={editingId}
+          canvasPreset={canvasPreset}
           onSelectElement={setSelectedId}
           onUpdateElement={handleUpdateElement}
           onDoubleClickElement={handleDoubleClick}
