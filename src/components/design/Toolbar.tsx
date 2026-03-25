@@ -9,11 +9,15 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { TEMPLATES } from '@/lib/templates';
 
+import { CANVAS_PRESETS, type CanvasPreset } from '@/types/design';
+
 interface ToolbarProps {
   onAddText: () => void;
   onAddShape: (shape: 'rectangle' | 'circle') => void;
   onAddImage: () => void;
   onApplyTemplate: (templateId: string) => void;
+  currentPreset: CanvasPreset;
+  onChangePreset: (preset: CanvasPreset) => void;
 }
 
 export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate }: ToolbarProps) {
