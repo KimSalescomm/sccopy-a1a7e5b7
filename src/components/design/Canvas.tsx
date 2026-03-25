@@ -15,7 +15,7 @@ interface CanvasProps {
 }
 
 export function Canvas({
-  page, selectedId, editingId,
+  page, selectedId, editingId, canvasPreset,
   onSelectElement, onUpdateElement, onDoubleClickElement,
   onTextChange, onFinishEditing,
 }: CanvasProps) {
