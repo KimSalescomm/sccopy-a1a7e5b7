@@ -47,37 +47,39 @@ export function Canvas({
   return (
     <div
       ref={containerRef}
-      className="flex-1 flex items-center justify-center overflow-hidden bg-muted/30"
+      className="flex-1 overflow-auto bg-muted/30"
       onClick={() => onSelectElement(null)}
     >
-      <div
-        className="relative shadow-2xl"
-        style={{
-          width: canvasPreset.width,
-          height: canvasPreset.height,
-          transform: `scale(${scale})`,
-          transformOrigin: 'center center',
-          ...bgStyle,
-        }}
-        onClick={e => e.stopPropagation()}
-        onMouseDown={e => {
-          if (e.target === e.currentTarget) onSelectElement(null);
-        }}
-      >
-        {page.elements.map(el => (
-          <DesignElementRenderer
-            key={el.id}
-            element={el}
-            selected={selectedId === el.id}
-            scale={scale}
-            onSelect={onSelectElement}
-            onUpdate={onUpdateElement}
-            onDoubleClick={onDoubleClickElement}
-            editingId={editingId}
-            onTextChange={onTextChange}
-            onFinishEditing={onFinishEditing}
-          />
-        ))}
+      <div className="min-w-max min-h-full flex items-center justify-center p-6">
+        <div
+          className="relative shadow-2xl flex-shrink-0"
+          style={{
+            width: canvasPreset.width,
+            height: canvasPreset.height,
+            transform: `scale(${scale})`,
+            transformOrigin: 'center center',
+            ...bgStyle,
+          }}
+          onClick={e => e.stopPropagation()}
+          onMouseDown={e => {
+            if (e.target === e.currentTarget) onSelectElement(null);
+          }}
+        >
+          {page.elements.map(el => (
+            <DesignElementRenderer
+              key={el.id}
+              element={el}
+              selected={selectedId === el.id}
+              scale={scale}
+              onSelect={onSelectElement}
+              onUpdate={onUpdateElement}
+              onDoubleClick={onDoubleClickElement}
+              editingId={editingId}
+              onTextChange={onTextChange}
+              onFinishEditing={onFinishEditing}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
