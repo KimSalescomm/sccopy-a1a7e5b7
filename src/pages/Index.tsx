@@ -146,6 +146,8 @@ const Index = () => {
         onAddShape={handleAddShape}
         onAddImage={handleAddImage}
         onApplyTemplate={handleApplyTemplate}
+        currentPreset={canvasPreset}
+        onChangePreset={setCanvasPreset}
       />
       <div className="flex-1 flex overflow-hidden">
         <PageSidebar

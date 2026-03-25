@@ -53,8 +53,8 @@ export function Canvas({
       <div
         className="relative shadow-2xl"
         style={{
-          width: CANVAS_WIDTH,
-          height: CANVAS_HEIGHT,
+          width: canvasPreset.width,
+          height: canvasPreset.height,
           transform: `scale(${scale})`,
           transformOrigin: 'center center',
           ...bgStyle,
