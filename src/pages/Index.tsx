@@ -13,6 +13,7 @@ const Index = () => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [canvasPreset, setCanvasPreset] = useState<CanvasPreset>(DEFAULT_PRESET);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
   const currentPage = pages[currentPageIndex];
