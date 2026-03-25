@@ -83,7 +83,25 @@ export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, cu
 
       <div className="flex-1" />
 
-      <span className="text-[10px] text-muted-foreground hidden md:inline">1080 × 1350 (4:5)</span>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="text-xs gap-1.5 h-7">
+            {currentPreset.width} × {currentPreset.height} ({currentPreset.ratio})
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {CANVAS_PRESETS.map(p => (
+            <DropdownMenuItem
+              key={p.id}
+              onClick={() => onChangePreset(p)}
+              className={p.id === currentPreset.id ? 'bg-accent' : ''}
+            >
+              <span className="text-xs font-medium mr-2">{p.ratio}</span>
+              <span className="text-[10px] text-muted-foreground">{p.label} ({p.width}×{p.height})</span>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   );
 }

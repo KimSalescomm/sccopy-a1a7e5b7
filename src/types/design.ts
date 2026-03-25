@@ -67,9 +67,30 @@ export interface Template {
   pages: Page[];
 }
 
-// Canvas constants
-export const CANVAS_WIDTH = 1080;
-export const CANVAS_HEIGHT = 1350;
+// Canvas presets
+export interface CanvasPreset {
+  id: string;
+  label: string;
+  width: number;
+  height: number;
+  ratio: string;
+}
+
+export const CANVAS_PRESETS: CanvasPreset[] = [
+  { id: '1:1', label: '1:1 정사각형', width: 1080, height: 1080, ratio: '1:1' },
+  { id: '3:4', label: '3:4 세로형', width: 1080, height: 1440, ratio: '3:4' },
+  { id: '4:3', label: '4:3 가로형', width: 1440, height: 1080, ratio: '4:3' },
+  { id: '4:5', label: '4:5 세로형', width: 1080, height: 1350, ratio: '4:5' },
+  { id: '5:4', label: '5:4 가로형', width: 1350, height: 1080, ratio: '5:4' },
+  { id: '9:16', label: '9:16 세로형', width: 1080, height: 1920, ratio: '9:16' },
+  { id: '16:9', label: '16:9 가로형', width: 1920, height: 1080, ratio: '16:9' },
+];
+
+export const DEFAULT_PRESET = CANVAS_PRESETS[2]; // 3:4
+
+// Legacy constants for compatibility
+export const CANVAS_WIDTH = DEFAULT_PRESET.width;
+export const CANVAS_HEIGHT = DEFAULT_PRESET.height;
 
 export function createId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
