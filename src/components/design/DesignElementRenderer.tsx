@@ -1,9 +1,8 @@
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import type { DesignElement, Position, Size } from '@/types/design';
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from '@/types/design';
 import { analyzeText, type AnalysisError } from '@/lib/analysis-engine';
-import { Badge } from '@/components/ui/badge';
-import { AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, Wand2 } from 'lucide-react';
 
 interface DesignElementRendererProps {
   element: DesignElement;
