@@ -28,6 +28,9 @@ export function DesignElementRenderer({
   const isEditing = editingId === element.id;
   const [analysisErrors, setAnalysisErrors] = useState<AnalysisError[]>([]);
   const [showCorrections, setShowCorrections] = useState(false);
+  const [isCorrectingAI, setIsCorrectingAI] = useState(false);
+  const [aiChanges, setAiChanges] = useState<CorrectionChange[]>([]);
+  const [aiCorrected, setAiCorrected] = useState<string | null>(null);
 
   // Analyze text for writing errors
   useEffect(() => {
