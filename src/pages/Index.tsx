@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
-import type { Page, DesignElement } from '@/types/design';
-import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId } from '@/types/design';
+import type { Page, DesignElement, CanvasPreset } from '@/types/design';
+import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId, DEFAULT_PRESET } from '@/types/design';
 import { getTemplatePages } from '@/lib/templates';
 import { Toolbar } from '@/components/design/Toolbar';
 import { PageSidebar } from '@/components/design/PageSidebar';
