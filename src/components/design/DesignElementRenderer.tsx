@@ -1,9 +1,8 @@
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import type { DesignElement, Position, Size } from '@/types/design';
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from '@/types/design';
 import { analyzeText, type AnalysisError } from '@/lib/analysis-engine';
-import { Badge } from '@/components/ui/badge';
-import { AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, Wand2 } from 'lucide-react';
 
 interface DesignElementRendererProps {
   element: DesignElement;
@@ -26,6 +25,7 @@ export function DesignElementRenderer({
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number; handle: string } | null>(null);
   const isEditing = editingId === element.id;
   const [analysisErrors, setAnalysisErrors] = useState<AnalysisError[]>([]);
+  const [showCorrections, setShowCorrections] = useState(false);
 
   // Analyze text for writing errors
   useEffect(() => {
@@ -139,19 +139,62 @@ export function DesignElementRenderer({
             <textarea
               autoFocus
               value={element.text ?? ''}
-              onChange={e => onTextChange(element.id, e.target.value)}
-              onBlur={onFinishEditing}
-              onKeyDown={e => { if (e.key === 'Escape') onFinishEditing(); }}
+              onChange={e => { onTextChange(element.id, e.target.value); setShowCorrections(false); }}
+              onKeyDown={e => { if (e.key === 'Escape') { onFinishEditing(); setShowCorrections(false); } }}
               style={style}
               className="cursor-text"
             />
-            {analysisErrors.length > 0 && (
+
+            {/* 첨삭 버튼 */}
+            <div className="absolute right-0 flex items-center gap-1 z-50" style={{ top: -36 }}>
+              {analysisErrors.length > 0 && (
+                <button
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium shadow-md transition-all ${
+                    showCorrections
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-card border text-foreground hover:bg-accent'
+                  }`}
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => setShowCorrections(!showCorrections)}
+                >
+                  <Wand2 className="w-3 h-3" />
+                  첨삭 ({analysisErrors.length})
+                </button>
+              )}
+            </div>
+
+            {/* 대체어 버튼들 - 텍스트 위에 표시 */}
+            {showCorrections && analysisErrors.length > 0 && (
               <div
-                className="absolute left-0 flex items-center gap-1 px-2 py-1 rounded-md bg-warning/90 text-warning-foreground shadow-lg z-50"
-                style={{ bottom: -32, fontSize: 12 }}
+                className="absolute left-0 right-0 flex flex-wrap gap-1.5 z-50 p-2 rounded-lg bg-card/95 backdrop-blur-sm border shadow-xl overflow-y-auto"
+                style={{ bottom: '100%', marginBottom: 4, maxHeight: 200 }}
+                onMouseDown={e => e.preventDefault()}
               >
-                <AlertTriangle className="w-3 h-3" />
-                <span>{analysisErrors.length}개 글쓰기 오류</span>
+                {analysisErrors.map((err, i) => (
+                  <div key={i} className="flex items-center gap-1 flex-wrap">
+                    <span
+                      className="inline-flex items-center px-2 py-1 rounded text-xs line-through opacity-60"
+                      style={{ backgroundColor: err.severity === 'error' ? 'hsl(var(--destructive) / 0.15)' : 'hsl(var(--warning) / 0.15)' }}
+                    >
+                      {err.original}
+                    </span>
+                    <span className="text-muted-foreground text-xs">→</span>
+                    {err.suggestions.map((s, j) => (
+                      <button
+                        key={j}
+                        className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-colors border border-primary/20"
+                        onClick={() => {
+                          if (element.text) {
+                            onTextChange(element.id, element.text.replace(err.original, s));
+                          }
+                        }}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                    {i < analysisErrors.length - 1 && <div className="w-px h-4 bg-border mx-1" />}
+                  </div>
+                ))}
               </div>
             )}
           </div>
