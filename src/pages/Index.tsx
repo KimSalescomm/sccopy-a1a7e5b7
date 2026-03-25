@@ -1,133 +1,182 @@
-import { useState, useMemo, useCallback } from 'react';
-import { analyzeText, type AnalysisError } from '@/lib/analysis-engine';
-import { ScoreGauge } from '@/components/ScoreGauge';
-import { ErrorCard } from '@/components/ErrorCard';
-import { CategoryStats } from '@/components/CategoryStats';
-import { FileText, Sparkles, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-
-const SAMPLE_TEXT = `LG전자는 업계 최초로 스마트 온도 감지 자동 제어 기능을 탑재했습니다.
-전원 버튼을 눌러 기동합니다.
-완벽하게 세척할수있습니다.
-몇일 안에 배송됩니다.`;
+import { useState, useCallback, useRef } from 'react';
+import type { Page, DesignElement } from '@/types/design';
+import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId } from '@/types/design';
+import { getTemplatePages } from '@/lib/templates';
+import { Toolbar } from '@/components/design/Toolbar';
+import { PageSidebar } from '@/components/design/PageSidebar';
+import { Canvas } from '@/components/design/Canvas';
+import { PropertiesPanel } from '@/components/design/PropertiesPanel';
+import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
-  const [text, setText] = useState('');
+  const [pages, setPages] = useState<Page[]>([createDefaultPage()]);
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const result = useMemo(() => analyzeText(text), [text]);
+  const currentPage = pages[currentPageIndex];
+  const selectedElement = currentPage?.elements.find(e => e.id === selectedId) ?? null;
 
-  const handleApplySuggestion = useCallback((error: AnalysisError, suggestion: string) => {
-    setText(prev => prev.replace(error.original, suggestion));
+  const updatePage = useCallback((index: number, updater: (page: Page) => Page) => {
+    setPages(prev => prev.map((p, i) => i === index ? updater(p) : p));
   }, []);
 
-  const handleLoadSample = () => setText(SAMPLE_TEXT);
-  const handleClear = () => setText('');
+  const handleUpdateElement = useCallback((id: string, updates: Partial<DesignElement>) => {
+    updatePage(currentPageIndex, page => ({
+      ...page,
+      elements: page.elements.map(e => e.id === id ? { ...e, ...updates } as DesignElement : e),
+    }));
+  }, [currentPageIndex, updatePage]);
+
+  const handleDeleteElement = useCallback((id: string) => {
+    updatePage(currentPageIndex, page => ({
+      ...page,
+      elements: page.elements.filter(e => e.id !== id),
+    }));
+    setSelectedId(null);
+  }, [currentPageIndex, updatePage]);
+
+  const handleAddText = useCallback(() => {
+    const el = createTextElement();
+    updatePage(currentPageIndex, page => ({ ...page, elements: [...page.elements, el] }));
+    setSelectedId(el.id);
+  }, [currentPageIndex, updatePage]);
+
+  const handleAddShape = useCallback((shape: 'rectangle' | 'circle') => {
+    const el = createShapeElement({
+      shapeType: shape,
+      shapeStyle: {
+        fill: '#e0e0e0',
+        borderRadius: shape === 'circle' ? 9999 : 16,
+        borderWidth: 0,
+        borderColor: '#ccc',
+        opacity: 1,
+      },
+    });
+    updatePage(currentPageIndex, page => ({ ...page, elements: [...page.elements, el] }));
+    setSelectedId(el.id);
+  }, [currentPageIndex, updatePage]);
+
+  const handleAddImage = useCallback(() => {
+    imageInputRef.current?.click();
+  }, []);
+
+  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const el = createImageElement(url);
+    updatePage(currentPageIndex, page => ({ ...page, elements: [...page.elements, el] }));
+    setSelectedId(el.id);
+    e.target.value = '';
+  }, [currentPageIndex, updatePage]);
+
+  const handleApplyTemplate = useCallback((templateId: string) => {
+    const templatePages = getTemplatePages(templateId);
+    if (templatePages.length === 0) return;
+
+    // Replace current page with template's first page
+    updatePage(currentPageIndex, () => templatePages[0]);
+
+    // Add additional template pages
+    if (templatePages.length > 1) {
+      setPages(prev => {
+        const newPages = [...prev];
+        for (let i = 1; i < templatePages.length; i++) {
+          newPages.splice(currentPageIndex + i, 0, templatePages[i]);
+        }
+        return newPages;
+      });
+    }
+
+    setSelectedId(null);
+    setEditingId(null);
+    toast({ title: '템플릿 적용 완료', description: '텍스트를 더블클릭하여 편집하세요.' });
+  }, [currentPageIndex, updatePage]);
+
+  const handleAddPage = useCallback(() => {
+    setPages(prev => [...prev, createDefaultPage()]);
+    setCurrentPageIndex(pages.length);
+    setSelectedId(null);
+  }, [pages.length]);
+
+  const handleDeletePage = useCallback((index: number) => {
+    if (pages.length <= 1) return;
+    setPages(prev => prev.filter((_, i) => i !== index));
+    setCurrentPageIndex(prev => Math.min(prev, pages.length - 2));
+    setSelectedId(null);
+  }, [pages.length]);
+
+  const handleDoubleClick = useCallback((id: string) => {
+    const el = currentPage?.elements.find(e => e.id === id);
+    if (el?.type === 'text') {
+      setEditingId(id);
+    }
+  }, [currentPage]);
+
+  const handleTextChange = useCallback((id: string, text: string) => {
+    handleUpdateElement(id, { text });
+  }, [handleUpdateElement]);
+
+  const handleFinishEditing = useCallback(() => {
+    setEditingId(null);
+  }, []);
+
+  const handleBgChange = useCallback((updates: any) => {
+    updatePage(currentPageIndex, page => ({
+      ...page,
+      background: { ...page.background, ...updates },
+    }));
+  }, [currentPageIndex, updatePage]);
+
+  // Keyboard shortcuts
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (editingId) return;
+    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
+      handleDeleteElement(selectedId);
+    }
+  }, [editingId, selectedId, handleDeleteElement]);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <FileText className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-base font-bold text-foreground">고객언어 글쓰기 분석기</h1>
-              <p className="text-[11px] text-muted-foreground">LG 고객언어 4원칙 기반 실시간 분석</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleLoadSample} className="text-xs">
-              <Sparkles className="w-3 h-3 mr-1" />
-              예시 불러오기
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 min-h-[calc(100vh-120px)]">
-          {/* Left: Editor */}
-          <div className="lg:col-span-3 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <ScoreGauge score={result.score} />
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-foreground">
-                    {text.trim() ? `${result.errors.length}개 항목 발견` : '텍스트를 입력해주세요'}
-                  </p>
-                  <CategoryStats stats={result.stats} />
-                </div>
-              </div>
-              {text && (
-                <Button variant="ghost" size="sm" onClick={handleClear} className="text-xs text-muted-foreground">
-                  <Trash2 className="w-3 h-3 mr-1" />
-                  지우기
-                </Button>
-              )}
-            </div>
-
-            <div className="relative">
-              <textarea
-                value={text}
-                onChange={e => setText(e.target.value)}
-                placeholder="고객에게 전달할 문장을 입력해주세요...&#10;&#10;예: 전원 버튼을 눌러 기동합니다."
-                className="w-full min-h-[400px] lg:min-h-[520px] rounded-xl border border-input bg-card p-5 text-base leading-8 text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 resize-none transition-shadow"
-                spellCheck={false}
-              />
-              <div className="absolute bottom-3 right-3 text-xs text-muted-foreground">
-                {text.length}자
-              </div>
-            </div>
-          </div>
-
-          {/* Right: Analysis Panel */}
-          <div className="lg:col-span-2 space-y-3">
-            <div className="sticky top-20">
-              <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                📋 분석 결과
-                {result.errors.length > 0 && (
-                  <span className="text-xs font-normal text-muted-foreground">
-                    ({result.errors.length}건)
-                  </span>
-                )}
-              </h2>
-
-              {result.errors.length === 0 && text.trim() && (
-                <div className="bg-success/5 border border-success/20 rounded-xl p-6 text-center space-y-2">
-                  <div className="text-3xl">🎉</div>
-                  <p className="text-sm font-medium text-success">완벽해요!</p>
-                  <p className="text-xs text-muted-foreground">고객언어 원칙에 맞는 글입니다.</p>
-                </div>
-              )}
-
-              {!text.trim() && (
-                <div className="border border-dashed rounded-xl p-8 text-center space-y-3">
-                  <div className="text-3xl">✍️</div>
-                  <p className="text-sm text-muted-foreground">
-                    왼쪽에 텍스트를 입력하면<br />실시간으로 분석 결과가 표시됩니다.
-                  </p>
-                  <Button variant="outline" size="sm" onClick={handleLoadSample} className="text-xs">
-                    예시 텍스트로 시작하기
-                  </Button>
-                </div>
-              )}
-
-              <div className="space-y-3 max-h-[calc(100vh-180px)] overflow-y-auto pr-1">
-                {result.errors.map(error => (
-                  <ErrorCard
-                    key={error.id}
-                    error={error}
-                    onApplySuggestion={handleApplySuggestion}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+    <div className="h-screen flex flex-col bg-background" onKeyDown={handleKeyDown} tabIndex={0}>
+      <Toolbar
+        onAddText={handleAddText}
+        onAddShape={handleAddShape}
+        onAddImage={handleAddImage}
+        onApplyTemplate={handleApplyTemplate}
+      />
+      <div className="flex-1 flex overflow-hidden">
+        <PageSidebar
+          pages={pages}
+          currentIndex={currentPageIndex}
+          onSelectPage={i => { setCurrentPageIndex(i); setSelectedId(null); setEditingId(null); }}
+          onAddPage={handleAddPage}
+          onDeletePage={handleDeletePage}
+        />
+        <Canvas
+          page={currentPage}
+          selectedId={selectedId}
+          editingId={editingId}
+          onSelectElement={setSelectedId}
+          onUpdateElement={handleUpdateElement}
+          onDoubleClickElement={handleDoubleClick}
+          onTextChange={handleTextChange}
+          onFinishEditing={handleFinishEditing}
+        />
+        <PropertiesPanel
+          element={selectedElement}
+          onUpdate={handleUpdateElement}
+          onDelete={handleDeleteElement}
+          bgColor={currentPage.background.color}
+          bgType={currentPage.background.type}
+          bgGradientFrom={currentPage.background.gradientFrom}
+          bgGradientTo={currentPage.background.gradientTo}
+          bgGradientDir={currentPage.background.gradientDirection}
+          onBgChange={handleBgChange}
+        />
+      </div>
+      <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
     </div>
   );
 };
