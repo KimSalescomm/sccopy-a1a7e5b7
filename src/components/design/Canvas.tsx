@@ -26,10 +26,10 @@ export function Canvas({
     if (!containerRef.current) return;
     const { clientWidth, clientHeight } = containerRef.current;
     const padding = 48;
-    const sx = (clientWidth - padding) / CANVAS_WIDTH;
-    const sy = (clientHeight - padding) / CANVAS_HEIGHT;
+    const sx = (clientWidth - padding) / canvasPreset.width;
+    const sy = (clientHeight - padding) / canvasPreset.height;
     setScale(Math.min(sx, sy, 1));
-  }, []);
+  }, [canvasPreset]);
 
   useEffect(() => {
     updateScale();
