@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import type { Page, DesignElement, CanvasPreset } from '@/types/design';
-import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId, DEFAULT_PRESET } from '@/types/design';
-import { getTemplatePages } from '@/lib/templates';
+import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId, DEFAULT_PRESET, CANVAS_PRESETS } from '@/types/design';
+import { getTemplatePages, getTemplatePresetId } from '@/lib/templates';
 import { Toolbar } from '@/components/design/Toolbar';
 import { PageSidebar } from '@/components/design/PageSidebar';
 import { Canvas } from '@/components/design/Canvas';
@@ -76,6 +76,13 @@ const Index = () => {
   const handleApplyTemplate = useCallback((templateId: string) => {
     const templatePages = getTemplatePages(templateId);
     if (templatePages.length === 0) return;
+
+    // Auto-switch canvas preset if template specifies one
+    const presetId = getTemplatePresetId(templateId);
+    if (presetId) {
+      const preset = CANVAS_PRESETS.find(p => p.id === presetId);
+      if (preset) setCanvasPreset(preset);
+    }
 
     // Replace current page with template's first page
     updatePage(currentPageIndex, () => templatePages[0]);

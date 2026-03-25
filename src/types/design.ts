@@ -80,6 +80,7 @@ export interface Template {
   name: string;
   description: string;
   thumbnail: string; // emoji
+  presetId?: string; // auto-switch canvas preset when applied
   pages: Page[];
 }
 
