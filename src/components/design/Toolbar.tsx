@@ -1,14 +1,18 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Type, Square, Circle, Image, LayoutTemplate, FileText } from 'lucide-react';
+import { Type, Square, Circle, Image, LayoutTemplate, FileText, ChevronRight } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu';
 import { TEMPLATES } from '@/lib/templates';
-
+import { TEMPLATE_CATEGORIES } from '@/types/design';
 import { CANVAS_PRESETS, type CanvasPreset } from '@/types/design';
 
 interface ToolbarProps {
@@ -39,16 +43,31 @@ export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, cu
             템플릿
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          {TEMPLATES.map(t => (
-            <DropdownMenuItem key={t.id} onClick={() => onApplyTemplate(t.id)}>
-              <span className="mr-2">{t.thumbnail}</span>
-              <div>
-                <div className="text-xs font-medium">{t.name}</div>
-                <div className="text-[10px] text-muted-foreground">{t.description}</div>
-              </div>
-            </DropdownMenuItem>
-          ))}
+        <DropdownMenuContent className="w-56">
+          {TEMPLATE_CATEGORIES.map(cat => {
+            const catTemplates = TEMPLATES.filter(t => t.category === cat.id);
+            return (
+              <DropdownMenuSub key={cat.id}>
+                <DropdownMenuSubTrigger className="gap-2">
+                  <span>{cat.emoji}</span>
+                  <span className="text-xs font-medium">{cat.label}</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent className="w-52">
+                    {catTemplates.map(t => (
+                      <DropdownMenuItem key={t.id} onClick={() => onApplyTemplate(t.id)}>
+                        <span className="mr-2">{t.thumbnail}</span>
+                        <div>
+                          <div className="text-xs font-medium">{t.name}</div>
+                          <div className="text-[10px] text-muted-foreground">{t.description}</div>
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+            );
+          })}
         </DropdownMenuContent>
       </DropdownMenu>
 

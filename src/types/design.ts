@@ -59,8 +59,24 @@ export interface Page {
   background: PageBackground;
 }
 
+export type TemplateCategory = 'basic' | 'issueCard' | 'issueDefault' | 'deep';
+
+export interface TemplateCategoryInfo {
+  id: TemplateCategory;
+  label: string;
+  emoji: string;
+}
+
+export const TEMPLATE_CATEGORIES: TemplateCategoryInfo[] = [
+  { id: 'basic', label: '기본 (세일즈톡)', emoji: '📄' },
+  { id: 'issueCard', label: '이슈 (카드형)', emoji: '🃏' },
+  { id: 'issueDefault', label: '이슈 (일반)', emoji: '📋' },
+  { id: 'deep', label: '심화', emoji: '📘' },
+];
+
 export interface Template {
   id: string;
+  category: TemplateCategory;
   name: string;
   description: string;
   thumbnail: string; // emoji
