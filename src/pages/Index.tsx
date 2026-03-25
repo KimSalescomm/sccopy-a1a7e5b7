@@ -77,6 +77,13 @@ const Index = () => {
     const templatePages = getTemplatePages(templateId);
     if (templatePages.length === 0) return;
 
+    // Auto-switch canvas preset if template specifies one
+    const presetId = getTemplatePresetId(templateId);
+    if (presetId) {
+      const preset = CANVAS_PRESETS.find(p => p.id === presetId);
+      if (preset) setCanvasPreset(preset);
+    }
+
     // Replace current page with template's first page
     updatePage(currentPageIndex, () => templatePages[0]);
 
