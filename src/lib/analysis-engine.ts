@@ -299,7 +299,7 @@ function detectSpacingErrors(text: string, errors: AnalysisError[]) {
 export function analyzeText(text: string): AnalysisResult {
   errorIdCounter = 0;
   if (!text.trim()) {
-    return { score: 100, errors: [], stats: { customer: 0, easy: 0, concise: 0, correct: 0 } };
+    return { score: 100, errors: [], stats: { customer: 0, easy: 0, concise: 0, correct: 0, benefit: 0 } };
   }
 
   const errors: AnalysisError[] = [];
