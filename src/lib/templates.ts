@@ -194,58 +194,44 @@ export const TEMPLATES: Template[] = [
   {
     id: 'issue-default-overview',
     category: 'issueDefault',
-    name: '이슈 개요',
-    description: '배경/원인/영향 범위 정리',
+    name: '이슈 일반',
+    description: '헤더 + 빈 본문 + 디스클레이머 (16:9)',
     thumbnail: '📋',
+    presetId: '16:9',
     pages: [
       {
         id: createId(),
         elements: [
-          // 좌측 컬러 바
-          { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 4, height: 1350 }, rotation: 0, locked: true, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          // 상단 라벨
-          { id: createId(), type: 'text', position: { x: 80, y: 60 }, size: { width: 200, height: 24 }, rotation: 0, locked: false, text: 'ISSUE OVERVIEW', textStyle: { fontSize: 11, fontWeight: 500, color: '#AAAAAA', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
-          // 제목
-          { id: createId(), type: 'text', position: { x: 80, y: 90 }, size: { width: 920, height: 60 }, rotation: 0, locked: false, text: '이슈 제목', textStyle: { fontSize: 36, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
-          // 구분선
-          { id: createId(), type: 'shape', position: { x: 80, y: 170 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          // 섹션 1 — 배경
-          { id: createId(), type: 'text', position: { x: 80, y: 200 }, size: { width: 120, height: 24 }, rotation: 0, locked: false, text: '배경', textStyle: { fontSize: 14, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 80, y: 232 }, size: { width: 920, height: 180 }, rotation: 0, locked: false, text: '이슈의 배경을 서술하세요.\n시장 상황, 고객 반응, 내부 요인 등을 포함합니다.', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Noto Sans KR' } },
-          // 섹션 2 — 원인
-          { id: createId(), type: 'text', position: { x: 80, y: 440 }, size: { width: 120, height: 24 }, rotation: 0, locked: false, text: '원인', textStyle: { fontSize: 14, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 80, y: 472 }, size: { width: 920, height: 180 }, rotation: 0, locked: false, text: '근본 원인을 분석하세요.\n기술적, 운영적, 외부적 요인을 구분하여 정리합니다.', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Noto Sans KR' } },
-          // 섹션 3 — 영향 범위
-          { id: createId(), type: 'text', position: { x: 80, y: 680 }, size: { width: 120, height: 24 }, rotation: 0, locked: false, text: '영향 범위', textStyle: { fontSize: 14, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 80, y: 712 }, size: { width: 920, height: 180 }, rotation: 0, locked: false, text: '고객, 매출, 브랜드 등에 미치는 영향을 정리하세요.', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Noto Sans KR' } },
-          // 페이지 번호
-          { id: createId(), type: 'text', position: { x: 80, y: 1290 }, size: { width: 920, height: 30 }, rotation: 0, locked: false, text: '01', textStyle: { fontSize: 11, fontWeight: 400, color: '#CCCCCC', textAlign: 'right', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          // ── 우측 상단 타입 인디케이터 뱃지 ──
+          { id: createId(), type: 'shape', position: { x: 1820, y: 16 }, size: { width: 80, height: 28 }, rotation: 0, locked: true, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 14, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 1820, y: 16 }, size: { width: 80, height: 28 }, rotation: 0, locked: true, text: '이슈', textStyle: { fontSize: 12, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 2.2, fontFamily: 'Noto Sans KR' } },
+
+          // ══════════════════════════════════════
+          // HEADER AREA (15vh = 162px, y:0–162)
+          // ══════════════════════════════════════
+          { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1920, height: 162 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#F5F5F5', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 48, y: 50 }, size: { width: 1724, height: 60 }, rotation: 0, locked: false, text: '이슈 제목을 입력하세요', textStyle: { fontSize: 32, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          // 헤더 하단선
+          { id: createId(), type: 'shape', position: { x: 0, y: 162 }, size: { width: 1920, height: 2 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+
+          // ══════════════════════════════════════
+          // BODY AREA (70vh = 756px, y:162–918)
+          // 완전한 빈 공간 (Blank Canvas)
+          // 세일즈톡 등을 자유롭게 구성
+          // ══════════════════════════════════════
+          { id: createId(), type: 'text', position: { x: 48, y: 480 }, size: { width: 1824, height: 40 }, rotation: 0, locked: false, text: '이 영역에 세일즈톡 등을 자유롭게 구성하세요', textStyle: { fontSize: 16, fontWeight: 400, color: '#CCCCCC', textAlign: 'center', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+
+          // ══════════════════════════════════════
+          // FOOTER AREA (15vh = 162px, y:918–1080)
+          // ══════════════════════════════════════
+          { id: createId(), type: 'shape', position: { x: 0, y: 918 }, size: { width: 1920, height: 2 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 48, y: 940 }, size: { width: 1824, height: 50 }, rotation: 0, locked: false, text: '{유의사항 및 디스클레이머 텍스트 입력 영역}', textStyle: { fontSize: 12, fontWeight: 400, color: '#AAAAAA', textAlign: 'left', lineHeight: 1.6, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 48, y: 990 }, size: { width: 1824, height: 24 }, rotation: 0, locked: false, text: '사내교육용 / 대외비', textStyle: { fontSize: 11, fontWeight: 700, color: '#888888', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
         ],
         background: { type: 'solid', color: '#FFFFFF' },
       },
     ],
   },
-  {
-    id: 'issue-default-analysis',
-    category: 'issueDefault',
-    name: '세부 분석 + 대응',
-    description: '원인/고객/시장 분석 + 전략',
-    thumbnail: '🔍',
-    pages: [
-      {
-        id: createId(),
-        elements: [
-          // 좌측 컬러 바
-          { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 4, height: 1350 }, rotation: 0, locked: true, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          // 상단 라벨
-          { id: createId(), type: 'text', position: { x: 80, y: 60 }, size: { width: 200, height: 24 }, rotation: 0, locked: false, text: 'ANALYSIS', textStyle: { fontSize: 11, fontWeight: 500, color: '#AAAAAA', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
-          // 제목
-          { id: createId(), type: 'text', position: { x: 80, y: 90 }, size: { width: 920, height: 60 }, rotation: 0, locked: false, text: '세부 분석 및 대응', textStyle: { fontSize: 36, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
-          // 구분선
-          { id: createId(), type: 'shape', position: { x: 80, y: 170 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          // 분석 영역
-          { id: createId(), type: 'text', position: { x: 80, y: 200 }, size: { width: 120, height: 24 }, rotation: 0, locked: false, text: '분석', textStyle: { fontSize: 14, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 80, y: 232 }, size: { width: 920, height: 280 }, rotation: 0, locked: false, text: '1)  원인 분석\n\n2)  고객 영향\n\n3)  제품 영향\n\n4)  시장 / 경쟁 영향', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
           // 중간 구분선
           { id: createId(), type: 'shape', position: { x: 80, y: 550 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
           // 대응 전략
