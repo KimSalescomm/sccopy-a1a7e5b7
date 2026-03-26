@@ -329,7 +329,7 @@ export function analyzeText(text: string): AnalysisResult {
   score = Math.max(0, score);
 
   // 카테고리별 통계
-  const stats = { customer: 0, easy: 0, concise: 0, correct: 0 };
+  const stats = { customer: 0, easy: 0, concise: 0, correct: 0, benefit: 0 };
   for (const e of unique) {
     stats[e.category]++;
   }
