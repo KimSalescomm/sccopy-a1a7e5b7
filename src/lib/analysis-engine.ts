@@ -23,6 +23,7 @@ export interface AnalysisResult {
     easy: number;
     concise: number;
     correct: number;
+    benefit: number;
   };
 }
 
