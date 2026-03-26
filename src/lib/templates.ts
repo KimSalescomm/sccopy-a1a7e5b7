@@ -232,21 +232,8 @@ export const TEMPLATES: Template[] = [
       },
     ],
   },
-          // 중간 구분선
-          { id: createId(), type: 'shape', position: { x: 80, y: 550 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          // 대응 전략
-          { id: createId(), type: 'text', position: { x: 80, y: 580 }, size: { width: 120, height: 24 }, rotation: 0, locked: false, text: '대응 전략', textStyle: { fontSize: 14, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 80, y: 612 }, size: { width: 920, height: 200 }, rotation: 0, locked: false, text: '•  단기 전략:\n\n•  중기 전략:\n\n•  장기 전략:', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
-          // 기대 효과
-          { id: createId(), type: 'text', position: { x: 80, y: 850 }, size: { width: 120, height: 24 }, rotation: 0, locked: false, text: '기대 효과', textStyle: { fontSize: 14, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 80, y: 882 }, size: { width: 920, height: 120 }, rotation: 0, locked: false, text: '•  개선 포인트를 정리하세요', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
-          // 페이지 번호
-          { id: createId(), type: 'text', position: { x: 80, y: 1290 }, size: { width: 920, height: 30 }, rotation: 0, locked: false, text: '02', textStyle: { fontSize: 11, fontWeight: 400, color: '#CCCCCC', textAlign: 'right', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
-        ],
-        background: { type: 'solid', color: '#FFFFFF' },
-      },
-    ],
-  },
+
+
 
   // ─── 심화 ───
   {
