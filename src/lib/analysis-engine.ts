@@ -347,5 +347,6 @@ export function getCategoryLabel(c: ErrorCategory): string {
     case 'easy': return '쉽게';
     case 'concise': return '간결하게';
     case 'correct': return '바르게';
+    case 'benefit': return '베네핏 점검';
   }
 }
