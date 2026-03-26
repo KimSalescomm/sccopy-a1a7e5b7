@@ -294,7 +294,48 @@ function detectSpacingErrors(text: string, errors: AnalysisError[]) {
   }
 }
 
+function detectFeatureOnlyCopy(text: string, errors: AnalysisError[]) {
+  // Feature-only pattern detection
+  for (const { pattern, desc } of FEATURE_ONLY_PATTERNS) {
+    pattern.lastIndex = 0;
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      errors.push({
+        id: nextId(),
+        severity: 'warning',
+        category: 'benefit',
+        principle: '베네핏 점검 — 가치 단계',
+        description: `${desc}: 단순 기능(Feature) 나열에 머물러 있습니다. 고객의 이익 상황(Benefit)으로 전환해보세요.`,
+        original: match[0],
+        suggestions: ['고객이 이 기능으로 어떤 문제를 해결하는지 서술하세요', '예: "~하여 더 편리하게 사용할 수 있습니다"'],
+        startIndex: match.index,
+        endIndex: match.index + match[0].length,
+      });
+    }
+  }
+
+  // Corporate-centric copy in sales context
+  for (const verb of CORPORATE_CENTRIC_COPY) {
+    let idx = text.indexOf(verb);
+    while (idx !== -1) {
+      errors.push({
+        id: nextId(),
+        severity: 'suggestion',
+        category: 'benefit',
+        principle: '베네핏 점검 — 카피 형태',
+        description: `"${verb}"은 제품 중심(Concept) 표현입니다. 고객 중심(Benefit) 카피로 전환을 검토하세요.`,
+        original: verb,
+        suggestions: ['고객 관점의 베네핏 문장으로 전환하세요'],
+        startIndex: idx,
+        endIndex: idx + verb.length,
+      });
+      idx = text.indexOf(verb, idx + 1);
+    }
+  }
+}
+
 // ── 메인 분석 함수 ──
+
 
 export function analyzeText(text: string): AnalysisResult {
   errorIdCounter = 0;
