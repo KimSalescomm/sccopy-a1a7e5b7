@@ -67,6 +67,19 @@ const BLACKLIST = [
   '타의 추종을 불허', '독보적인',
 ];
 
+// ── 베네핏 점검: Feature → Benefit 전환 탐지 ──
+
+const FEATURE_ONLY_PATTERNS = [
+  { pattern: /(?:을|를)\s*(?:제공합니다|지원합니다|탑재했습니다|적용했습니다|장착했습니다)/g, desc: '기능 나열형 문장' },
+  { pattern: /(?:기능|성능|스펙|사양)(?:이|을|를)?\s*(?:갖추|보유|구비)/g, desc: '스펙 나열형 표현' },
+  { pattern: /(?:최대|최소)\s*\d+\s*(?:W|dB|kg|L|mm|cm|℃|°C|rpm)/g, desc: '수치 스펙만 나열' },
+];
+
+const CORPORATE_CENTRIC_COPY = [
+  '출시했습니다', '개발했습니다', '적용했습니다', '도입했습니다',
+  '장착했습니다', '구현했습니다', '설계했습니다',
+];
+
 const UNNECESSARY_WORDS = ['적', '것', '들', '적으로', '위하여'];
 
 const SPELLING_ERRORS: Record<string, string> = {
