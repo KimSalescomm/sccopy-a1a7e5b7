@@ -1,7 +1,7 @@
 // LG 고객언어 글쓰기 분석 엔진
 
 export type ErrorSeverity = 'error' | 'warning' | 'suggestion';
-export type ErrorCategory = 'customer' | 'easy' | 'concise' | 'correct';
+export type ErrorCategory = 'customer' | 'easy' | 'concise' | 'correct' | 'benefit';
 
 export interface AnalysisError {
   id: string;
@@ -23,6 +23,7 @@ export interface AnalysisResult {
     easy: number;
     concise: number;
     correct: number;
+    benefit: number;
   };
 }
 
@@ -64,6 +65,19 @@ const BLACKLIST = [
   '업계 최초', '압도적', '완벽하게', '100% 보장', '최고의 기술력',
   '세계 최고', '혁신적인', '획기적인', '놀라운', '경이로운',
   '타의 추종을 불허', '독보적인',
+];
+
+// ── 베네핏 점검: Feature → Benefit 전환 탐지 ──
+
+const FEATURE_ONLY_PATTERNS = [
+  { pattern: /(?:을|를)\s*(?:제공합니다|지원합니다|탑재했습니다|적용했습니다|장착했습니다)/g, desc: '기능 나열형 문장' },
+  { pattern: /(?:기능|성능|스펙|사양)(?:이|을|를)?\s*(?:갖추|보유|구비)/g, desc: '스펙 나열형 표현' },
+  { pattern: /(?:최대|최소)\s*\d+\s*(?:W|dB|kg|L|mm|cm|℃|°C|rpm)/g, desc: '수치 스펙만 나열' },
+];
+
+const CORPORATE_CENTRIC_COPY = [
+  '출시했습니다', '개발했습니다', '적용했습니다', '도입했습니다',
+  '장착했습니다', '구현했습니다', '설계했습니다',
 ];
 
 const UNNECESSARY_WORDS = ['적', '것', '들', '적으로', '위하여'];
@@ -280,12 +294,53 @@ function detectSpacingErrors(text: string, errors: AnalysisError[]) {
   }
 }
 
+function detectFeatureOnlyCopy(text: string, errors: AnalysisError[]) {
+  // Feature-only pattern detection
+  for (const { pattern, desc } of FEATURE_ONLY_PATTERNS) {
+    pattern.lastIndex = 0;
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      errors.push({
+        id: nextId(),
+        severity: 'warning',
+        category: 'benefit',
+        principle: '베네핏 점검 — 가치 단계',
+        description: `${desc}: 단순 기능(Feature) 나열에 머물러 있습니다. 고객의 이익 상황(Benefit)으로 전환해보세요.`,
+        original: match[0],
+        suggestions: ['고객이 이 기능으로 어떤 문제를 해결하는지 서술하세요', '예: "~하여 더 편리하게 사용할 수 있습니다"'],
+        startIndex: match.index,
+        endIndex: match.index + match[0].length,
+      });
+    }
+  }
+
+  // Corporate-centric copy in sales context
+  for (const verb of CORPORATE_CENTRIC_COPY) {
+    let idx = text.indexOf(verb);
+    while (idx !== -1) {
+      errors.push({
+        id: nextId(),
+        severity: 'suggestion',
+        category: 'benefit',
+        principle: '베네핏 점검 — 카피 형태',
+        description: `"${verb}"은 제품 중심(Concept) 표현입니다. 고객 중심(Benefit) 카피로 전환을 검토하세요.`,
+        original: verb,
+        suggestions: ['고객 관점의 베네핏 문장으로 전환하세요'],
+        startIndex: idx,
+        endIndex: idx + verb.length,
+      });
+      idx = text.indexOf(verb, idx + 1);
+    }
+  }
+}
+
 // ── 메인 분석 함수 ──
+
 
 export function analyzeText(text: string): AnalysisResult {
   errorIdCounter = 0;
   if (!text.trim()) {
-    return { score: 100, errors: [], stats: { customer: 0, easy: 0, concise: 0, correct: 0 } };
+    return { score: 100, errors: [], stats: { customer: 0, easy: 0, concise: 0, correct: 0, benefit: 0 } };
   }
 
   const errors: AnalysisError[] = [];
@@ -298,6 +353,7 @@ export function analyzeText(text: string): AnalysisResult {
   detectBlacklist(text, errors);
   detectSpellingErrors(text, errors);
   detectSpacingErrors(text, errors);
+  detectFeatureOnlyCopy(text, errors);
 
   // 중복 제거 (같은 위치에 같은 카테고리)
   const unique = errors.filter((e, i, arr) =>
@@ -314,7 +370,7 @@ export function analyzeText(text: string): AnalysisResult {
   score = Math.max(0, score);
 
   // 카테고리별 통계
-  const stats = { customer: 0, easy: 0, concise: 0, correct: 0 };
+  const stats = { customer: 0, easy: 0, concise: 0, correct: 0, benefit: 0 };
   for (const e of unique) {
     stats[e.category]++;
   }
@@ -332,5 +388,6 @@ export function getCategoryLabel(c: ErrorCategory): string {
     case 'easy': return '쉽게';
     case 'concise': return '간결하게';
     case 'correct': return '바르게';
+    case 'benefit': return '베네핏 점검';
   }
 }
