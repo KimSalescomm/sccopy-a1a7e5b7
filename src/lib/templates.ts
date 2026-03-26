@@ -6,65 +6,60 @@ export const TEMPLATES: Template[] = [
     id: 'basic-usp',
     category: 'basic',
     name: '특장점',
-    description: '레퍼런스형 USP 4단 구성 (16:9)',
+    description: 'USP 4단 구성 (16:9)',
     thumbnail: '⭐',
     presetId: '16:9',
     pages: [
       {
         id: createId(),
         elements: [
-          // ── 전체 배경 ──
-          { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1920, height: 1080 }, rotation: 0, locked: true, shapeType: 'rectangle', shapeStyle: { fill: '#F7F3EB', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // ── 좌측 34% 이미지 placeholder ──
+          { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 653, height: 1080 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#F0F0F0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 0, y: 510 }, size: { width: 653, height: 60 }, rotation: 0, locked: false, text: '제품 사진', textStyle: { fontSize: 20, fontWeight: 400, color: '#BFBFBF', textAlign: 'center', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
 
-          // ── 좌측 34% 이미지 placeholder (x:0 w:653) ──
-          { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 653, height: 1080 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E9E9E9', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 0, y: 510 }, size: { width: 653, height: 60 }, rotation: 0, locked: false, text: '제품 사진', textStyle: { fontSize: 24, fontWeight: 700, color: '#C8C8C8', textAlign: 'center', lineHeight: 1.4, fontFamily: 'LG EI Text' } },
+          // ── 우측 66% (x:653) ──
+          // ─ 헤더 12% (y:0–130) ─
+          { id: createId(), type: 'text', position: { x: 701, y: 50 }, size: { width: 1170, height: 32 }, rotation: 0, locked: false, text: '제품명 | 신제품 특장점', textStyle: { fontSize: 22, fontWeight: 700, color: '#222222', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'shape', position: { x: 701, y: 100 }, size: { width: 1170, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
 
-          // ── 우측 66% (x:653 w:1267) ──
-          // ─ 헤더 (y:0-130, 12%) ─
-          { id: createId(), type: 'text', position: { x: 701, y: 48 }, size: { width: 1171, height: 36 }, rotation: 0, locked: false, text: '제품명 신제품 특장점', textStyle: { fontSize: 24, fontWeight: 700, color: '#595959', textAlign: 'left', lineHeight: 1.4, fontFamily: 'LG EI Text' } },
-          // 헤더 하단 구분선
-          { id: createId(), type: 'shape', position: { x: 653, y: 129 }, size: { width: 1267, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E9E9E9', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-
-          // ─ USP 1 (y:130-368, h:238, 22%) ─
-          // 카테고리 라벨
-          { id: createId(), type: 'text', position: { x: 701, y: 150 }, size: { width: 200, height: 28 }, rotation: 0, locked: false, text: '카테고리', textStyle: { fontSize: 18, fontWeight: 700, color: '#595959', textAlign: 'left', lineHeight: 1.4, fontFamily: 'LG EI Text' } },
+          // ─ USP 1  22% (y:130–368) ─
+          { id: createId(), type: 'text', position: { x: 701, y: 140 }, size: { width: 300, height: 26 }, rotation: 0, locked: false, text: '카테고리명', textStyle: { fontSize: 13, fontWeight: 500, color: '#888888', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
           // NEW pill
-          { id: createId(), type: 'shape', position: { x: 701, y: 190 }, size: { width: 48, height: 22 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#FD312E', borderRadius: 999, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 701, y: 191 }, size: { width: 48, height: 20 }, rotation: 0, locked: false, text: 'NEW', textStyle: { fontSize: 12, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 1.4, fontFamily: 'Cafe24 Boldface' } },
-          // USP 제목 (pill 오른쪽 8px 간격)
-          { id: createId(), type: 'text', position: { x: 757, y: 190 }, size: { width: 400, height: 24 }, rotation: 0, locked: false, text: 'USP명 1', textStyle: { fontSize: 18, fontWeight: 700, color: '#595959', textAlign: 'left', lineHeight: 1.2, fontFamily: 'LG EI Text' } },
+          { id: createId(), type: 'shape', position: { x: 701, y: 176 }, size: { width: 44, height: 20 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 999, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 701, y: 176 }, size: { width: 44, height: 20 }, rotation: 0, locked: false, text: 'NEW', textStyle: { fontSize: 10, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          // USP 제목
+          { id: createId(), type: 'text', position: { x: 753, y: 174 }, size: { width: 500, height: 24 }, rotation: 0, locked: false, text: 'USP 제목을 입력하세요', textStyle: { fontSize: 16, fontWeight: 700, color: '#222222', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
           // USP 설명
-          { id: createId(), type: 'text', position: { x: 701, y: 224 }, size: { width: 1121, height: 100 }, rotation: 0, locked: false, text: '해당 기능을 설명할 수 있는 상세 설명을 담아주세요.\n최대 3줄, 폰트는 LG EI Text TTF Regular 12', textStyle: { fontSize: 12, fontWeight: 400, color: '#595959', textAlign: 'left', lineHeight: 1.6, fontFamily: 'LG EI Text' } },
+          { id: createId(), type: 'text', position: { x: 701, y: 210 }, size: { width: 1120, height: 110 }, rotation: 0, locked: false, text: '이 기능이 고객에게 어떤 이점을 주는지 설명하세요.\n최대 2~3줄로 간결하게 작성합니다.', textStyle: { fontSize: 13, fontWeight: 400, color: '#555555', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Noto Sans KR' } },
           // 구분선
-          { id: createId(), type: 'shape', position: { x: 701, y: 348 }, size: { width: 1171, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E9E9E9', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'shape', position: { x: 701, y: 348 }, size: { width: 1170, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
 
-          // ─ USP 2 (y:368-606, h:238, 22%) ─
-          { id: createId(), type: 'text', position: { x: 701, y: 388 }, size: { width: 200, height: 28 }, rotation: 0, locked: false, text: '탈취/살균', textStyle: { fontSize: 18, fontWeight: 700, color: '#595959', textAlign: 'left', lineHeight: 1.4, fontFamily: 'LG EI Text' } },
-          { id: createId(), type: 'shape', position: { x: 701, y: 428 }, size: { width: 48, height: 22 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#FD312E', borderRadius: 999, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 701, y: 429 }, size: { width: 48, height: 20 }, rotation: 0, locked: false, text: 'NEW', textStyle: { fontSize: 12, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 1.4, fontFamily: 'Cafe24 Boldface' } },
-          { id: createId(), type: 'text', position: { x: 757, y: 428 }, size: { width: 400, height: 24 }, rotation: 0, locked: false, text: '듀얼 히팅 트루스팀', textStyle: { fontSize: 18, fontWeight: 700, color: '#595959', textAlign: 'left', lineHeight: 1.2, fontFamily: 'LG EI Text' } },
-          { id: createId(), type: 'text', position: { x: 701, y: 462 }, size: { width: 1121, height: 100 }, rotation: 0, locked: false, text: '듀얼 히터가 만드는 진짜 듀얼 트루스팀이 의류에 맞게 스팀양을 조절해\n섬유 속 깊이 밴 생활 냄새까지 99% 제거하고, 유해세균부터 바이러스까지 케어', textStyle: { fontSize: 12, fontWeight: 400, color: '#595959', textAlign: 'left', lineHeight: 1.6, fontFamily: 'LG EI Text' } },
-          { id: createId(), type: 'shape', position: { x: 701, y: 586 }, size: { width: 1171, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E9E9E9', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // ─ USP 2  22% (y:368–606) ─
+          { id: createId(), type: 'text', position: { x: 701, y: 378 }, size: { width: 300, height: 26 }, rotation: 0, locked: false, text: '카테고리명', textStyle: { fontSize: 13, fontWeight: 500, color: '#888888', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'shape', position: { x: 701, y: 414 }, size: { width: 44, height: 20 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 999, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 701, y: 414 }, size: { width: 44, height: 20 }, rotation: 0, locked: false, text: 'NEW', textStyle: { fontSize: 10, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 753, y: 412 }, size: { width: 500, height: 24 }, rotation: 0, locked: false, text: 'USP 제목을 입력하세요', textStyle: { fontSize: 16, fontWeight: 700, color: '#222222', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 701, y: 448 }, size: { width: 1120, height: 110 }, rotation: 0, locked: false, text: '이 기능이 고객에게 어떤 이점을 주는지 설명하세요.\n최대 2~3줄로 간결하게 작성합니다.', textStyle: { fontSize: 13, fontWeight: 400, color: '#555555', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'shape', position: { x: 701, y: 586 }, size: { width: 1170, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
 
-          // ─ USP 3 (y:606-844, h:238, 22%) ─
-          { id: createId(), type: 'text', position: { x: 701, y: 626 }, size: { width: 200, height: 28 }, rotation: 0, locked: false, text: '스타일링', textStyle: { fontSize: 18, fontWeight: 700, color: '#595959', textAlign: 'left', lineHeight: 1.4, fontFamily: 'LG EI Text' } },
-          { id: createId(), type: 'shape', position: { x: 701, y: 666 }, size: { width: 48, height: 22 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#FD312E', borderRadius: 999, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 701, y: 667 }, size: { width: 48, height: 20 }, rotation: 0, locked: false, text: 'NEW', textStyle: { fontSize: 12, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 1.4, fontFamily: 'Cafe24 Boldface' } },
-          { id: createId(), type: 'text', position: { x: 757, y: 666 }, size: { width: 400, height: 24 }, rotation: 0, locked: false, text: '빌트인 고압 스티머', textStyle: { fontSize: 18, fontWeight: 700, color: '#595959', textAlign: 'left', lineHeight: 1.2, fontFamily: 'LG EI Text' } },
-          { id: createId(), type: 'text', position: { x: 701, y: 700 }, size: { width: 1121, height: 100 }, rotation: 0, locked: false, text: '외출 전 카라 끝, 소매도 빠르고 손쉽게 스타일링하고,\n세탁소 고압 스티머 수준의 풍부한 스팀으로 린넨 등 구김이 잘 펴지지 않는 소재도 깔끔하게 케어', textStyle: { fontSize: 12, fontWeight: 400, color: '#595959', textAlign: 'left', lineHeight: 1.6, fontFamily: 'LG EI Text' } },
-          { id: createId(), type: 'shape', position: { x: 701, y: 824 }, size: { width: 1171, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E9E9E9', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // ─ USP 3  22% (y:606–844) ─
+          { id: createId(), type: 'text', position: { x: 701, y: 616 }, size: { width: 300, height: 26 }, rotation: 0, locked: false, text: '카테고리명', textStyle: { fontSize: 13, fontWeight: 500, color: '#888888', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'shape', position: { x: 701, y: 652 }, size: { width: 44, height: 20 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 999, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 701, y: 652 }, size: { width: 44, height: 20 }, rotation: 0, locked: false, text: 'NEW', textStyle: { fontSize: 10, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 753, y: 650 }, size: { width: 500, height: 24 }, rotation: 0, locked: false, text: 'USP 제목을 입력하세요', textStyle: { fontSize: 16, fontWeight: 700, color: '#222222', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 701, y: 686 }, size: { width: 1120, height: 110 }, rotation: 0, locked: false, text: '이 기능이 고객에게 어떤 이점을 주는지 설명하세요.\n최대 2~3줄로 간결하게 작성합니다.', textStyle: { fontSize: 13, fontWeight: 400, color: '#555555', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'shape', position: { x: 701, y: 824 }, size: { width: 1170, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
 
-          // ─ USP 4 (y:844-972, h:128, 12%) ─
-          { id: createId(), type: 'text', position: { x: 701, y: 856 }, size: { width: 200, height: 28 }, rotation: 0, locked: false, text: '편의', textStyle: { fontSize: 18, fontWeight: 700, color: '#595959', textAlign: 'left', lineHeight: 1.4, fontFamily: 'LG EI Text' } },
-          { id: createId(), type: 'text', position: { x: 701, y: 892 }, size: { width: 1121, height: 60 }, rotation: 0, locked: false, text: '자동 환기 시스템으로 코스 종료 후에도 보송하게 보관', textStyle: { fontSize: 12, fontWeight: 400, color: '#595959', textAlign: 'left', lineHeight: 1.6, fontFamily: 'LG EI Text' } },
+          // ─ USP 4  12% (y:844–972) ─
+          { id: createId(), type: 'text', position: { x: 701, y: 854 }, size: { width: 300, height: 26 }, rotation: 0, locked: false, text: '카테고리명', textStyle: { fontSize: 13, fontWeight: 500, color: '#888888', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 701, y: 886 }, size: { width: 1120, height: 60 }, rotation: 0, locked: false, text: '간단한 USP 한 줄 설명을 입력하세요.', textStyle: { fontSize: 13, fontWeight: 400, color: '#555555', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Noto Sans KR' } },
 
-          // ─ 푸터 (y:972-1080, h:108, 10%) ─
-          { id: createId(), type: 'shape', position: { x: 653, y: 972 }, size: { width: 1267, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E9E9E9', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 701, y: 988 }, size: { width: 1171, height: 20 }, rotation: 0, locked: false, text: '* 이미지, 문안, 날짜는 예시입니다. 실제 사용 시 제품 정보와 검수 완료 문안을 반영해주세요.', textStyle: { fontSize: 12, fontWeight: 400, color: '#C8C8C8', textAlign: 'left', lineHeight: 1.4, fontFamily: 'LG EI Text' } },
-          { id: createId(), type: 'text', position: { x: 701, y: 1012 }, size: { width: 1171, height: 20 }, rotation: 0, locked: false, text: '사내교육용 / 대외비', textStyle: { fontSize: 12, fontWeight: 700, color: '#595959', textAlign: 'left', lineHeight: 1.4, fontFamily: 'LG EI Text' } },
+          // ─ 푸터 10% (y:972–1080) ─
+          { id: createId(), type: 'shape', position: { x: 701, y: 972 }, size: { width: 1170, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 701, y: 990 }, size: { width: 1170, height: 20 }, rotation: 0, locked: false, text: '* 이미지, 문안, 날짜는 예시입니다. 실제 사용 시 검수 완료 문안을 반영해주세요.', textStyle: { fontSize: 11, fontWeight: 400, color: '#BBBBBB', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 701, y: 1014 }, size: { width: 1170, height: 20 }, rotation: 0, locked: false, text: '사내교육용 / 대외비', textStyle: { fontSize: 11, fontWeight: 700, color: '#888888', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
         ],
-        background: { type: 'solid', color: '#F7F3EB' },
+        background: { type: 'solid', color: '#FFFFFF' },
       },
     ],
   },
@@ -79,53 +74,22 @@ export const TEMPLATES: Template[] = [
       {
         id: createId(),
         elements: [
-          {
-            id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1920, height: 1080 },
-            rotation: 0, locked: true, shapeType: 'rectangle',
-            shapeStyle: { fill: '#F7F3EB', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
-          },
-          {
-            id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1920, height: 72 },
-            rotation: 0, locked: false, shapeType: 'rectangle',
-            shapeStyle: { fill: '#FFFFFF', borderRadius: 0, borderWidth: 0, borderColor: '#E9E9E9', opacity: 1 },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 48, y: 18 }, size: { width: 600, height: 36 },
-            rotation: 0, locked: false, text: '비주얼톡',
-            textStyle: { fontSize: 24, fontWeight: 700, color: '#595959', textAlign: 'left', lineHeight: 1.4, fontFamily: 'LG EI Text' },
-          },
-          {
-            id: createId(), type: 'shape', position: { x: 48, y: 112 }, size: { width: 1120, height: 920 },
-            rotation: 0, locked: false, shapeType: 'rectangle',
-            shapeStyle: { fill: '#E9E9E9', borderRadius: 12, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 48, y: 520 }, size: { width: 1120, height: 50 },
-            rotation: 0, locked: false, text: '키 비주얼 이미지 영역',
-            textStyle: { fontSize: 18, fontWeight: 400, color: '#C8C8C8', textAlign: 'center', lineHeight: 1.4, fontFamily: 'LG EI Text' },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 1220, y: 112 }, size: { width: 652, height: 60 },
-            rotation: 0, locked: false, text: 'Key Claim',
-            textStyle: { fontSize: 24, fontWeight: 700, color: '#FD312E', textAlign: 'left', lineHeight: 1.4, fontFamily: 'LG EI Text' },
-          },
-          {
-            id: createId(), type: 'shape', position: { x: 1220, y: 184 }, size: { width: 652, height: 1 },
-            rotation: 0, locked: false, shapeType: 'rectangle',
-            shapeStyle: { fill: '#E9E9E9', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 1220, y: 210 }, size: { width: 652, height: 200 },
-            rotation: 0, locked: false, text: '핵심 메시지를 입력하세요.\n\n제품의 가장 강력한\n비주얼 포인트를 전달합니다.',
-            textStyle: { fontSize: 18, fontWeight: 400, color: '#595959', textAlign: 'left', lineHeight: 1.6, fontFamily: 'LG EI Text' },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 1220, y: 440 }, size: { width: 652, height: 40 },
-            rotation: 0, locked: false, text: '부가 설명 텍스트',
-            textStyle: { fontSize: 12, fontWeight: 400, color: '#C8C8C8', textAlign: 'left', lineHeight: 1.6, fontFamily: 'LG EI Text' },
-          },
+          // ── 헤더 바 ──
+          { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1920, height: 64 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#FAFAFA', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 48, y: 16 }, size: { width: 400, height: 32 }, rotation: 0, locked: false, text: '비주얼톡', textStyle: { fontSize: 18, fontWeight: 700, color: '#333333', textAlign: 'left', lineHeight: 1.6, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'shape', position: { x: 0, y: 64 }, size: { width: 1920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+
+          // ── 좌측 키 비주얼 (60%) ──
+          { id: createId(), type: 'shape', position: { x: 48, y: 96 }, size: { width: 1100, height: 936 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#F0F0F0', borderRadius: 8, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 48, y: 530 }, size: { width: 1100, height: 40 }, rotation: 0, locked: false, text: '키 비주얼 이미지 영역', textStyle: { fontSize: 16, fontWeight: 400, color: '#BFBFBF', textAlign: 'center', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+
+          // ── 우측 텍스트 영역 (40%) ──
+          { id: createId(), type: 'text', position: { x: 1200, y: 120 }, size: { width: 672, height: 40 }, rotation: 0, locked: false, text: 'Key Claim', textStyle: { fontSize: 22, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'shape', position: { x: 1200, y: 172 }, size: { width: 672, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 1200, y: 200 }, size: { width: 672, height: 200 }, rotation: 0, locked: false, text: '핵심 메시지를 입력하세요.\n\n고객에게 가장 강력하게 전달할\n비주얼 포인트를 작성합니다.', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 1200, y: 430 }, size: { width: 672, height: 40 }, rotation: 0, locked: false, text: '부가 설명 텍스트를 입력하세요.', textStyle: { fontSize: 12, fontWeight: 400, color: '#AAAAAA', textAlign: 'left', lineHeight: 1.6, fontFamily: 'Noto Sans KR' } },
         ],
-        background: { type: 'solid', color: '#F7F3EB' },
+        background: { type: 'solid', color: '#FFFFFF' },
       },
     ],
   },
