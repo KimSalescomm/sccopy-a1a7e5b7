@@ -105,38 +105,21 @@ export const TEMPLATES: Template[] = [
       {
         id: createId(),
         elements: [
-          {
-            id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1080, height: 1350 },
-            rotation: 0, locked: true, shapeType: 'rectangle',
-            shapeStyle: { fill: '#0f172a', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 100 }, size: { width: 920, height: 60 },
-            rotation: 0, locked: false, text: 'ISSUE',
-            textStyle: { fontSize: 24, fontWeight: 600, color: '#f59e0b', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Pretendard' },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 170 }, size: { width: 920, height: 120 },
-            rotation: 0, locked: false, text: '이슈 제목을\n입력하세요',
-            textStyle: { fontSize: 56, fontWeight: 700, color: '#ffffff', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Pretendard' },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 320 }, size: { width: 920, height: 60 },
-            rotation: 0, locked: false, text: '핵심 요약 1~2줄을 입력하세요',
-            textStyle: { fontSize: 28, fontWeight: 400, color: '#94a3b8', textAlign: 'left', lineHeight: 1.5, fontFamily: 'Pretendard' },
-          },
-          {
-            id: createId(), type: 'shape', position: { x: 80, y: 420 }, size: { width: 920, height: 4 },
-            rotation: 0, locked: false, shapeType: 'rectangle',
-            shapeStyle: { fill: '#ffffff', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 0.1 },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 460 }, size: { width: 920, height: 250 },
-            rotation: 0, locked: false, text: '• 이슈 포인트\n• 데이터 / 수치\n• 한 줄 결론',
-            textStyle: { fontSize: 32, fontWeight: 400, color: '#e2e8f0', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Pretendard' },
-          },
+          // 상단 라벨
+          { id: createId(), type: 'shape', position: { x: 80, y: 80 }, size: { width: 72, height: 28 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 4, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 72, height: 28 }, rotation: 0, locked: false, text: 'ISSUE', textStyle: { fontSize: 12, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 2.2, fontFamily: 'Noto Sans KR' } },
+          // 제목
+          { id: createId(), type: 'text', position: { x: 80, y: 130 }, size: { width: 920, height: 120 }, rotation: 0, locked: false, text: '이슈 제목을\n입력하세요', textStyle: { fontSize: 40, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.35, fontFamily: 'Noto Sans KR' } },
+          // 요약
+          { id: createId(), type: 'text', position: { x: 80, y: 270 }, size: { width: 920, height: 50 }, rotation: 0, locked: false, text: '핵심 요약 1~2줄을 입력하세요', textStyle: { fontSize: 16, fontWeight: 400, color: '#888888', textAlign: 'left', lineHeight: 1.5, fontFamily: 'Noto Sans KR' } },
+          // 구분선
+          { id: createId(), type: 'shape', position: { x: 80, y: 350 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // 본문
+          { id: createId(), type: 'text', position: { x: 80, y: 390 }, size: { width: 920, height: 300 }, rotation: 0, locked: false, text: '•  이슈 포인트를 작성하세요\n\n•  관련 데이터 / 수치\n\n•  한 줄 결론', textStyle: { fontSize: 18, fontWeight: 400, color: '#333333', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          // 하단 페이지 번호
+          { id: createId(), type: 'text', position: { x: 80, y: 1290 }, size: { width: 920, height: 30 }, rotation: 0, locked: false, text: '01', textStyle: { fontSize: 11, fontWeight: 400, color: '#CCCCCC', textAlign: 'right', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
         ],
-        background: { type: 'solid', color: '#0f172a' },
+        background: { type: 'solid', color: '#FFFFFF' },
       },
     ],
   },
@@ -144,71 +127,50 @@ export const TEMPLATES: Template[] = [
     id: 'issue-card-3',
     category: 'issueCard',
     name: '이슈 카드 3장 세트',
-    description: '포인트/영향/대응 3장 구성',
+    description: '포인트 → 영향 → 대응 3단계',
     thumbnail: '📇',
     pages: [
+      // Card 1
       {
         id: createId(),
         elements: [
-          {
-            id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1080, height: 1350 },
-            rotation: 0, locked: true, shapeType: 'rectangle',
-            shapeStyle: { fill: '#0f172a', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 50 },
-            rotation: 0, locked: false, text: 'CARD 1 — 이슈 포인트',
-            textStyle: { fontSize: 24, fontWeight: 600, color: '#f59e0b', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Pretendard' },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 160 }, size: { width: 920, height: 300 },
-            rotation: 0, locked: false, text: '• 이슈 포인트\n• 데이터 / 수치\n• 한 줄 결론',
-            textStyle: { fontSize: 36, fontWeight: 400, color: '#ffffff', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Pretendard' },
-          },
+          { id: createId(), type: 'shape', position: { x: 80, y: 80 }, size: { width: 28, height: 28 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 14, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 28, height: 28 }, rotation: 0, locked: false, text: '1', textStyle: { fontSize: 13, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 2.0, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 120, y: 80 }, size: { width: 880, height: 32 }, rotation: 0, locked: false, text: '이슈 포인트', textStyle: { fontSize: 14, fontWeight: 500, color: '#888888', textAlign: 'left', lineHeight: 2.0, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 140 }, size: { width: 920, height: 100 }, rotation: 0, locked: false, text: '이슈 제목을 입력하세요', textStyle: { fontSize: 32, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.35, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'shape', position: { x: 80, y: 270 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E8E8E8', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 80, y: 310 }, size: { width: 920, height: 400 }, rotation: 0, locked: false, text: '•  핵심 이슈를 정리하세요\n\n•  관련 데이터 / 수치\n\n•  한 줄 결론', textStyle: { fontSize: 16, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 1290 }, size: { width: 920, height: 30 }, rotation: 0, locked: false, text: '01 / 03', textStyle: { fontSize: 11, fontWeight: 400, color: '#CCCCCC', textAlign: 'right', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
         ],
-        background: { type: 'solid', color: '#0f172a' },
+        background: { type: 'solid', color: '#FFFFFF' },
       },
+      // Card 2
       {
         id: createId(),
         elements: [
-          {
-            id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1080, height: 1350 },
-            rotation: 0, locked: true, shapeType: 'rectangle',
-            shapeStyle: { fill: '#0f172a', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 50 },
-            rotation: 0, locked: false, text: 'CARD 2 — 영향도',
-            textStyle: { fontSize: 24, fontWeight: 600, color: '#f59e0b', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Pretendard' },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 160 }, size: { width: 920, height: 300 },
-            rotation: 0, locked: false, text: '• 영향도 분석\n• 고객 Pain Point\n• 시나리오',
-            textStyle: { fontSize: 36, fontWeight: 400, color: '#ffffff', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Pretendard' },
-          },
+          { id: createId(), type: 'shape', position: { x: 80, y: 80 }, size: { width: 28, height: 28 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 14, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 28, height: 28 }, rotation: 0, locked: false, text: '2', textStyle: { fontSize: 13, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 2.0, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 120, y: 80 }, size: { width: 880, height: 32 }, rotation: 0, locked: false, text: '영향도 분석', textStyle: { fontSize: 14, fontWeight: 500, color: '#888888', textAlign: 'left', lineHeight: 2.0, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 140 }, size: { width: 920, height: 100 }, rotation: 0, locked: false, text: '영향 범위를 입력하세요', textStyle: { fontSize: 32, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.35, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'shape', position: { x: 80, y: 270 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E8E8E8', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 80, y: 310 }, size: { width: 920, height: 400 }, rotation: 0, locked: false, text: '•  고객 영향\n\n•  시장 / 경쟁 영향\n\n•  내부 영향', textStyle: { fontSize: 16, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 1290 }, size: { width: 920, height: 30 }, rotation: 0, locked: false, text: '02 / 03', textStyle: { fontSize: 11, fontWeight: 400, color: '#CCCCCC', textAlign: 'right', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
         ],
-        background: { type: 'solid', color: '#0f172a' },
+        background: { type: 'solid', color: '#FFFFFF' },
       },
+      // Card 3
       {
         id: createId(),
         elements: [
-          {
-            id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1080, height: 1350 },
-            rotation: 0, locked: true, shapeType: 'rectangle',
-            shapeStyle: { fill: '#0f172a', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 50 },
-            rotation: 0, locked: false, text: 'CARD 3 — 대응 요약',
-            textStyle: { fontSize: 24, fontWeight: 600, color: '#f59e0b', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Pretendard' },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 160 }, size: { width: 920, height: 300 },
-            rotation: 0, locked: false, text: '• 대응 요약\n• 핵심 해결 키\n• 실행 계획',
-            textStyle: { fontSize: 36, fontWeight: 400, color: '#ffffff', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Pretendard' },
-          },
+          { id: createId(), type: 'shape', position: { x: 80, y: 80 }, size: { width: 28, height: 28 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 14, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 28, height: 28 }, rotation: 0, locked: false, text: '3', textStyle: { fontSize: 13, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 2.0, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 120, y: 80 }, size: { width: 880, height: 32 }, rotation: 0, locked: false, text: '대응 전략', textStyle: { fontSize: 14, fontWeight: 500, color: '#888888', textAlign: 'left', lineHeight: 2.0, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 140 }, size: { width: 920, height: 100 }, rotation: 0, locked: false, text: '대응 방안을 입력하세요', textStyle: { fontSize: 32, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.35, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'shape', position: { x: 80, y: 270 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E8E8E8', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 80, y: 310 }, size: { width: 920, height: 400 }, rotation: 0, locked: false, text: '•  단기 대응\n\n•  중장기 전략\n\n•  기대 효과', textStyle: { fontSize: 16, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 1290 }, size: { width: 920, height: 30 }, rotation: 0, locked: false, text: '03 / 03', textStyle: { fontSize: 11, fontWeight: 400, color: '#CCCCCC', textAlign: 'right', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
         ],
-        background: { type: 'solid', color: '#0f172a' },
+        background: { type: 'solid', color: '#FFFFFF' },
       },
     ],
   },
@@ -224,23 +186,27 @@ export const TEMPLATES: Template[] = [
       {
         id: createId(),
         elements: [
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 80 },
-            rotation: 0, locked: false, text: '이슈 제목',
-            textStyle: { fontSize: 52, fontWeight: 700, color: '#1a1a1a', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Pretendard' },
-          },
-          {
-            id: createId(), type: 'shape', position: { x: 80, y: 180 }, size: { width: 120, height: 4 },
-            rotation: 0, locked: false, shapeType: 'rectangle',
-            shapeStyle: { fill: '#e11d48', borderRadius: 2, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 220 }, size: { width: 920, height: 700 },
-            rotation: 0, locked: false, text: '■ 이슈 개요\n\n배경:\n\n원인:\n\n영향 범위:',
-            textStyle: { fontSize: 32, fontWeight: 400, color: '#333333', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Pretendard' },
-          },
+          // 좌측 컬러 바
+          { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 4, height: 1350 }, rotation: 0, locked: true, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // 상단 라벨
+          { id: createId(), type: 'text', position: { x: 80, y: 60 }, size: { width: 200, height: 24 }, rotation: 0, locked: false, text: 'ISSUE OVERVIEW', textStyle: { fontSize: 11, fontWeight: 500, color: '#AAAAAA', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          // 제목
+          { id: createId(), type: 'text', position: { x: 80, y: 90 }, size: { width: 920, height: 60 }, rotation: 0, locked: false, text: '이슈 제목', textStyle: { fontSize: 36, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
+          // 구분선
+          { id: createId(), type: 'shape', position: { x: 80, y: 170 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // 섹션 1 — 배경
+          { id: createId(), type: 'text', position: { x: 80, y: 200 }, size: { width: 120, height: 24 }, rotation: 0, locked: false, text: '배경', textStyle: { fontSize: 14, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 232 }, size: { width: 920, height: 180 }, rotation: 0, locked: false, text: '이슈의 배경을 서술하세요.\n시장 상황, 고객 반응, 내부 요인 등을 포함합니다.', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Noto Sans KR' } },
+          // 섹션 2 — 원인
+          { id: createId(), type: 'text', position: { x: 80, y: 440 }, size: { width: 120, height: 24 }, rotation: 0, locked: false, text: '원인', textStyle: { fontSize: 14, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 472 }, size: { width: 920, height: 180 }, rotation: 0, locked: false, text: '근본 원인을 분석하세요.\n기술적, 운영적, 외부적 요인을 구분하여 정리합니다.', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Noto Sans KR' } },
+          // 섹션 3 — 영향 범위
+          { id: createId(), type: 'text', position: { x: 80, y: 680 }, size: { width: 120, height: 24 }, rotation: 0, locked: false, text: '영향 범위', textStyle: { fontSize: 14, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 712 }, size: { width: 920, height: 180 }, rotation: 0, locked: false, text: '고객, 매출, 브랜드 등에 미치는 영향을 정리하세요.', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Noto Sans KR' } },
+          // 페이지 번호
+          { id: createId(), type: 'text', position: { x: 80, y: 1290 }, size: { width: 920, height: 30 }, rotation: 0, locked: false, text: '01', textStyle: { fontSize: 11, fontWeight: 400, color: '#CCCCCC', textAlign: 'right', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
         ],
-        background: { type: 'solid', color: '#ffffff' },
+        background: { type: 'solid', color: '#FFFFFF' },
       },
     ],
   },
@@ -254,28 +220,29 @@ export const TEMPLATES: Template[] = [
       {
         id: createId(),
         elements: [
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 80 },
-            rotation: 0, locked: false, text: '세부 분석',
-            textStyle: { fontSize: 48, fontWeight: 700, color: '#1a1a1a', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Pretendard' },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 180 }, size: { width: 920, height: 500 },
-            rotation: 0, locked: false, text: '1) 원인 분석\n2) 고객 영향\n3) 제품 영향\n4) 시장/경쟁 영향',
-            textStyle: { fontSize: 32, fontWeight: 400, color: '#333333', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Pretendard' },
-          },
-          {
-            id: createId(), type: 'shape', position: { x: 80, y: 720 }, size: { width: 920, height: 4 },
-            rotation: 0, locked: false, shapeType: 'rectangle',
-            shapeStyle: { fill: '#e11d48', borderRadius: 2, borderWidth: 0, borderColor: 'transparent', opacity: 0.5 },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 760 }, size: { width: 920, height: 400 },
-            rotation: 0, locked: false, text: '■ 대응 전략\n• 단기 전략:\n• 중기 전략:\n• 장기 전략:\n\n■ 기대 효과\n• 개선 포인트:',
-            textStyle: { fontSize: 30, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Pretendard' },
-          },
+          // 좌측 컬러 바
+          { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 4, height: 1350 }, rotation: 0, locked: true, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // 상단 라벨
+          { id: createId(), type: 'text', position: { x: 80, y: 60 }, size: { width: 200, height: 24 }, rotation: 0, locked: false, text: 'ANALYSIS', textStyle: { fontSize: 11, fontWeight: 500, color: '#AAAAAA', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          // 제목
+          { id: createId(), type: 'text', position: { x: 80, y: 90 }, size: { width: 920, height: 60 }, rotation: 0, locked: false, text: '세부 분석 및 대응', textStyle: { fontSize: 36, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
+          // 구분선
+          { id: createId(), type: 'shape', position: { x: 80, y: 170 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // 분석 영역
+          { id: createId(), type: 'text', position: { x: 80, y: 200 }, size: { width: 120, height: 24 }, rotation: 0, locked: false, text: '분석', textStyle: { fontSize: 14, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 232 }, size: { width: 920, height: 280 }, rotation: 0, locked: false, text: '1)  원인 분석\n\n2)  고객 영향\n\n3)  제품 영향\n\n4)  시장 / 경쟁 영향', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          // 중간 구분선
+          { id: createId(), type: 'shape', position: { x: 80, y: 550 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // 대응 전략
+          { id: createId(), type: 'text', position: { x: 80, y: 580 }, size: { width: 120, height: 24 }, rotation: 0, locked: false, text: '대응 전략', textStyle: { fontSize: 14, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 612 }, size: { width: 920, height: 200 }, rotation: 0, locked: false, text: '•  단기 전략:\n\n•  중기 전략:\n\n•  장기 전략:', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          // 기대 효과
+          { id: createId(), type: 'text', position: { x: 80, y: 850 }, size: { width: 120, height: 24 }, rotation: 0, locked: false, text: '기대 효과', textStyle: { fontSize: 14, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 882 }, size: { width: 920, height: 120 }, rotation: 0, locked: false, text: '•  개선 포인트를 정리하세요', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          // 페이지 번호
+          { id: createId(), type: 'text', position: { x: 80, y: 1290 }, size: { width: 920, height: 30 }, rotation: 0, locked: false, text: '02', textStyle: { fontSize: 11, fontWeight: 400, color: '#CCCCCC', textAlign: 'right', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
         ],
-        background: { type: 'solid', color: '#ffffff' },
+        background: { type: 'solid', color: '#FFFFFF' },
       },
     ],
   },
@@ -285,39 +252,30 @@ export const TEMPLATES: Template[] = [
     id: 'deep-cover',
     category: 'deep',
     name: '심화 표지',
-    description: '문서 제목/버전/목차 표지',
+    description: '문서 제목 / 버전 / 목차',
     thumbnail: '📘',
     pages: [
       {
         id: createId(),
         elements: [
-          {
-            id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1080, height: 1350 },
-            rotation: 0, locked: true, shapeType: 'rectangle',
-            shapeStyle: { fill: '#1e293b', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
-          },
-          {
-            id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 8, height: 1350 },
-            rotation: 0, locked: true, shapeType: 'rectangle',
-            shapeStyle: { fill: '#3b82f6', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 300 }, size: { width: 920, height: 180 },
-            rotation: 0, locked: false, text: '심화 콘텐츠\n문서 제목',
-            textStyle: { fontSize: 64, fontWeight: 700, color: '#ffffff', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Pretendard' },
-          },
-          {
-            id: createId(), type: 'shape', position: { x: 80, y: 510 }, size: { width: 200, height: 4 },
-            rotation: 0, locked: false, shapeType: 'rectangle',
-            shapeStyle: { fill: '#3b82f6', borderRadius: 2, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 550 }, size: { width: 920, height: 400 },
-            rotation: 0, locked: false, text: '버전: v1.0\n작성일: 2025.01.01\n작성자:\n\n목차:\n1. 서론\n2. 본론\n3. 전략 제안\n4. 결론',
-            textStyle: { fontSize: 28, fontWeight: 400, color: '#94a3b8', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Pretendard' },
-          },
+          // 상단 얇은 액센트 바
+          { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1080, height: 4 }, rotation: 0, locked: true, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // 분류 라벨
+          { id: createId(), type: 'text', position: { x: 80, y: 100 }, size: { width: 400, height: 24 }, rotation: 0, locked: false, text: 'IN-DEPTH REPORT', textStyle: { fontSize: 11, fontWeight: 500, color: '#AAAAAA', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          // 문서 제목
+          { id: createId(), type: 'text', position: { x: 80, y: 340 }, size: { width: 920, height: 160 }, rotation: 0, locked: false, text: '심화 콘텐츠\n문서 제목', textStyle: { fontSize: 48, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
+          // 구분선
+          { id: createId(), type: 'shape', position: { x: 80, y: 530 }, size: { width: 60, height: 3 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 2, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // 메타 정보
+          { id: createId(), type: 'text', position: { x: 80, y: 570 }, size: { width: 920, height: 140 }, rotation: 0, locked: false, text: '버전  v1.0\n작성일  2025.01.01\n작성자  홍길동', textStyle: { fontSize: 14, fontWeight: 400, color: '#888888', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          // 목차
+          { id: createId(), type: 'shape', position: { x: 80, y: 760 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 80, y: 790 }, size: { width: 120, height: 24 }, rotation: 0, locked: false, text: '목차', textStyle: { fontSize: 13, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 830 }, size: { width: 920, height: 300 }, rotation: 0, locked: false, text: '01    서론\n\n02    본론\n\n03    전략 제안\n\n04    결론', textStyle: { fontSize: 14, fontWeight: 400, color: '#555555', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          // 하단 Confidential
+          { id: createId(), type: 'text', position: { x: 80, y: 1290 }, size: { width: 920, height: 30 }, rotation: 0, locked: false, text: 'CONFIDENTIAL', textStyle: { fontSize: 10, fontWeight: 500, color: '#CCCCCC', textAlign: 'right', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
         ],
-        background: { type: 'solid', color: '#1e293b' },
+        background: { type: 'solid', color: '#FFFFFF' },
       },
     ],
   },
@@ -325,29 +283,41 @@ export const TEMPLATES: Template[] = [
     id: 'deep-body',
     category: 'deep',
     name: '심화 본문',
-    description: '서론/본론/전략/결론 구조',
+    description: '서론 / 본론 / 전략 / 결론',
     thumbnail: '📗',
     pages: [
       {
         id: createId(),
         elements: [
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 80 }, size: { width: 920, height: 80 },
-            rotation: 0, locked: false, text: '1. 서론',
-            textStyle: { fontSize: 48, fontWeight: 700, color: '#1e293b', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Pretendard' },
-          },
-          {
-            id: createId(), type: 'shape', position: { x: 80, y: 170 }, size: { width: 60, height: 4 },
-            rotation: 0, locked: false, shapeType: 'rectangle',
-            shapeStyle: { fill: '#3b82f6', borderRadius: 2, borderWidth: 0, borderColor: 'transparent', opacity: 1 },
-          },
-          {
-            id: createId(), type: 'text', position: { x: 80, y: 210 }, size: { width: 920, height: 900 },
-            rotation: 0, locked: false, text: '배경:\n\n문제 정의:\n\n\n2. 본론\n\n2-1. 분석\n2-2. 데이터/도표/사례\n2-3. 핵심 인사이트\n\n\n3. 전략 제안\n• 전략 1:\n• 전략 2:\n• 전략 3:\n\n\n4. 결론\n• 전체 요약\n• 실행 시나리오\n• 기대효과',
-            textStyle: { fontSize: 28, fontWeight: 400, color: '#333333', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Pretendard' },
-          },
+          // 좌측 컬러 바
+          { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 4, height: 1350 }, rotation: 0, locked: true, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // 섹션 번호
+          { id: createId(), type: 'text', position: { x: 80, y: 60 }, size: { width: 100, height: 24 }, rotation: 0, locked: false, text: 'SECTION 01', textStyle: { fontSize: 11, fontWeight: 500, color: '#AAAAAA', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          // 제목
+          { id: createId(), type: 'text', position: { x: 80, y: 90 }, size: { width: 920, height: 50 }, rotation: 0, locked: false, text: '서론', textStyle: { fontSize: 32, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
+          // 구분선
+          { id: createId(), type: 'shape', position: { x: 80, y: 155 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // 본문
+          { id: createId(), type: 'text', position: { x: 80, y: 185 }, size: { width: 920, height: 200 }, rotation: 0, locked: false, text: '배경:\n\n문제 정의:', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          // 섹션 2
+          { id: createId(), type: 'shape', position: { x: 80, y: 420 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 80, y: 440 }, size: { width: 100, height: 24 }, rotation: 0, locked: false, text: 'SECTION 02', textStyle: { fontSize: 11, fontWeight: 500, color: '#AAAAAA', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 470 }, size: { width: 920, height: 50 }, rotation: 0, locked: false, text: '본론', textStyle: { fontSize: 32, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 530 }, size: { width: 920, height: 200 }, rotation: 0, locked: false, text: '2-1.  분석\n\n2-2.  데이터 / 도표 / 사례\n\n2-3.  핵심 인사이트', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          // 섹션 3
+          { id: createId(), type: 'shape', position: { x: 80, y: 770 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 80, y: 790 }, size: { width: 100, height: 24 }, rotation: 0, locked: false, text: 'SECTION 03', textStyle: { fontSize: 11, fontWeight: 500, color: '#AAAAAA', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 820 }, size: { width: 920, height: 50 }, rotation: 0, locked: false, text: '전략 제안', textStyle: { fontSize: 32, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 880 }, size: { width: 920, height: 160 }, rotation: 0, locked: false, text: '•  전략 1:\n\n•  전략 2:\n\n•  전략 3:', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          // 섹션 4
+          { id: createId(), type: 'shape', position: { x: 80, y: 1080 }, size: { width: 920, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          { id: createId(), type: 'text', position: { x: 80, y: 1100 }, size: { width: 100, height: 24 }, rotation: 0, locked: false, text: 'SECTION 04', textStyle: { fontSize: 11, fontWeight: 500, color: '#AAAAAA', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 1130 }, size: { width: 920, height: 50 }, rotation: 0, locked: false, text: '결론', textStyle: { fontSize: 32, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 80, y: 1190 }, size: { width: 920, height: 80 }, rotation: 0, locked: false, text: '•  전체 요약 / 실행 시나리오 / 기대효과', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          // 페이지 번호
+          { id: createId(), type: 'text', position: { x: 80, y: 1290 }, size: { width: 920, height: 30 }, rotation: 0, locked: false, text: '02', textStyle: { fontSize: 11, fontWeight: 400, color: '#CCCCCC', textAlign: 'right', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
         ],
-        background: { type: 'solid', color: '#ffffff' },
+        background: { type: 'solid', color: '#FFFFFF' },
       },
     ],
   },
