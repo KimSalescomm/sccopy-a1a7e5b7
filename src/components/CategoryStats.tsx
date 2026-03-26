@@ -9,6 +9,7 @@ const categories = [
   { key: 'easy' as const, label: '쉽게', emoji: '💡' },
   { key: 'concise' as const, label: '간결하게', emoji: '✂️' },
   { key: 'correct' as const, label: '바르게', emoji: '✅' },
+  { key: 'benefit' as const, label: '베네핏', emoji: '🎯' },
 ];
 
 export function CategoryStats({ stats }: CategoryStatsProps) {
