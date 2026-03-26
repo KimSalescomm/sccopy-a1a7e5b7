@@ -1,7 +1,7 @@
 // LG 고객언어 글쓰기 분석 엔진
 
 export type ErrorSeverity = 'error' | 'warning' | 'suggestion';
-export type ErrorCategory = 'customer' | 'easy' | 'concise' | 'correct';
+export type ErrorCategory = 'customer' | 'easy' | 'concise' | 'correct' | 'benefit';
 
 export interface AnalysisError {
   id: string;
