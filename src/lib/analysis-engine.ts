@@ -312,6 +312,7 @@ export function analyzeText(text: string): AnalysisResult {
   detectBlacklist(text, errors);
   detectSpellingErrors(text, errors);
   detectSpacingErrors(text, errors);
+  detectFeatureOnlyCopy(text, errors);
 
   // 중복 제거 (같은 위치에 같은 카테고리)
   const unique = errors.filter((e, i, arr) =>
