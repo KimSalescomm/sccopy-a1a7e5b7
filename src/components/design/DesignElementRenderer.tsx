@@ -2,9 +2,17 @@ import React, { useRef, useCallback, useState, useEffect } from 'react';
 import type { DesignElement, Position, Size } from '@/types/design';
 import { analyzeText, type AnalysisError } from '@/lib/analysis-engine';
 import { correctText, type CorrectionChange } from '@/lib/ai-correction';
-import { Button } from '@/components/ui/button';
-import { AlertTriangle, Wand2, Loader2, Sparkles } from 'lucide-react';
+import { AlertTriangle, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface DesignElementRendererProps {
   element: DesignElement;
@@ -27,12 +35,13 @@ export function DesignElementRenderer({
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number; handle: string } | null>(null);
   const isEditing = editingId === element.id;
   const [analysisErrors, setAnalysisErrors] = useState<AnalysisError[]>([]);
-  const [showCorrections, setShowCorrections] = useState(false);
+
+  // AI correction state
+  const [showModal, setShowModal] = useState(false);
   const [isCorrectingAI, setIsCorrectingAI] = useState(false);
   const [aiChanges, setAiChanges] = useState<CorrectionChange[]>([]);
   const [aiCorrected, setAiCorrected] = useState<string | null>(null);
 
-  // Analyze text for writing errors
   useEffect(() => {
     if (element.type === 'text' && element.text) {
       const result = analyzeText(element.text);
@@ -41,6 +50,34 @@ export function DesignElementRenderer({
       setAnalysisErrors([]);
     }
   }, [element.text, element.type]);
+
+  const handleAICorrection = useCallback(async () => {
+    if (!element.text?.trim()) return;
+    setShowModal(true);
+    setIsCorrectingAI(true);
+    setAiCorrected(null);
+    setAiChanges([]);
+    try {
+      const result = await correctText(element.text);
+      setAiCorrected(result.corrected);
+      setAiChanges(result.changes);
+    } catch (err: any) {
+      toast.error(err.message || '첨삭에 실패했습니다.');
+      setShowModal(false);
+    } finally {
+      setIsCorrectingAI(false);
+    }
+  }, [element.text]);
+
+  const handleApply = useCallback(() => {
+    if (aiCorrected) {
+      onTextChange(element.id, aiCorrected);
+      toast.success('교정된 문장이 적용되었습니다.');
+    }
+    setShowModal(false);
+    setAiCorrected(null);
+    setAiChanges([]);
+  }, [aiCorrected, element.id, onTextChange]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (element.locked || isEditing) return;
@@ -86,7 +123,6 @@ export function DesignElementRenderer({
       if (!resizeRef.current) return;
       const dx = (ev.clientX - resizeRef.current.startX) / scale;
       const dy = (ev.clientY - resizeRef.current.startY) / scale;
-      const updates: Partial<DesignElement> = {};
       const newSize: Size = { ...element.size };
       const newPos: Position = { ...element.position };
 
@@ -101,9 +137,10 @@ export function DesignElementRenderer({
         newPos.y = element.position.y + dy;
       }
 
-      updates.size = { width: Math.round(newSize.width), height: Math.round(newSize.height) };
-      updates.position = { x: Math.round(newPos.x), y: Math.round(newPos.y) };
-      onUpdate(element.id, updates);
+      onUpdate(element.id, {
+        size: { width: Math.round(newSize.width), height: Math.round(newSize.height) },
+        position: { x: Math.round(newPos.x), y: Math.round(newPos.y) },
+      });
     };
 
     const handleMouseUp = () => {
@@ -140,109 +177,14 @@ export function DesignElementRenderer({
 
       if (isEditing) {
         return (
-          <div className="relative w-full h-full">
-            <textarea
-              autoFocus
-              value={element.text ?? ''}
-              onChange={e => { onTextChange(element.id, e.target.value); setShowCorrections(false); }}
-              onKeyDown={e => { if (e.key === 'Escape') { onFinishEditing(); setShowCorrections(false); } }}
-              style={style}
-              className="cursor-text"
-            />
-
-            {/* AI 첨삭 버튼 */}
-            <div className="absolute right-0 flex items-center gap-1 z-50" style={{ top: -36 }}>
-              <button
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium shadow-md transition-all ${
-                  showCorrections
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-card border text-foreground hover:bg-accent'
-                }`}
-                onMouseDown={e => e.preventDefault()}
-                onClick={async () => {
-                  if (showCorrections) {
-                    setShowCorrections(false);
-                    return;
-                  }
-                  if (!element.text?.trim()) return;
-                  setIsCorrectingAI(true);
-                  setShowCorrections(true);
-                  try {
-                    const result = await correctText(element.text);
-                    setAiCorrected(result.corrected);
-                    setAiChanges(result.changes);
-                  } catch (err: any) {
-                    toast.error(err.message || '첨삭에 실패했습니다.');
-                    setShowCorrections(false);
-                  } finally {
-                    setIsCorrectingAI(false);
-                  }
-                }}
-                disabled={isCorrectingAI}
-              >
-                {isCorrectingAI ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                ) : (
-                  <Sparkles className="w-3 h-3" />
-                )}
-                AI 첨삭
-              </button>
-            </div>
-
-            {/* AI 첨삭 결과 패널 */}
-            {showCorrections && (
-              <div
-                className="absolute left-0 right-0 z-50 rounded-lg bg-card/95 backdrop-blur-sm border shadow-xl overflow-y-auto"
-                style={{ bottom: '100%', marginBottom: 4, maxHeight: 260 }}
-                onMouseDown={e => e.preventDefault()}
-              >
-                {isCorrectingAI ? (
-                  <div className="flex items-center justify-center gap-2 p-4 text-sm text-muted-foreground">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    AI가 첨삭 중...
-                  </div>
-                ) : aiCorrected ? (
-                  <div className="p-3 space-y-3">
-                    {/* 교정된 문장 전체 적용 버튼 */}
-                    <div className="space-y-2">
-                      <div className="text-xs font-medium text-muted-foreground">교정된 문장</div>
-                      <div className="p-2.5 rounded-md bg-primary/5 border border-primary/20 text-sm leading-relaxed">
-                        {aiCorrected}
-                      </div>
-                      <button
-                        className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                        onClick={() => {
-                          onTextChange(element.id, aiCorrected);
-                          setShowCorrections(false);
-                          setAiCorrected(null);
-                          setAiChanges([]);
-                          toast.success('교정된 문장이 적용되었습니다.');
-                        }}
-                      >
-                        <Sparkles className="w-3 h-3" />
-                        전체 적용
-                      </button>
-                    </div>
-
-                    {/* 변경 사항 목록 */}
-                    {aiChanges.length > 0 && (
-                      <div className="space-y-1.5">
-                        <div className="text-xs font-medium text-muted-foreground">변경 사항</div>
-                        {aiChanges.map((change, i) => (
-                          <div key={i} className="flex items-start gap-2 text-xs p-1.5 rounded bg-muted/50">
-                            <span className="line-through text-destructive/70 shrink-0">{change.original}</span>
-                            <span className="text-muted-foreground shrink-0">→</span>
-                            <span className="text-primary font-medium shrink-0">{change.corrected}</span>
-                            <span className="text-muted-foreground ml-auto text-right">{change.reason}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : null}
-              </div>
-            )}
-          </div>
+          <textarea
+            autoFocus
+            value={element.text ?? ''}
+            onChange={e => onTextChange(element.id, e.target.value)}
+            onKeyDown={e => { if (e.key === 'Escape') onFinishEditing(); }}
+            style={style}
+            className="cursor-text"
+          />
         );
       }
 
@@ -302,46 +244,125 @@ export function DesignElementRenderer({
   };
 
   const hasErrors = element.type === 'text' && analysisErrors.length > 0 && !isEditing;
+  const showAIButton = element.type === 'text' && selected && !!element.text?.trim();
 
   return (
-    <div
-      ref={elRef}
-      className="absolute group"
-      style={{
-        left: element.position.x,
-        top: element.position.y,
-        width: element.size.width,
-        height: element.size.height,
-        cursor: element.locked ? 'default' : (isEditing ? 'text' : 'move'),
-        outline: selected ? '2px solid hsl(230, 65%, 55%)' : (hasErrors ? '2px dashed hsl(30, 90%, 52%)' : 'none'),
-        outlineOffset: 1,
-        zIndex: selected ? 100 : 'auto',
-      }}
-      onMouseDown={handleMouseDown}
-      onDoubleClick={() => onDoubleClick(element.id)}
-    >
-      {renderContent()}
+    <>
+      <div
+        ref={elRef}
+        className="absolute group"
+        style={{
+          left: element.position.x,
+          top: element.position.y,
+          width: element.size.width,
+          height: element.size.height,
+          cursor: element.locked ? 'default' : (isEditing ? 'text' : 'move'),
+          outline: selected ? '2px solid hsl(230, 65%, 55%)' : (hasErrors ? '2px dashed hsl(30, 90%, 52%)' : 'none'),
+          outlineOffset: 1,
+          zIndex: selected ? 100 : 'auto',
+        }}
+        onMouseDown={handleMouseDown}
+        onDoubleClick={() => onDoubleClick(element.id)}
+      >
+        {renderContent()}
 
-      {/* Error indicator badge */}
-      {hasErrors && (
-        <div
-          className="absolute flex items-center gap-1 px-1.5 py-0.5 rounded bg-warning text-warning-foreground shadow-sm"
-          style={{ top: -24, right: 0, fontSize: 10 }}
-        >
-          <AlertTriangle className="w-3 h-3" />
-          {analysisErrors.length}
-        </div>
-      )}
+        {/* AI 첨삭 버튼 - 선택된 텍스트 요소의 우측 상단 */}
+        {showAIButton && (
+          <button
+            className="absolute flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium shadow-md transition-all bg-primary text-primary-foreground hover:bg-primary/90 z-50"
+            style={{ top: -32, right: 0 }}
+            onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
+            onClick={e => { e.stopPropagation(); handleAICorrection(); }}
+          >
+            <Sparkles className="w-3 h-3" />
+            AI 첨삭
+          </button>
+        )}
 
-      {/* Resize handles */}
-      {selected && !element.locked && !isEditing && handles.map(h => (
-        <div
-          key={h}
-          className="absolute w-2 h-2 bg-primary rounded-sm border border-primary-foreground shadow-sm"
-          style={{ ...handlePositions[h], cursor: handleCursors[h] }}
-          onMouseDown={e => handleResizeMouseDown(e, h)}
-        />
-      ))}
-    </div>
+        {/* Error indicator badge */}
+        {hasErrors && (
+          <div
+            className="absolute flex items-center gap-1 px-1.5 py-0.5 rounded bg-warning text-warning-foreground shadow-sm"
+            style={{ top: -24, right: showAIButton ? 80 : 0, fontSize: 10 }}
+          >
+            <AlertTriangle className="w-3 h-3" />
+            {analysisErrors.length}
+          </div>
+        )}
+
+        {/* Resize handles */}
+        {selected && !element.locked && !isEditing && handles.map(h => (
+          <div
+            key={h}
+            className="absolute w-2 h-2 bg-primary rounded-sm border border-primary-foreground shadow-sm"
+            style={{ ...handlePositions[h], cursor: handleCursors[h] }}
+            onMouseDown={e => handleResizeMouseDown(e, h)}
+          />
+        ))}
+      </div>
+
+      {/* AI 첨삭 결과 모달 */}
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-primary" />
+              AI 첨삭 결과
+            </DialogTitle>
+            <DialogDescription>
+              AI가 텍스트를 분석하여 수정안을 제안합니다.
+            </DialogDescription>
+          </DialogHeader>
+
+          {isCorrectingAI ? (
+            <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              AI가 첨삭 중입니다...
+            </div>
+          ) : aiCorrected ? (
+            <div className="space-y-4">
+              {/* 수정안 */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold text-foreground">수정안</h4>
+                <div className="p-3 rounded-md bg-primary/5 border border-primary/20 text-sm leading-relaxed whitespace-pre-wrap">
+                  {aiCorrected}
+                </div>
+              </div>
+
+              {/* 수정 이유 */}
+              {aiChanges.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-foreground">수정 이유</h4>
+                  <div className="space-y-2">
+                    {aiChanges.map((change, i) => (
+                      <div key={i} className="rounded-md border p-3 space-y-1.5 text-sm">
+                        <div className="flex items-start gap-2 flex-wrap">
+                          <span className="line-through text-destructive/70">{change.original}</span>
+                          <span className="text-muted-foreground">→</span>
+                          <span className="text-primary font-medium">{change.corrected}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{change.reason}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : null}
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setShowModal(false)}>
+              닫기
+            </Button>
+            {aiCorrected && (
+              <Button onClick={handleApply}>
+                <Sparkles className="w-3.5 h-3.5 mr-1" />
+                적용하기
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
