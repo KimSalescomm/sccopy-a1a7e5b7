@@ -103,6 +103,22 @@ export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, cu
         이미지
       </Button>
 
+      <Separator orientation="vertical" className="h-6 mx-1" />
+
+      <Button variant="ghost" size="sm" className="text-xs gap-1.5" onClick={onManualSave}>
+        <Save className="w-3.5 h-3.5" />
+        저장
+      </Button>
+
+      <span className="text-[10px] text-muted-foreground ml-1 min-w-[60px]">
+        {saveStatus === 'saving' && (
+          <span className="flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" />저장 중...</span>
+        )}
+        {saveStatus === 'saved' && (
+          <span className="flex items-center gap-1 text-green-600"><Cloud className="w-3 h-3" />자동 저장됨</span>
+        )}
+      </span>
+
       <div className="flex-1" />
 
       <DropdownMenu>
