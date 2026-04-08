@@ -45,7 +45,14 @@ export const TEMPLATES: Template[] = [
           { id: createId(), type: 'text', position: { x: 432, y: 230 }, size: { width: 1440, height: 36 }, rotation: 0, locked: false, text: '{베네핏} + {USP 1}', textStyle: { fontSize: 21, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
           // 하위 기능 박스 (노란색)
           { id: createId(), type: 'shape', position: { x: 432, y: 278 }, size: { width: 1440, height: 120 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#FFF9E6', borderRadius: 8, borderWidth: 1, borderColor: '#F5E6B8', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 452, y: 290 }, size: { width: 1400, height: 96 }, rotation: 0, locked: false, text: '**{기능명 1}** : {상세설명}\n**{기능명 2}** : {상세설명}\n**{기능명 3}** : {상세설명}', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          // Row 1
+          { id: createId(), type: 'text', position: { x: 452, y: 288 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: 'AI 딥클린', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 792, y: 288 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '자동으로 먼지와 이물질을 감지해 오염 상태에 맞게 조절해줘요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          // Row divider
+          { id: createId(), type: 'shape', position: { x: 452, y: 336 }, size: { width: 1400, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#F0E6C8', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // Row 2
+          { id: createId(), type: 'text', position: { x: 452, y: 344 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: '자동 먼지 감지', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 792, y: 344 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '보이지 않는 미세먼지까지 자동으로 감지해 흡입력을 조절해요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
 
           // 구분선 1
           { id: createId(), type: 'shape', position: { x: 432, y: 418 }, size: { width: 1440, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
