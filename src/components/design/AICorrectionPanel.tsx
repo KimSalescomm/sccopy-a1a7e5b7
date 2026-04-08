@@ -234,6 +234,16 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
               variant="outline"
               size="sm"
               className="h-8 text-xs"
+              onClick={() => runCorrection()}
+              disabled={isRefining}
+            >
+              <Sparkles className="w-3 h-3 mr-1" />
+              다시 첨삭
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs"
               onClick={handleRefine}
               disabled={isRefining}
             >
@@ -242,7 +252,6 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
             </Button>
             {unappliedCount > 0 && (
               <Button size="sm" className="h-8 text-xs" onClick={handleApplyAll}>
-                <Sparkles className="w-3 h-3 mr-1" />
                 전체 적용 ({unappliedCount})
               </Button>
             )}
