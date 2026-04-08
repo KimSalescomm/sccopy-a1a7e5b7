@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Page, DesignElement, CanvasPreset } from '@/types/design';
 import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId, DEFAULT_PRESET, CANVAS_PRESETS } from '@/types/design';
 import { getTemplatePages, getTemplatePresetId } from '@/lib/templates';
@@ -7,6 +7,17 @@ import { PageSidebar } from '@/components/design/PageSidebar';
 import { Canvas } from '@/components/design/Canvas';
 import { PropertiesPanel } from '@/components/design/PropertiesPanel';
 import { toast } from '@/hooks/use-toast';
+import { useAutoSave, hasSavedData, loadSavedData, clearSavedData } from '@/hooks/use-auto-save';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const Index = () => {
   const [pages, setPages] = useState<Page[]>([createDefaultPage()]);
@@ -14,7 +25,41 @@ const Index = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [canvasPreset, setCanvasPreset] = useState<CanvasPreset>(DEFAULT_PRESET);
+  const [showRestoreDialog, setShowRestoreDialog] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const { status: saveStatus, saveNow } = useAutoSave(pages, canvasPreset.id);
+
+  // Check for saved data on mount
+  useEffect(() => {
+    if (hasSavedData()) {
+      setShowRestoreDialog(true);
+    }
+  }, []);
+
+  const handleRestore = useCallback(() => {
+    const data = loadSavedData();
+    if (data) {
+      setPages(data.pages);
+      const preset = CANVAS_PRESETS.find(p => p.id === data.canvasPresetId);
+      if (preset) setCanvasPreset(preset);
+      setCurrentPageIndex(0);
+      setSelectedId(null);
+      setEditingId(null);
+      toast({ title: '복원 완료', description: '이전 작업이 복원되었습니다.' });
+    }
+    setShowRestoreDialog(false);
+  }, []);
+
+  const handleDismissRestore = useCallback(() => {
+    clearSavedData();
+    setShowRestoreDialog(false);
+  }, []);
+
+  const handleManualSave = useCallback(() => {
+    saveNow();
+    toast({ title: '저장되었습니다', description: '현재 작업이 저장되었습니다.' });
+  }, [saveNow]);
 
   const currentPage = pages[currentPageIndex];
   const selectedElement = currentPage?.elements.find(e => e.id === selectedId) ?? null;
@@ -155,6 +200,8 @@ const Index = () => {
         onApplyTemplate={handleApplyTemplate}
         currentPreset={canvasPreset}
         onChangePreset={setCanvasPreset}
+        saveStatus={saveStatus}
+        onManualSave={handleManualSave}
       />
       <div className="flex-1 flex overflow-hidden">
         <PageSidebar
@@ -188,6 +235,21 @@ const Index = () => {
         />
       </div>
       <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+
+      <AlertDialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>이전 작업 복원</AlertDialogTitle>
+            <AlertDialogDescription>
+              이전에 작업하던 내용이 있습니다. 복원하시겠습니까?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleDismissRestore}>새로 시작</AlertDialogCancel>
+            <AlertDialogAction onClick={handleRestore}>복원하기</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

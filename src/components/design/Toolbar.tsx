@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Type, Square, Circle, Image, LayoutTemplate, FileText, ChevronRight } from 'lucide-react';
+import { Type, Square, Circle, Image, LayoutTemplate, FileText, Save, Cloud, CloudOff, Loader2 } from 'lucide-react';
+import type { SaveStatus } from '@/hooks/use-auto-save';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,9 +23,11 @@ interface ToolbarProps {
   onApplyTemplate: (templateId: string) => void;
   currentPreset: CanvasPreset;
   onChangePreset: (preset: CanvasPreset) => void;
+  saveStatus: SaveStatus;
+  onManualSave: () => void;
 }
 
-export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, currentPreset, onChangePreset }: ToolbarProps) {
+export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, currentPreset, onChangePreset, saveStatus, onManualSave }: ToolbarProps) {
   return (
     <header className="h-12 border-b bg-card flex items-center px-3 gap-1">
       <div className="flex items-center gap-2 mr-3">
@@ -99,6 +102,22 @@ export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, cu
         <Image className="w-3.5 h-3.5" />
         이미지
       </Button>
+
+      <Separator orientation="vertical" className="h-6 mx-1" />
+
+      <Button variant="ghost" size="sm" className="text-xs gap-1.5" onClick={onManualSave}>
+        <Save className="w-3.5 h-3.5" />
+        저장
+      </Button>
+
+      <span className="text-[10px] text-muted-foreground ml-1 min-w-[60px]">
+        {saveStatus === 'saving' && (
+          <span className="flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" />저장 중...</span>
+        )}
+        {saveStatus === 'saved' && (
+          <span className="flex items-center gap-1 text-primary"><Cloud className="w-3 h-3" />자동 저장됨</span>
+        )}
+      </span>
 
       <div className="flex-1" />
 
