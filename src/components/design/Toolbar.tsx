@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Type, Square, Circle, Image, LayoutTemplate, FileText, ChevronRight } from 'lucide-react';
+import { Type, Square, Circle, Image, LayoutTemplate, FileText, Save, Cloud, CloudOff, Loader2 } from 'lucide-react';
+import type { SaveStatus } from '@/hooks/use-auto-save';
 import {
   DropdownMenu,
   DropdownMenuContent,
