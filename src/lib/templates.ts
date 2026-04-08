@@ -63,13 +63,13 @@ export const TEMPLATES: Template[] = [
           { id: createId(), type: 'text', position: { x: 432, y: 478 }, size: { width: 1440, height: 36 }, rotation: 0, locked: false, text: '{베네핏} + {USP 2}', textStyle: { fontSize: 21, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
           { id: createId(), type: 'shape', position: { x: 432, y: 526 }, size: { width: 1440, height: 120 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#FFF9E6', borderRadius: 8, borderWidth: 1, borderColor: '#F5E6B8', opacity: 1 } },
           // Row 1
-          { id: createId(), type: 'text', position: { x: 452, y: 536 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: '스마트 센서', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 792, y: 536 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '바닥 재질에 따라 흡입력을 자동으로 전환해줘요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 452, y: 536 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: 'USP명', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 792, y: 536 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '자세한 설명을 적어주세요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
           // Row divider
           { id: createId(), type: 'shape', position: { x: 452, y: 584 }, size: { width: 1400, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#F0E6C8', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
           // Row 2
-          { id: createId(), type: 'text', position: { x: 452, y: 592 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: '물걸레 시스템', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 792, y: 592 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '진공 청소와 물걸레를 동시에 처리하는 듀얼 시스템이에요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 452, y: 592 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: 'USP명', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 792, y: 592 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '자세한 설명을 적어주세요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
 
           // 구분선 2
           { id: createId(), type: 'shape', position: { x: 432, y: 666 }, size: { width: 1440, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
