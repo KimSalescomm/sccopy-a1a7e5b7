@@ -133,7 +133,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text } = await req.json();
+    const { text, mode } = await req.json();
 
     if (!text || typeof text !== "string" || text.trim().length === 0) {
       return new Response(
