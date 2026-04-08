@@ -23,22 +23,25 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
   const [isRefining, setIsRefining] = useState(false);
   const [refinedText, setRefinedText] = useState<string | null>(null);
 
-  const runCorrection = useCallback(async () => {
+  const runCorrection = useCallback(async (targetText?: string) => {
+    const textToCheck = targetText ?? currentText;
     setIsLoading(true);
+    setRefinedText(null);
+    setAppliedState({});
     try {
-      const result = await correctText(text);
+      const result = await correctText(textToCheck);
       setChanges(result.changes);
-      setCurrentText(text);
+      setCurrentText(textToCheck);
     } catch (err: any) {
       toast.error(err.message || '첨삭에 실패했습니다.');
       onClose();
     } finally {
       setIsLoading(false);
     }
-  }, [text, onClose]);
+  }, [currentText, onClose]);
 
   React.useEffect(() => {
-    runCorrection();
+    runCorrection(text);
   }, []);
 
   const handleApplyItem = useCallback((index: number, change: CorrectionChange) => {
