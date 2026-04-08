@@ -115,7 +115,7 @@ export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, cu
           <span className="flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" />저장 중...</span>
         )}
         {saveStatus === 'saved' && (
-          <span className="flex items-center gap-1 text-green-600"><Cloud className="w-3 h-3" />자동 저장됨</span>
+          <span className="flex items-center gap-1 text-primary"><Cloud className="w-3 h-3" />자동 저장됨</span>
         )}
       </span>
 
