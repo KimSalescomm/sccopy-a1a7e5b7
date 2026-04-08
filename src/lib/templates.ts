@@ -219,7 +219,7 @@ export const TEMPLATES: Template[] = [
           // 완전한 빈 공간 (Blank Canvas)
           // 세일즈톡 등을 자유롭게 구성
           // ══════════════════════════════════════
-          { id: createId(), type: 'text', position: { x: 48, y: 480 }, size: { width: 1824, height: 40 }, rotation: 0, locked: false, text: '이 영역에 세일즈톡 등을 자유롭게 구성하세요', textStyle: { fontSize: 16, fontWeight: 400, color: '#CCCCCC', textAlign: 'center', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 48, y: 480 }, size: { width: 1824, height: 40 }, rotation: 0, locked: false, text: '이 영역에 세일즈톡 등을 자유롭게 구성하세요', textStyle: { fontSize: 15, fontWeight: 400, color: '#CCCCCC', textAlign: 'center', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
 
           // ══════════════════════════════════════
           // FOOTER AREA (15vh = 162px, y:918–1080)
