@@ -192,7 +192,13 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
               <RefreshCw className="w-3 h-3 text-primary" />
               <span className="text-xs font-semibold text-foreground">다듬어진 문장</span>
             </div>
-            <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap">{refinedText}</p>
+            <textarea
+              className="w-full text-xs text-foreground leading-relaxed whitespace-pre-wrap bg-background border border-border rounded-md p-2 resize-none outline-none focus:border-primary/50 transition-colors"
+              rows={3}
+              value={refinedText}
+              onChange={e => setRefinedText(e.target.value)}
+            />
+            <p className="text-[10px] text-muted-foreground">직접 수정한 후 적용할 수 있습니다</p>
             <div className="flex justify-end">
               <Button
                 size="sm"

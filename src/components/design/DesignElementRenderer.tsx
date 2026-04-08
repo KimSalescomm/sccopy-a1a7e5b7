@@ -206,7 +206,7 @@ export function DesignElementRenderer({
   };
 
   const hasErrors = element.type === 'text' && analysisErrors.length > 0 && !isEditing;
-  const showAIButton = element.type === 'text' && selected && !!element.text?.trim() && !showCorrectionPanel;
+  const showAIButton = element.type === 'text' && selected && !!element.text?.trim() && !showCorrectionPanel && !isEditing;
 
   return (
     <div
