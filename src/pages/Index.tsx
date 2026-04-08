@@ -200,6 +200,8 @@ const Index = () => {
         onApplyTemplate={handleApplyTemplate}
         currentPreset={canvasPreset}
         onChangePreset={setCanvasPreset}
+        saveStatus={saveStatus}
+        onManualSave={handleManualSave}
       />
       <div className="flex-1 flex overflow-hidden">
         <PageSidebar
@@ -233,6 +235,21 @@ const Index = () => {
         />
       </div>
       <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+
+      <AlertDialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>이전 작업 복원</AlertDialogTitle>
+            <AlertDialogDescription>
+              이전에 작업하던 내용이 있습니다. 복원하시겠습니까?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleDismissRestore}>새로 시작</AlertDialogCancel>
+            <AlertDialogAction onClick={handleRestore}>복원하기</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
