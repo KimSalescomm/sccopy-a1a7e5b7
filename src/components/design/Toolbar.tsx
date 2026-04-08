@@ -23,9 +23,11 @@ interface ToolbarProps {
   onApplyTemplate: (templateId: string) => void;
   currentPreset: CanvasPreset;
   onChangePreset: (preset: CanvasPreset) => void;
+  saveStatus: SaveStatus;
+  onManualSave: () => void;
 }
 
-export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, currentPreset, onChangePreset }: ToolbarProps) {
+export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, currentPreset, onChangePreset, saveStatus, onManualSave }: ToolbarProps) {
   return (
     <header className="h-12 border-b bg-card flex items-center px-3 gap-1">
       <div className="flex items-center gap-2 mr-3">
