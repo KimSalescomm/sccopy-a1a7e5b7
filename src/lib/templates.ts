@@ -21,7 +21,7 @@ export const TEMPLATES: Template[] = [
           // HEADER AREA (15vh = 162px, y:0–162)
           // ══════════════════════════════════════
           { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1920, height: 162 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#F5F5F5', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 48, y: 50 }, size: { width: 1824, height: 60 }, rotation: 0, locked: false, text: '{제품명} | {신제품 특장점}', textStyle: { fontSize: 32, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 48, y: 50 }, size: { width: 1824, height: 60 }, rotation: 0, locked: false, text: '{제품명} | {신제품 특장점}', textStyle: { fontSize: 34, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.25, fontFamily: 'Noto Sans KR' } },
           // 헤더 하단선
           { id: createId(), type: 'shape', position: { x: 0, y: 162 }, size: { width: 1920, height: 2 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
 
