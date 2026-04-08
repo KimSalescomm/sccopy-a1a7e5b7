@@ -21,7 +21,7 @@ export const TEMPLATES: Template[] = [
           // HEADER AREA (15vh = 162px, y:0–162)
           // ══════════════════════════════════════
           { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1920, height: 162 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#F5F5F5', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 48, y: 50 }, size: { width: 1824, height: 60 }, rotation: 0, locked: false, text: '{제품명} | {신제품 특장점}', textStyle: { fontSize: 32, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 48, y: 50 }, size: { width: 1824, height: 60 }, rotation: 0, locked: false, text: '{제품명} | {신제품 특장점}', textStyle: { fontSize: 34, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.25, fontFamily: 'Noto Sans KR' } },
           // 헤더 하단선
           { id: createId(), type: 'shape', position: { x: 0, y: 162 }, size: { width: 1920, height: 2 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
 
@@ -40,32 +40,32 @@ export const TEMPLATES: Template[] = [
           // Feature 1 (y:184 ~ y:424, ~240px each for 3 features)
           // 카테고리 뱃지
           { id: createId(), type: 'shape', position: { x: 432, y: 190 }, size: { width: 100, height: 28 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 4, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 432, y: 190 }, size: { width: 100, height: 28 }, rotation: 0, locked: false, text: '{카테고리}', textStyle: { fontSize: 12, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 2.2, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 432, y: 190 }, size: { width: 100, height: 28 }, rotation: 0, locked: false, text: '{카테고리}', textStyle: { fontSize: 13, fontWeight: 500, color: '#FFFFFF', textAlign: 'center', lineHeight: 2.2, fontFamily: 'Noto Sans KR' } },
           // 메인 카피
-          { id: createId(), type: 'text', position: { x: 432, y: 230 }, size: { width: 1440, height: 36 }, rotation: 0, locked: false, text: '{베네핏} + {USP 1}', textStyle: { fontSize: 22, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 432, y: 230 }, size: { width: 1440, height: 36 }, rotation: 0, locked: false, text: '{베네핏} + {USP 1}', textStyle: { fontSize: 21, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
           // 하위 기능 박스 (노란색)
           { id: createId(), type: 'shape', position: { x: 432, y: 278 }, size: { width: 1440, height: 120 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#FFF9E6', borderRadius: 8, borderWidth: 1, borderColor: '#F5E6B8', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 452, y: 290 }, size: { width: 1400, height: 96 }, rotation: 0, locked: false, text: '**{기능명 1}** : {상세설명}\n**{기능명 2}** : {상세설명}\n**{기능명 3}** : {상세설명}', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 452, y: 290 }, size: { width: 1400, height: 96 }, rotation: 0, locked: false, text: '**{기능명 1}** : {상세설명}\n**{기능명 2}** : {상세설명}\n**{기능명 3}** : {상세설명}', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
 
           // 구분선 1
           { id: createId(), type: 'shape', position: { x: 432, y: 418 }, size: { width: 1440, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
 
           // Feature 2 (y:430 ~ y:660)
           { id: createId(), type: 'shape', position: { x: 432, y: 438 }, size: { width: 100, height: 28 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 4, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 432, y: 438 }, size: { width: 100, height: 28 }, rotation: 0, locked: false, text: '{카테고리}', textStyle: { fontSize: 12, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 2.2, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 432, y: 478 }, size: { width: 1440, height: 36 }, rotation: 0, locked: false, text: '{베네핏} + {USP 2}', textStyle: { fontSize: 22, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 432, y: 438 }, size: { width: 100, height: 28 }, rotation: 0, locked: false, text: '{카테고리}', textStyle: { fontSize: 13, fontWeight: 500, color: '#FFFFFF', textAlign: 'center', lineHeight: 2.2, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 432, y: 478 }, size: { width: 1440, height: 36 }, rotation: 0, locked: false, text: '{베네핏} + {USP 2}', textStyle: { fontSize: 21, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
           { id: createId(), type: 'shape', position: { x: 432, y: 526 }, size: { width: 1440, height: 120 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#FFF9E6', borderRadius: 8, borderWidth: 1, borderColor: '#F5E6B8', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 452, y: 538 }, size: { width: 1400, height: 96 }, rotation: 0, locked: false, text: '**{기능명 1}** : {상세설명}\n**{기능명 2}** : {상세설명}', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 452, y: 538 }, size: { width: 1400, height: 96 }, rotation: 0, locked: false, text: '**{기능명 1}** : {상세설명}\n**{기능명 2}** : {상세설명}', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
 
           // 구분선 2
           { id: createId(), type: 'shape', position: { x: 432, y: 666 }, size: { width: 1440, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
 
           // Feature 3 (y:678 ~ y:908)
           { id: createId(), type: 'shape', position: { x: 432, y: 686 }, size: { width: 100, height: 28 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 4, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 432, y: 686 }, size: { width: 100, height: 28 }, rotation: 0, locked: false, text: '{카테고리}', textStyle: { fontSize: 12, fontWeight: 700, color: '#FFFFFF', textAlign: 'center', lineHeight: 2.2, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 432, y: 726 }, size: { width: 1440, height: 36 }, rotation: 0, locked: false, text: '{베네핏} + {USP 3}', textStyle: { fontSize: 22, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 432, y: 686 }, size: { width: 100, height: 28 }, rotation: 0, locked: false, text: '{카테고리}', textStyle: { fontSize: 13, fontWeight: 500, color: '#FFFFFF', textAlign: 'center', lineHeight: 2.2, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 432, y: 726 }, size: { width: 1440, height: 36 }, rotation: 0, locked: false, text: '{베네핏} + {USP 3}', textStyle: { fontSize: 21, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
           { id: createId(), type: 'shape', position: { x: 432, y: 774 }, size: { width: 1440, height: 120 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#FFF9E6', borderRadius: 8, borderWidth: 1, borderColor: '#F5E6B8', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 452, y: 786 }, size: { width: 1400, height: 96 }, rotation: 0, locked: false, text: '**{기능명 1}** : {상세설명}', textStyle: { fontSize: 14, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.8, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 452, y: 786 }, size: { width: 1400, height: 96 }, rotation: 0, locked: false, text: '**{기능명 1}** : {상세설명}', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
 
           // ══════════════════════════════════════
           // FOOTER AREA (15vh = 162px, y:918–1080)
@@ -99,10 +99,10 @@ export const TEMPLATES: Template[] = [
           { id: createId(), type: 'text', position: { x: 48, y: 530 }, size: { width: 1100, height: 40 }, rotation: 0, locked: false, text: '키 비주얼 이미지 영역', textStyle: { fontSize: 16, fontWeight: 400, color: '#BFBFBF', textAlign: 'center', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
 
           // ── 우측 텍스트 영역 (40%) ──
-          { id: createId(), type: 'text', position: { x: 1200, y: 120 }, size: { width: 672, height: 40 }, rotation: 0, locked: false, text: 'Key Claim', textStyle: { fontSize: 22, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 1200, y: 120 }, size: { width: 672, height: 40 }, rotation: 0, locked: false, text: 'Key Claim', textStyle: { fontSize: 21, fontWeight: 700, color: '#E53935', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
           { id: createId(), type: 'shape', position: { x: 1200, y: 172 }, size: { width: 672, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 1200, y: 200 }, size: { width: 672, height: 200 }, rotation: 0, locked: false, text: '핵심 메시지를 입력하세요.\n\n고객에게 가장 강력하게 전달할\n비주얼 포인트를 작성합니다.', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.7, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 1200, y: 430 }, size: { width: 672, height: 40 }, rotation: 0, locked: false, text: '부가 설명 텍스트를 입력하세요.', textStyle: { fontSize: 12, fontWeight: 400, color: '#AAAAAA', textAlign: 'left', lineHeight: 1.6, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 1200, y: 200 }, size: { width: 672, height: 200 }, rotation: 0, locked: false, text: '핵심 메시지를 입력하세요.\n\n고객에게 가장 강력하게 전달할\n비주얼 포인트를 작성합니다.', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 1200, y: 430 }, size: { width: 672, height: 40 }, rotation: 0, locked: false, text: '부가 설명 텍스트를 입력하세요.', textStyle: { fontSize: 13, fontWeight: 500, color: '#AAAAAA', textAlign: 'left', lineHeight: 1.6, fontFamily: 'Noto Sans KR' } },
         ],
         background: { type: 'solid', color: '#FFFFFF' },
       },
@@ -210,7 +210,7 @@ export const TEMPLATES: Template[] = [
           // HEADER AREA (15vh = 162px, y:0–162)
           // ══════════════════════════════════════
           { id: createId(), type: 'shape', position: { x: 0, y: 0 }, size: { width: 1920, height: 162 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#F5F5F5', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
-          { id: createId(), type: 'text', position: { x: 48, y: 50 }, size: { width: 1724, height: 60 }, rotation: 0, locked: false, text: '이슈 제목을 입력하세요', textStyle: { fontSize: 32, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 48, y: 50 }, size: { width: 1724, height: 60 }, rotation: 0, locked: false, text: '이슈 제목을 입력하세요', textStyle: { fontSize: 34, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.25, fontFamily: 'Noto Sans KR' } },
           // 헤더 하단선
           { id: createId(), type: 'shape', position: { x: 0, y: 162 }, size: { width: 1920, height: 2 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
 
@@ -219,7 +219,7 @@ export const TEMPLATES: Template[] = [
           // 완전한 빈 공간 (Blank Canvas)
           // 세일즈톡 등을 자유롭게 구성
           // ══════════════════════════════════════
-          { id: createId(), type: 'text', position: { x: 48, y: 480 }, size: { width: 1824, height: 40 }, rotation: 0, locked: false, text: '이 영역에 세일즈톡 등을 자유롭게 구성하세요', textStyle: { fontSize: 16, fontWeight: 400, color: '#CCCCCC', textAlign: 'center', lineHeight: 1.4, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 48, y: 480 }, size: { width: 1824, height: 40 }, rotation: 0, locked: false, text: '이 영역에 세일즈톡 등을 자유롭게 구성하세요', textStyle: { fontSize: 15, fontWeight: 400, color: '#CCCCCC', textAlign: 'center', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
 
           // ══════════════════════════════════════
           // FOOTER AREA (15vh = 162px, y:918–1080)
