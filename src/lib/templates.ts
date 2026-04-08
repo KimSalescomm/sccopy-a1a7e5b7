@@ -46,13 +46,13 @@ export const TEMPLATES: Template[] = [
           // 하위 기능 박스 (노란색)
           { id: createId(), type: 'shape', position: { x: 432, y: 278 }, size: { width: 1440, height: 120 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#FFF9E6', borderRadius: 8, borderWidth: 1, borderColor: '#F5E6B8', opacity: 1 } },
           // Row 1
-          { id: createId(), type: 'text', position: { x: 452, y: 288 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: 'AI 딥클린', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 792, y: 288 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '자동으로 먼지와 이물질을 감지해 오염 상태에 맞게 조절해줘요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 452, y: 288 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: 'USP명', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 792, y: 288 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '자세한 설명을 적어주세요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
           // Row divider
           { id: createId(), type: 'shape', position: { x: 452, y: 336 }, size: { width: 1400, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#F0E6C8', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
           // Row 2
-          { id: createId(), type: 'text', position: { x: 452, y: 344 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: '자동 먼지 감지', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 792, y: 344 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '보이지 않는 미세먼지까지 자동으로 감지해 흡입력을 조절해요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 452, y: 344 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: 'USP명', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 792, y: 344 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '자세한 설명을 적어주세요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
 
           // 구분선 1
           { id: createId(), type: 'shape', position: { x: 432, y: 418 }, size: { width: 1440, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
@@ -63,13 +63,13 @@ export const TEMPLATES: Template[] = [
           { id: createId(), type: 'text', position: { x: 432, y: 478 }, size: { width: 1440, height: 36 }, rotation: 0, locked: false, text: '{베네핏} + {USP 2}', textStyle: { fontSize: 21, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
           { id: createId(), type: 'shape', position: { x: 432, y: 526 }, size: { width: 1440, height: 120 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#FFF9E6', borderRadius: 8, borderWidth: 1, borderColor: '#F5E6B8', opacity: 1 } },
           // Row 1
-          { id: createId(), type: 'text', position: { x: 452, y: 536 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: '스마트 센서', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 792, y: 536 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '바닥 재질에 따라 흡입력을 자동으로 전환해줘요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 452, y: 536 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: 'USP명', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 792, y: 536 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '자세한 설명을 적어주세요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
           // Row divider
           { id: createId(), type: 'shape', position: { x: 452, y: 584 }, size: { width: 1400, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#F0E6C8', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
           // Row 2
-          { id: createId(), type: 'text', position: { x: 452, y: 592 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: '물걸레 시스템', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 792, y: 592 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '진공 청소와 물걸레를 동시에 처리하는 듀얼 시스템이에요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 452, y: 592 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: 'USP명', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 792, y: 592 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '자세한 설명을 적어주세요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
 
           // 구분선 2
           { id: createId(), type: 'shape', position: { x: 432, y: 666 }, size: { width: 1440, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E0E0E0', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
@@ -78,10 +78,15 @@ export const TEMPLATES: Template[] = [
           { id: createId(), type: 'shape', position: { x: 432, y: 686 }, size: { width: 100, height: 28 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#E53935', borderRadius: 4, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
           { id: createId(), type: 'text', position: { x: 432, y: 686 }, size: { width: 100, height: 28 }, rotation: 0, locked: false, text: '{카테고리}', textStyle: { fontSize: 13, fontWeight: 500, color: '#FFFFFF', textAlign: 'center', lineHeight: 2.2, fontFamily: 'Noto Sans KR' } },
           { id: createId(), type: 'text', position: { x: 432, y: 726 }, size: { width: 1440, height: 36 }, rotation: 0, locked: false, text: '{베네핏} + {USP 3}', textStyle: { fontSize: 21, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'shape', position: { x: 432, y: 774 }, size: { width: 1440, height: 70 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#FFF9E6', borderRadius: 8, borderWidth: 1, borderColor: '#F5E6B8', opacity: 1 } },
-          // Row 1 (single row)
-          { id: createId(), type: 'text', position: { x: 452, y: 784 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: '스크래퍼', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
-          { id: createId(), type: 'text', position: { x: 792, y: 784 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '눌어붙은 음식물도 긁어내듯 깨끗하게 제거해줘요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'shape', position: { x: 432, y: 774 }, size: { width: 1440, height: 120 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#FFF9E6', borderRadius: 8, borderWidth: 1, borderColor: '#F5E6B8', opacity: 1 } },
+          // Row 1
+          { id: createId(), type: 'text', position: { x: 452, y: 784 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: 'USP명', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 792, y: 784 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '자세한 설명을 적어주세요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          // Row divider
+          { id: createId(), type: 'shape', position: { x: 452, y: 832 }, size: { width: 1400, height: 1 }, rotation: 0, locked: false, shapeType: 'rectangle', shapeStyle: { fill: '#F0E6C8', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
+          // Row 2
+          { id: createId(), type: 'text', position: { x: 452, y: 840 }, size: { width: 320, height: 40 }, rotation: 0, locked: false, text: 'USP명', textStyle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 792, y: 840 }, size: { width: 1060, height: 40 }, rotation: 0, locked: false, text: '자세한 설명을 적어주세요', textStyle: { fontSize: 15, fontWeight: 400, color: '#444444', textAlign: 'left', lineHeight: 1.55, fontFamily: 'Noto Sans KR' } },
 
           // ══════════════════════════════════════
           // FOOTER AREA (15vh = 162px, y:918–1080)
