@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
-import { Sparkles, Loader2, X, Check, ArrowRight } from 'lucide-react';
+import { Sparkles, Loader2, X, Check, ArrowRight, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { correctText, type CorrectionChange } from '@/lib/ai-correction';
+import { correctText, refineText, type CorrectionChange } from '@/lib/ai-correction';
 import { toast } from 'sonner';
 
 interface AppliedState {
@@ -20,6 +20,8 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
   const [changes, setChanges] = useState<CorrectionChange[]>([]);
   const [appliedState, setAppliedState] = useState<AppliedState>({});
   const [currentText, setCurrentText] = useState(text);
+  const [isRefining, setIsRefining] = useState(false);
+  const [refinedText, setRefinedText] = useState<string | null>(null);
 
   const runCorrection = useCallback(async () => {
     setIsLoading(true);
@@ -52,6 +54,7 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
     setCurrentText(updatedText);
     onTextChange(elementId, updatedText);
     setAppliedState(prev => ({ ...prev, [index]: 'applied' }));
+    setRefinedText(null);
     toast.success('수정이 적용되었습니다.');
   }, [currentText, elementId, onTextChange, appliedState]);
 
@@ -71,8 +74,34 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
     setCurrentText(updated);
     onTextChange(elementId, updated);
     setAppliedState(newState);
+    setRefinedText(null);
     toast.success('전체 수정이 적용되었습니다.');
   }, [currentText, changes, elementId, onTextChange, appliedState]);
+
+  const handleRefine = useCallback(async () => {
+    setIsRefining(true);
+    setRefinedText(null);
+    try {
+      const result = await refineText(currentText);
+      if (result === currentText) {
+        toast.info('이미 자연스러운 문장입니다. 유지 권장합니다.');
+      } else {
+        setRefinedText(result);
+      }
+    } catch (err: any) {
+      toast.error(err.message || '다듬기에 실패했습니다.');
+    } finally {
+      setIsRefining(false);
+    }
+  }, [currentText]);
+
+  const handleApplyRefine = useCallback(() => {
+    if (!refinedText) return;
+    setCurrentText(refinedText);
+    onTextChange(elementId, refinedText);
+    setRefinedText(null);
+    toast.success('다듬어진 문장이 적용되었습니다.');
+  }, [refinedText, elementId, onTextChange]);
 
   const unappliedCount = changes.filter((_, i) => !appliedState[i]).length;
 
@@ -155,28 +184,60 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
             );
           })
         )}
+
+        {/* Refine result */}
+        {refinedText && (
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3 space-y-2">
+            <div className="flex items-center gap-1.5">
+              <RefreshCw className="w-3 h-3 text-primary" />
+              <span className="text-xs font-semibold text-foreground">다듬어진 문장</span>
+            </div>
+            <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap">{refinedText}</p>
+            <div className="flex justify-end">
+              <Button
+                size="sm"
+                className="h-7 text-[11px] px-2.5"
+                onClick={handleApplyRefine}
+              >
+                적용하기
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Refining loader */}
+        {isRefining && (
+          <div className="flex items-center justify-center gap-2 py-4 text-sm text-muted-foreground">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            문장을 다듬고 있습니다...
+          </div>
+        )}
       </div>
 
       {/* Footer */}
-      {!isLoading && changes.length > 0 && (
+      {!isLoading && (
         <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/20">
           <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={onClose}>
             닫기
           </Button>
-          {unappliedCount > 0 && (
-            <Button size="sm" className="h-8 text-xs" onClick={handleApplyAll}>
-              <Sparkles className="w-3 h-3 mr-1" />
-              전체 적용 ({unappliedCount})
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs"
+              onClick={handleRefine}
+              disabled={isRefining}
+            >
+              <RefreshCw className={`w-3 h-3 mr-1 ${isRefining ? 'animate-spin' : ''}`} />
+              다시 다듬기
             </Button>
-          )}
-        </div>
-      )}
-
-      {!isLoading && changes.length === 0 && (
-        <div className="flex justify-end px-4 py-3 border-t border-border">
-          <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={onClose}>
-            닫기
-          </Button>
+            {unappliedCount > 0 && (
+              <Button size="sm" className="h-8 text-xs" onClick={handleApplyAll}>
+                <Sparkles className="w-3 h-3 mr-1" />
+                전체 적용 ({unappliedCount})
+              </Button>
+            )}
+          </div>
         </div>
       )}
     </div>

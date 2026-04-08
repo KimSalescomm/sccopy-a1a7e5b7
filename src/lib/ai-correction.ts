@@ -26,3 +26,19 @@ export async function correctText(text: string): Promise<CorrectionResult> {
 
   return data as CorrectionResult;
 }
+
+export async function refineText(text: string): Promise<string> {
+  const { data, error } = await supabase.functions.invoke("correct-text", {
+    body: { text, mode: "refine" },
+  });
+
+  if (error) {
+    throw new Error(error.message || "다듬기 요청에 실패했습니다.");
+  }
+
+  if (data?.error) {
+    throw new Error(data.error);
+  }
+
+  return data.refined as string;
+}
