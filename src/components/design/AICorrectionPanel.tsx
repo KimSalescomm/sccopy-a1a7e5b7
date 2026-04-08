@@ -23,22 +23,25 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
   const [isRefining, setIsRefining] = useState(false);
   const [refinedText, setRefinedText] = useState<string | null>(null);
 
-  const runCorrection = useCallback(async () => {
+  const runCorrection = useCallback(async (targetText?: string) => {
+    const textToCheck = targetText ?? currentText;
     setIsLoading(true);
+    setRefinedText(null);
+    setAppliedState({});
     try {
-      const result = await correctText(text);
+      const result = await correctText(textToCheck);
       setChanges(result.changes);
-      setCurrentText(text);
+      setCurrentText(textToCheck);
     } catch (err: any) {
       toast.error(err.message || '첨삭에 실패했습니다.');
       onClose();
     } finally {
       setIsLoading(false);
     }
-  }, [text, onClose]);
+  }, [currentText, onClose]);
 
   React.useEffect(() => {
-    runCorrection();
+    runCorrection(text);
   }, []);
 
   const handleApplyItem = useCallback((index: number, change: CorrectionChange) => {
@@ -192,7 +195,13 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
               <RefreshCw className="w-3 h-3 text-primary" />
               <span className="text-xs font-semibold text-foreground">다듬어진 문장</span>
             </div>
-            <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap">{refinedText}</p>
+            <textarea
+              className="w-full text-xs text-foreground leading-relaxed whitespace-pre-wrap bg-background border border-border rounded-md p-2 resize-none outline-none focus:border-primary/50 transition-colors"
+              rows={3}
+              value={refinedText}
+              onChange={e => setRefinedText(e.target.value)}
+            />
+            <p className="text-[10px] text-muted-foreground">직접 수정한 후 적용할 수 있습니다</p>
             <div className="flex justify-end">
               <Button
                 size="sm"
@@ -225,6 +234,16 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
               variant="outline"
               size="sm"
               className="h-8 text-xs"
+              onClick={() => runCorrection()}
+              disabled={isRefining}
+            >
+              <Sparkles className="w-3 h-3 mr-1" />
+              다시 첨삭
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs"
               onClick={handleRefine}
               disabled={isRefining}
             >
@@ -233,7 +252,6 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
             </Button>
             {unappliedCount > 0 && (
               <Button size="sm" className="h-8 text-xs" onClick={handleApplyAll}>
-                <Sparkles className="w-3 h-3 mr-1" />
                 전체 적용 ({unappliedCount})
               </Button>
             )}
