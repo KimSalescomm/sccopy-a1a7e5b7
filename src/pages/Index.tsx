@@ -4,7 +4,7 @@ import { createDefaultPage, createTextElement, createShapeElement, createImageEl
 import { getTemplatePages, getTemplatePresetId } from '@/lib/templates';
 import { Toolbar } from '@/components/design/Toolbar';
 import { PageSidebar } from '@/components/design/PageSidebar';
-import { Canvas } from '@/components/design/Canvas';
+import { Canvas, type CanvasHandle } from '@/components/design/Canvas';
 import { PropertiesPanel } from '@/components/design/PropertiesPanel';
 import { toast } from '@/hooks/use-toast';
 import { useAutoSave, hasSavedData, loadSavedData, clearSavedData } from '@/hooks/use-auto-save';
@@ -19,6 +19,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
+const MAX_HISTORY = 50;
+
 const Index = () => {
   const [pages, setPages] = useState<Page[]>([createDefaultPage()]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -26,7 +28,57 @@ const Index = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [canvasPreset, setCanvasPreset] = useState<CanvasPreset>(DEFAULT_PRESET);
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+  const [scale, setScale] = useState(0.5);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const canvasRef = useRef<CanvasHandle>(null);
+  const activeEditRef = useRef<HTMLElement | null>(null);
+
+  // Undo/Redo history
+  const historyRef = useRef<Page[][]>([]);
+  const pointerRef = useRef(-1);
+  const skipPush = useRef(false);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+
+  const pushHistory = useCallback((newPages: Page[]) => {
+    if (skipPush.current) {
+      skipPush.current = false;
+      return;
+    }
+    const h = historyRef.current;
+    // Trim future
+    historyRef.current = h.slice(0, pointerRef.current + 1);
+    historyRef.current.push(JSON.parse(JSON.stringify(newPages)));
+    if (historyRef.current.length > MAX_HISTORY) historyRef.current.shift();
+    pointerRef.current = historyRef.current.length - 1;
+    setCanUndo(pointerRef.current > 0);
+    setCanRedo(false);
+  }, []);
+
+  const handleUndo = useCallback(() => {
+    if (pointerRef.current <= 0) return;
+    pointerRef.current--;
+    skipPush.current = true;
+    const restored = JSON.parse(JSON.stringify(historyRef.current[pointerRef.current]));
+    setPages(restored);
+    setCanUndo(pointerRef.current > 0);
+    setCanRedo(true);
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    if (pointerRef.current >= historyRef.current.length - 1) return;
+    pointerRef.current++;
+    skipPush.current = true;
+    const restored = JSON.parse(JSON.stringify(historyRef.current[pointerRef.current]));
+    setPages(restored);
+    setCanUndo(true);
+    setCanRedo(pointerRef.current < historyRef.current.length - 1);
+  }, []);
+
+  // Push to history whenever pages change
+  useEffect(() => {
+    pushHistory(pages);
+  }, [pages, pushHistory]);
 
   const { status: saveStatus, saveNow } = useAutoSave(pages, canvasPreset.id);
 
@@ -122,17 +174,14 @@ const Index = () => {
     const templatePages = getTemplatePages(templateId);
     if (templatePages.length === 0) return;
 
-    // Auto-switch canvas preset if template specifies one
     const presetId = getTemplatePresetId(templateId);
     if (presetId) {
       const preset = CANVAS_PRESETS.find(p => p.id === presetId);
       if (preset) setCanvasPreset(preset);
     }
 
-    // Replace current page with template's first page
     updatePage(currentPageIndex, () => templatePages[0]);
 
-    // Add additional template pages
     if (templatePages.length > 1) {
       setPages(prev => {
         const newPages = [...prev];
@@ -185,11 +234,23 @@ const Index = () => {
 
   // Keyboard shortcuts
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    // Undo: Ctrl+Z
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+      e.preventDefault();
+      handleUndo();
+      return;
+    }
+    // Redo: Ctrl+Shift+Z or Ctrl+Y
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'Z' || e.key === 'y') && (e.shiftKey || e.key === 'y')) {
+      e.preventDefault();
+      handleRedo();
+      return;
+    }
     if (editingId) return;
     if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
       handleDeleteElement(selectedId);
     }
-  }, [editingId, selectedId, handleDeleteElement]);
+  }, [editingId, selectedId, handleDeleteElement, handleUndo, handleRedo]);
 
   return (
     <div className="h-screen flex flex-col bg-background" onKeyDown={handleKeyDown} tabIndex={0}>
@@ -202,6 +263,14 @@ const Index = () => {
         onChangePreset={setCanvasPreset}
         saveStatus={saveStatus}
         onManualSave={handleManualSave}
+        scale={scale}
+        onZoomIn={() => canvasRef.current?.zoomIn()}
+        onZoomOut={() => canvasRef.current?.zoomOut()}
+        onFitToScreen={() => canvasRef.current?.fitToScreen()}
+        canUndo={canUndo}
+        canRedo={canRedo}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
       />
       <div className="flex-1 flex overflow-hidden">
         <PageSidebar
@@ -212,6 +281,7 @@ const Index = () => {
           onDeletePage={handleDeletePage}
         />
         <Canvas
+          ref={canvasRef}
           page={currentPage}
           selectedId={selectedId}
           editingId={editingId}
@@ -221,6 +291,8 @@ const Index = () => {
           onDoubleClickElement={handleDoubleClick}
           onTextChange={handleTextChange}
           onFinishEditing={handleFinishEditing}
+          onScaleChange={setScale}
+          activeEditRef={activeEditRef}
         />
         <PropertiesPanel
           element={selectedElement}
@@ -232,6 +304,7 @@ const Index = () => {
           bgGradientTo={currentPage.background.gradientTo}
           bgGradientDir={currentPage.background.gradientDirection}
           onBgChange={handleBgChange}
+          activeEditRef={activeEditRef}
         />
       </div>
       <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
