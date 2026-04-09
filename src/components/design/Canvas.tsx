@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import type { Page, DesignElement, CanvasPreset } from '@/types/design';
 import { DesignElementRenderer } from './DesignElementRenderer';
+import { AlignmentGuidesOverlay, computeSnap, computeSpacingLabels, type GuideLine } from './AlignmentGuides';
 
 export interface CanvasHandle {
   zoomIn: () => void;
@@ -11,11 +12,12 @@ export interface CanvasHandle {
 
 interface CanvasProps {
   page: Page;
-  selectedId: string | null;
+  selectedIds: string[];
   editingId: string | null;
   canvasPreset: CanvasPreset;
-  onSelectElement: (id: string | null) => void;
+  onSelectElement: (id: string | null, additive?: boolean) => void;
   onUpdateElement: (id: string, updates: Partial<DesignElement>) => void;
+  onMoveSelected: (dx: number, dy: number) => void;
   onDoubleClickElement: (id: string) => void;
   onTextChange: (id: string, text: string) => void;
   onFinishEditing: () => void;
@@ -24,13 +26,15 @@ interface CanvasProps {
 }
 
 export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
-  page, selectedId, editingId, canvasPreset,
-  onSelectElement, onUpdateElement, onDoubleClickElement,
+  page, selectedIds, editingId, canvasPreset,
+  onSelectElement, onUpdateElement, onMoveSelected, onDoubleClickElement,
   onTextChange, onFinishEditing, onScaleChange, activeEditRef,
 }, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
   const [isManualZoom, setIsManualZoom] = useState(false);
+  const [guides, setGuides] = useState<GuideLine[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
 
   const getFitScale = useCallback(() => {
     if (!containerRef.current) return 0.5;
@@ -85,8 +89,8 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
 
   // Handle paste for image elements
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
-    if (!selectedId) return;
-    const selectedEl = page.elements.find(el => el.id === selectedId);
+    if (selectedIds.length !== 1) return;
+    const selectedEl = page.elements.find(el => el.id === selectedIds[0]);
     if (!selectedEl || selectedEl.type !== 'image') return;
 
     const items = e.clipboardData.items;
@@ -96,12 +100,51 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
         const file = items[i].getAsFile();
         if (file) {
           const url = URL.createObjectURL(file);
-          onUpdateElement(selectedId, { imageUrl: url });
+          onUpdateElement(selectedIds[0], { imageUrl: url });
         }
         return;
       }
     }
-  }, [selectedId, page.elements, onUpdateElement]);
+  }, [selectedIds, page.elements, onUpdateElement]);
+
+  // Drag handler with snap
+  const handleElementDrag = useCallback((elementId: string, newX: number, newY: number) => {
+    const el = page.elements.find(e => e.id === elementId);
+    if (!el) return;
+
+    const snap = computeSnap(
+      selectedIds,
+      page.elements,
+      newX, newY,
+      el.size.width, el.size.height,
+      canvasPreset.width, canvasPreset.height,
+    );
+
+    const finalX = snap.x ?? newX;
+    const finalY = snap.y ?? newY;
+    setGuides(snap.guides);
+
+    if (selectedIds.length > 1 && selectedIds.includes(elementId)) {
+      const dx = finalX - el.position.x;
+      const dy = finalY - el.position.y;
+      onMoveSelected(dx, dy);
+    } else {
+      onUpdateElement(elementId, { position: { x: Math.round(finalX), y: Math.round(finalY) } });
+    }
+  }, [selectedIds, page.elements, canvasPreset, onUpdateElement, onMoveSelected]);
+
+  const handleDragEnd = useCallback(() => {
+    setGuides([]);
+    setIsDragging(false);
+  }, []);
+
+  const handleDragStart = useCallback(() => {
+    setIsDragging(true);
+  }, []);
+
+  const spacingLabels = isDragging
+    ? computeSpacingLabels(selectedIds, page.elements, canvasPreset.width, canvasPreset.height)
+    : [];
 
   const bgStyle: React.CSSProperties = page.background.type === 'gradient'
     ? {
@@ -135,17 +178,31 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
             <DesignElementRenderer
               key={el.id}
               element={el}
-              selected={selectedId === el.id}
+              selected={selectedIds.includes(el.id)}
               scale={scale}
-              onSelect={onSelectElement}
+              onSelect={(id) => {
+                // Check if shift is held for multi-select
+                const lastEvent = window.event as KeyboardEvent | MouseEvent | null;
+                const additive = lastEvent && 'shiftKey' in lastEvent ? lastEvent.shiftKey : false;
+                onSelectElement(id, additive);
+              }}
               onUpdate={onUpdateElement}
               onDoubleClick={onDoubleClickElement}
               editingId={editingId}
               onTextChange={onTextChange}
               onFinishEditing={onFinishEditing}
               activeEditRef={activeEditRef}
+              onDragMove={handleElementDrag}
+              onDragEnd={handleDragEnd}
+              onDragStart={handleDragStart}
             />
           ))}
+          <AlignmentGuidesOverlay
+            guides={guides}
+            spacingLabels={spacingLabels}
+            canvasWidth={canvasPreset.width}
+            canvasHeight={canvasPreset.height}
+          />
         </div>
       </div>
     </div>

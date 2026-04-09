@@ -8,6 +8,7 @@ import { Canvas, type CanvasHandle } from '@/components/design/Canvas';
 import { PropertiesPanel } from '@/components/design/PropertiesPanel';
 import { toast } from '@/hooks/use-toast';
 import { useAutoSave, hasSavedData, loadSavedData, clearSavedData } from '@/hooks/use-auto-save';
+import { alignElements, type AlignAction } from '@/components/design/AlignmentGuides';
 
 // When a text element's height changes, adjust sibling elements in the same card
 function syncLayoutAfterResize(
@@ -22,7 +23,6 @@ function syncLayoutAfterResize(
   const changed = elements.find(e => e.id === changedId);
   if (!changed) return elements;
 
-  // Find containing card shape (rounded rect that encloses this element)
   const parentCard = elements.find(e =>
     e.type === 'shape' &&
     e.id !== changedId &&
@@ -40,29 +40,20 @@ function syncLayoutAfterResize(
 
   return elements.map(e => {
     if (e.id === changedId) return e;
-
-    // Expand parent card
     if (e.id === parentCard.id) {
       return { ...e, size: { ...e.size, height: e.size.height + delta } };
     }
-
-    // Elements inside the card, below the changed text → shift
     const isInsideCard =
       e.position.x >= parentCard.position.x &&
       e.position.x < parentCard.position.x + parentCard.size.width &&
       e.position.y >= changedOldBottom &&
       e.position.y < cardOriginalBottom;
-
     if (isInsideCard) {
       return { ...e, position: { ...e.position, y: e.position.y + delta } };
     }
-
-    // Elements below the card entirely → shift
     if (e.position.y >= cardOriginalBottom) {
       return { ...e, position: { ...e.position, y: e.position.y + delta } };
     }
-
-    // Image element on the left → expand height
     if (
       e.type === 'image' &&
       e.position.x < parentCard.position.x &&
@@ -71,10 +62,10 @@ function syncLayoutAfterResize(
     ) {
       return { ...e, size: { ...e.size, height: e.size.height + delta } };
     }
-
     return e;
   });
 }
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -91,7 +82,7 @@ const MAX_HISTORY = 50;
 const Index = () => {
   const [pages, setPages] = useState<Page[]>([createDefaultPage()]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [canvasPreset, setCanvasPreset] = useState<CanvasPreset>(DEFAULT_PRESET);
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
@@ -113,7 +104,6 @@ const Index = () => {
       return;
     }
     const h = historyRef.current;
-    // Trim future
     historyRef.current = h.slice(0, pointerRef.current + 1);
     historyRef.current.push(JSON.parse(JSON.stringify(newPages)));
     if (historyRef.current.length > MAX_HISTORY) historyRef.current.shift();
@@ -142,14 +132,12 @@ const Index = () => {
     setCanRedo(pointerRef.current < historyRef.current.length - 1);
   }, []);
 
-  // Push to history whenever pages change
   useEffect(() => {
     pushHistory(pages);
   }, [pages, pushHistory]);
 
   const { status: saveStatus, saveNow } = useAutoSave(pages, canvasPreset.id);
 
-  // Check for saved data on mount
   useEffect(() => {
     if (hasSavedData()) {
       setShowRestoreDialog(true);
@@ -163,7 +151,7 @@ const Index = () => {
       const preset = CANVAS_PRESETS.find(p => p.id === data.canvasPresetId);
       if (preset) setCanvasPreset(preset);
       setCurrentPageIndex(0);
-      setSelectedId(null);
+      setSelectedIds([]);
       setEditingId(null);
       toast({ title: '복원 완료', description: '이전 작업이 복원되었습니다.' });
     }
@@ -181,7 +169,9 @@ const Index = () => {
   }, [saveNow]);
 
   const currentPage = pages[currentPageIndex];
-  const selectedElement = currentPage?.elements.find(e => e.id === selectedId) ?? null;
+  const selectedElement = selectedIds.length === 1
+    ? (currentPage?.elements.find(e => e.id === selectedIds[0]) ?? null)
+    : null;
 
   const updatePage = useCallback((index: number, updater: (page: Page) => Page) => {
     setPages(prev => prev.map((p, i) => i === index ? updater(p) : p));
@@ -192,7 +182,6 @@ const Index = () => {
       const oldEl = page.elements.find(e => e.id === id);
       let newElements = page.elements.map(e => e.id === id ? { ...e, ...updates } as DesignElement : e);
 
-      // Auto-sync card layout when text element height changes
       if (
         oldEl?.type === 'text' &&
         updates.size &&
@@ -207,18 +196,43 @@ const Index = () => {
     });
   }, [currentPageIndex, updatePage]);
 
+  const handleMoveSelected = useCallback((dx: number, dy: number) => {
+    updatePage(currentPageIndex, page => ({
+      ...page,
+      elements: page.elements.map(e =>
+        selectedIds.includes(e.id) && !e.locked
+          ? { ...e, position: { x: Math.round(e.position.x + dx), y: Math.round(e.position.y + dy) } }
+          : e
+      ),
+    }));
+  }, [currentPageIndex, selectedIds, updatePage]);
+
   const handleDeleteElement = useCallback((id: string) => {
     updatePage(currentPageIndex, page => ({
       ...page,
       elements: page.elements.filter(e => e.id !== id),
     }));
-    setSelectedId(null);
+    setSelectedIds(prev => prev.filter(sid => sid !== id));
   }, [currentPageIndex, updatePage]);
+
+  const handleSelectElement = useCallback((id: string | null, additive?: boolean) => {
+    if (!id) {
+      setSelectedIds([]);
+      return;
+    }
+    if (additive) {
+      setSelectedIds(prev =>
+        prev.includes(id) ? prev.filter(sid => sid !== id) : [...prev, id]
+      );
+    } else {
+      setSelectedIds([id]);
+    }
+  }, []);
 
   const handleAddText = useCallback(() => {
     const el = createTextElement();
     updatePage(currentPageIndex, page => ({ ...page, elements: [...page.elements, el] }));
-    setSelectedId(el.id);
+    setSelectedIds([el.id]);
   }, [currentPageIndex, updatePage]);
 
   const handleAddShape = useCallback((shape: 'rectangle' | 'circle') => {
@@ -233,7 +247,7 @@ const Index = () => {
       },
     });
     updatePage(currentPageIndex, page => ({ ...page, elements: [...page.elements, el] }));
-    setSelectedId(el.id);
+    setSelectedIds([el.id]);
   }, [currentPageIndex, updatePage]);
 
   const handleAddImage = useCallback(() => {
@@ -246,7 +260,7 @@ const Index = () => {
     const url = URL.createObjectURL(file);
     const el = createImageElement(url);
     updatePage(currentPageIndex, page => ({ ...page, elements: [...page.elements, el] }));
-    setSelectedId(el.id);
+    setSelectedIds([el.id]);
     e.target.value = '';
   }, [currentPageIndex, updatePage]);
 
@@ -272,7 +286,7 @@ const Index = () => {
       });
     }
 
-    setSelectedId(null);
+    setSelectedIds([]);
     setEditingId(null);
     toast({ title: '템플릿 적용 완료', description: '텍스트를 더블클릭하여 편집하세요.' });
   }, [currentPageIndex, updatePage]);
@@ -280,14 +294,14 @@ const Index = () => {
   const handleAddPage = useCallback(() => {
     setPages(prev => [...prev, createDefaultPage()]);
     setCurrentPageIndex(pages.length);
-    setSelectedId(null);
+    setSelectedIds([]);
   }, [pages.length]);
 
   const handleDeletePage = useCallback((index: number) => {
     if (pages.length <= 1) return;
     setPages(prev => prev.filter((_, i) => i !== index));
     setCurrentPageIndex(prev => Math.min(prev, pages.length - 2));
-    setSelectedId(null);
+    setSelectedIds([]);
   }, [pages.length]);
 
   const handleDoubleClick = useCallback((id: string) => {
@@ -312,6 +326,14 @@ const Index = () => {
     }));
   }, [currentPageIndex, updatePage]);
 
+  const handleAlign = useCallback((action: AlignAction) => {
+    if (selectedIds.length < 2) return;
+    updatePage(currentPageIndex, page => ({
+      ...page,
+      elements: alignElements(page.elements, selectedIds, action),
+    }));
+  }, [selectedIds, currentPageIndex, updatePage]);
+
   // Keyboard shortcuts
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     // Undo: Ctrl+Z
@@ -327,10 +349,25 @@ const Index = () => {
       return;
     }
     if (editingId) return;
-    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
-      handleDeleteElement(selectedId);
+
+    // Delete selected
+    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedIds.length > 0) {
+      selectedIds.forEach(id => handleDeleteElement(id));
+      return;
     }
-  }, [editingId, selectedId, handleDeleteElement, handleUndo, handleRedo]);
+
+    // Arrow keys: move selected elements
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) && selectedIds.length > 0) {
+      e.preventDefault();
+      const step = e.shiftKey ? 10 : 1;
+      let dx = 0, dy = 0;
+      if (e.key === 'ArrowUp') dy = -step;
+      if (e.key === 'ArrowDown') dy = step;
+      if (e.key === 'ArrowLeft') dx = -step;
+      if (e.key === 'ArrowRight') dx = step;
+      handleMoveSelected(dx, dy);
+    }
+  }, [editingId, selectedIds, handleDeleteElement, handleUndo, handleRedo, handleMoveSelected]);
 
   return (
     <div className="h-screen flex flex-col bg-background" onKeyDown={handleKeyDown} tabIndex={0}>
@@ -351,23 +388,26 @@ const Index = () => {
         canRedo={canRedo}
         onUndo={handleUndo}
         onRedo={handleRedo}
+        multiSelectCount={selectedIds.length}
+        onAlign={handleAlign}
       />
       <div className="flex-1 flex overflow-hidden">
         <PageSidebar
           pages={pages}
           currentIndex={currentPageIndex}
-          onSelectPage={i => { setCurrentPageIndex(i); setSelectedId(null); setEditingId(null); }}
+          onSelectPage={i => { setCurrentPageIndex(i); setSelectedIds([]); setEditingId(null); }}
           onAddPage={handleAddPage}
           onDeletePage={handleDeletePage}
         />
         <Canvas
           ref={canvasRef}
           page={currentPage}
-          selectedId={selectedId}
+          selectedIds={selectedIds}
           editingId={editingId}
           canvasPreset={canvasPreset}
-          onSelectElement={setSelectedId}
+          onSelectElement={handleSelectElement}
           onUpdateElement={handleUpdateElement}
+          onMoveSelected={handleMoveSelected}
           onDoubleClickElement={handleDoubleClick}
           onTextChange={handleTextChange}
           onFinishEditing={handleFinishEditing}

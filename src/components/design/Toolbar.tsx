@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Type, Square, Circle, Image, LayoutTemplate, FileText, Save, Cloud, Loader2, ZoomIn, ZoomOut, Maximize, Undo2, Redo2 } from 'lucide-react';
+import { Type, Square, Circle, Image, LayoutTemplate, FileText, Save, Cloud, Loader2, ZoomIn, ZoomOut, Maximize, Undo2, Redo2, AlignLeft, AlignCenter, AlignRight, AlignStartVertical, AlignCenterVertical, AlignEndVertical, GripHorizontal, GripVertical } from 'lucide-react';
 import type { SaveStatus } from '@/hooks/use-auto-save';
+import type { AlignAction } from './AlignmentGuides';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,12 @@ import {
 import { TEMPLATES } from '@/lib/templates';
 import { TEMPLATE_CATEGORIES } from '@/types/design';
 import { CANVAS_PRESETS, type CanvasPreset } from '@/types/design';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface ToolbarProps {
   onAddText: () => void;
@@ -25,16 +32,16 @@ interface ToolbarProps {
   onChangePreset: (preset: CanvasPreset) => void;
   saveStatus: SaveStatus;
   onManualSave: () => void;
-  // Zoom
   scale: number;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onFitToScreen: () => void;
-  // Undo/Redo
   canUndo: boolean;
   canRedo: boolean;
   onUndo: () => void;
   onRedo: () => void;
+  multiSelectCount: number;
+  onAlign: (action: AlignAction) => void;
 }
 
 export function Toolbar({
@@ -42,7 +49,10 @@ export function Toolbar({
   currentPreset, onChangePreset, saveStatus, onManualSave,
   scale, onZoomIn, onZoomOut, onFitToScreen,
   canUndo, canRedo, onUndo, onRedo,
+  multiSelectCount, onAlign,
 }: ToolbarProps) {
+  const showAlign = multiSelectCount >= 2;
+
   return (
     <header className="h-12 border-b bg-card flex items-center px-3 gap-1">
       <div className="flex items-center gap-2 mr-3">
@@ -143,6 +153,65 @@ export function Toolbar({
           <span className="flex items-center gap-1 text-primary"><Cloud className="w-3 h-3" />자동 저장됨</span>
         )}
       </span>
+
+      {/* Alignment tools (multi-select) */}
+      {showAlign && (
+        <>
+          <Separator orientation="vertical" className="h-6 mx-1" />
+          <TooltipProvider delayDuration={200}>
+            <div className="flex items-center gap-0.5">
+              <Tooltip><TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => onAlign('left')}>
+                  <AlignLeft className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">좌측 정렬</p></TooltipContent></Tooltip>
+
+              <Tooltip><TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => onAlign('centerH')}>
+                  <AlignCenter className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">가운데 정렬 (가로)</p></TooltipContent></Tooltip>
+
+              <Tooltip><TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => onAlign('right')}>
+                  <AlignRight className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">우측 정렬</p></TooltipContent></Tooltip>
+
+              <Tooltip><TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => onAlign('top')}>
+                  <AlignStartVertical className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">상단 정렬</p></TooltipContent></Tooltip>
+
+              <Tooltip><TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => onAlign('centerV')}>
+                  <AlignCenterVertical className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">중앙 정렬 (세로)</p></TooltipContent></Tooltip>
+
+              <Tooltip><TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => onAlign('bottom')}>
+                  <AlignEndVertical className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">하단 정렬</p></TooltipContent></Tooltip>
+
+              <Tooltip><TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => onAlign('distributeH')}>
+                  <GripHorizontal className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">가로 간격 균등</p></TooltipContent></Tooltip>
+
+              <Tooltip><TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => onAlign('distributeV')}>
+                  <GripVertical className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">세로 간격 균등</p></TooltipContent></Tooltip>
+            </div>
+          </TooltipProvider>
+          <span className="text-[10px] text-muted-foreground ml-1">{multiSelectCount}개 선택</span>
+        </>
+      )}
 
       <div className="flex-1" />
 
