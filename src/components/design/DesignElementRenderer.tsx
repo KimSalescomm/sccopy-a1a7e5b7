@@ -192,9 +192,22 @@ export function DesignElementRenderer({
             contentEditable
             suppressContentEditableWarning
             onInput={handleInput}
+            onPaste={e => {
+              e.preventDefault();
+              const plain = e.clipboardData.getData('text/plain');
+              const sel = window.getSelection();
+              if (sel && sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode(plain));
+                range.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(range);
+              }
+              handleInput();
+            }}
             onKeyDown={e => {
               if (e.key === 'Escape') onFinishEditing();
-              // Allow Ctrl+Z to work within contentEditable (browser native undo)
               e.stopPropagation();
             }}
             style={style}
