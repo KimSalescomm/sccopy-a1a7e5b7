@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react';
 import { Sparkles, Loader2, X, Check, ArrowRight, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { correctText, refineText, type CorrectionChange } from '@/lib/ai-correction';
 import { toast } from 'sonner';
 
@@ -111,15 +110,15 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
   return (
     <div
       className="absolute left-0 right-0 z-[200] bg-background border border-border rounded-lg shadow-xl overflow-hidden"
-      style={{ top: '100%', marginTop: 8, minWidth: 320, maxWidth: 480 }}
+      style={{ top: '100%', marginTop: 8, minWidth: 300, maxWidth: 440 }}
       onMouseDown={e => e.stopPropagation()}
       onClick={e => e.stopPropagation()}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-muted/30">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-primary" />
-          <span className="text-sm font-semibold text-foreground">AI 첨삭 제안</span>
+          <span className="font-semibold text-foreground" style={{ fontSize: 15 }}>AI 첨삭 제안</span>
         </div>
         <button
           className="p-1 rounded hover:bg-muted transition-colors"
@@ -129,19 +128,19 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
         </button>
       </div>
 
-      <div className="px-4 pt-2 pb-1">
-        <p className="text-xs text-muted-foreground">고객언어 기준으로 수정이 필요한 항목을 제안합니다</p>
+      <div className="px-4 pt-1.5 pb-0.5">
+        <p style={{ fontSize: 12 }} className="text-muted-foreground">고객언어 기준으로 수정이 필요한 항목을 제안합니다</p>
       </div>
 
       {/* Content */}
-      <div className="px-4 py-3 max-h-[300px] overflow-y-auto space-y-2.5">
+      <div className="px-4 py-2.5 max-h-[280px] overflow-y-auto" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {isLoading ? (
-          <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
-            <Loader2 className="w-5 h-5 animate-spin" />
+          <div className="flex items-center justify-center gap-2 py-6 text-muted-foreground" style={{ fontSize: 13 }}>
+            <Loader2 className="w-4 h-4 animate-spin" />
             AI가 첨삭 중입니다...
           </div>
         ) : changes.length === 0 ? (
-          <div className="py-6 text-center text-sm text-muted-foreground">
+          <div className="py-5 text-center text-muted-foreground" style={{ fontSize: 13 }}>
             수정할 항목이 없습니다. 유지 권장합니다.
           </div>
         ) : (
@@ -150,37 +149,37 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
             return (
               <div
                 key={i}
-                className={`rounded-md border p-3 space-y-2 text-sm transition-colors ${
+                className={`rounded-md border transition-colors ${
                   state === 'applied'
                     ? 'bg-primary/5 border-primary/20 opacity-70'
                     : state === 'not-found'
                     ? 'bg-muted/50 border-muted opacity-60'
                     : 'bg-background border-border'
                 }`}
+                style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}
               >
                 <div className="flex items-start gap-2 flex-wrap">
-                  <span className="line-through text-destructive/70 text-xs">{change.original}</span>
+                  <span className="line-through text-destructive/70 font-medium" style={{ fontSize: 13 }}>{change.original}</span>
                   <ArrowRight className="w-3 h-3 mt-0.5 text-muted-foreground shrink-0" />
-                  <span className="text-primary font-medium text-xs">{change.corrected}</span>
+                  <span className="text-primary font-medium" style={{ fontSize: 13 }}>{change.corrected}</span>
                 </div>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">{change.reason}</p>
+                <p className="text-muted-foreground" style={{ fontSize: 12, lineHeight: 1.5 }}>{change.reason}</p>
                 <div className="flex justify-end">
                   {state === 'applied' ? (
-                    <span className="flex items-center gap-1 text-[11px] text-primary font-medium">
+                    <span className="flex items-center gap-1 text-primary font-medium" style={{ fontSize: 12 }}>
                       <Check className="w-3 h-3" />
                       적용됨
                     </span>
                   ) : state === 'not-found' ? (
-                    <span className="text-[11px] text-muted-foreground">원문 없음</span>
+                    <span className="text-muted-foreground" style={{ fontSize: 12 }}>원문 없음</span>
                   ) : (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-7 text-[11px] px-2.5"
+                    <button
+                      className="inline-flex items-center justify-center rounded-md font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
+                      style={{ fontSize: 12, height: 28, padding: '0 10px' }}
                       onClick={() => handleApplyItem(i, change)}
                     >
                       이 항목 적용
-                    </Button>
+                    </button>
                   )}
                 </div>
               </div>
@@ -190,33 +189,34 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
 
         {/* Refine result */}
         {refinedText && (
-          <div className="rounded-md border border-primary/30 bg-primary/5 p-3 space-y-2">
+          <div className="rounded-md border border-primary/30 bg-primary/5" style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <div className="flex items-center gap-1.5">
               <RefreshCw className="w-3 h-3 text-primary" />
-              <span className="text-xs font-semibold text-foreground">다듬어진 문장</span>
+              <span className="font-semibold text-foreground" style={{ fontSize: 13 }}>다듬어진 문장</span>
             </div>
             <textarea
-              className="w-full text-xs text-foreground leading-relaxed whitespace-pre-wrap bg-background border border-border rounded-md p-2 resize-none outline-none focus:border-primary/50 transition-colors"
+              className="w-full text-foreground whitespace-pre-wrap bg-background border border-border rounded-md p-2 resize-none outline-none focus:border-primary/50 transition-colors"
+              style={{ fontSize: 13, lineHeight: 1.5 }}
               rows={3}
               value={refinedText}
               onChange={e => setRefinedText(e.target.value)}
             />
-            <p className="text-[10px] text-muted-foreground">직접 수정한 후 적용할 수 있습니다</p>
+            <p className="text-muted-foreground" style={{ fontSize: 11 }}>직접 수정한 후 적용할 수 있습니다</p>
             <div className="flex justify-end">
-              <Button
-                size="sm"
-                className="h-7 text-[11px] px-2.5"
+              <button
+                className="inline-flex items-center justify-center rounded-md font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                style={{ fontSize: 12, height: 28, padding: '0 10px' }}
                 onClick={handleApplyRefine}
               >
                 적용하기
-              </Button>
+              </button>
             </div>
           </div>
         )}
 
         {/* Refining loader */}
         {isRefining && (
-          <div className="flex items-center justify-center gap-2 py-4 text-sm text-muted-foreground">
+          <div className="flex items-center justify-center gap-2 py-3 text-muted-foreground" style={{ fontSize: 13 }}>
             <Loader2 className="w-4 h-4 animate-spin" />
             문장을 다듬고 있습니다...
           </div>
@@ -225,35 +225,41 @@ export function AICorrectionPanel({ text, elementId, onTextChange, onClose }: AI
 
       {/* Footer */}
       {!isLoading && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/20">
-          <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={onClose}>
+        <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-muted/20">
+          <button
+            className="inline-flex items-center justify-center rounded-md font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+            style={{ fontSize: 12, height: 28, padding: '0 10px' }}
+            onClick={onClose}
+          >
             닫기
-          </Button>
+          </button>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 text-xs"
+            <button
+              className="inline-flex items-center justify-center gap-[4px] rounded-md font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
+              style={{ fontSize: 12, height: 28, padding: '0 10px' }}
               onClick={() => runCorrection()}
               disabled={isRefining}
             >
-              <Sparkles className="w-3 h-3 mr-1" />
+              <Sparkles className="w-3 h-3" />
               다시 첨삭
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 text-xs"
+            </button>
+            <button
+              className="inline-flex items-center justify-center gap-[4px] rounded-md font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
+              style={{ fontSize: 12, height: 28, padding: '0 10px' }}
               onClick={handleRefine}
               disabled={isRefining}
             >
-              <RefreshCw className={`w-3 h-3 mr-1 ${isRefining ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3 h-3 ${isRefining ? 'animate-spin' : ''}`} />
               다시 다듬기
-            </Button>
+            </button>
             {unappliedCount > 0 && (
-              <Button size="sm" className="h-8 text-xs" onClick={handleApplyAll}>
+              <button
+                className="inline-flex items-center justify-center rounded-md font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                style={{ fontSize: 12, height: 28, padding: '0 10px' }}
+                onClick={handleApplyAll}
+              >
                 전체 적용 ({unappliedCount})
-              </Button>
+              </button>
             )}
           </div>
         </div>

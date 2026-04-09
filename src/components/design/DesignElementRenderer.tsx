@@ -289,12 +289,12 @@ export function DesignElementRenderer({
       {/* AI 첨삭 버튼 */}
       {showAIButton && (
         <button
-          className="absolute flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium shadow-md transition-all bg-primary text-primary-foreground hover:bg-primary/90 z-50"
-          style={{ top: -32, right: 0 }}
+          className="absolute flex items-center gap-[5px] px-[11px] rounded-md font-semibold shadow-sm transition-all bg-primary text-primary-foreground hover:bg-primary/90 z-50"
+          style={{ top: -36, right: 0, fontSize: 13, height: 30 }}
           onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
           onClick={e => { e.stopPropagation(); setShowCorrectionPanel(true); }}
         >
-          <Sparkles className="w-3 h-3" />
+          <Sparkles className="w-3.5 h-3.5" />
           AI 첨삭
         </button>
       )}
