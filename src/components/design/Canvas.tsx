@@ -1,7 +1,13 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import type { Page, DesignElement, CanvasPreset } from '@/types/design';
 import { DesignElementRenderer } from './DesignElementRenderer';
-import { ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+
+export interface CanvasHandle {
+  zoomIn: () => void;
+  zoomOut: () => void;
+  fitToScreen: () => void;
+  getScale: () => number;
+}
 
 interface CanvasProps {
   page: Page;
@@ -13,13 +19,15 @@ interface CanvasProps {
   onDoubleClickElement: (id: string) => void;
   onTextChange: (id: string, text: string) => void;
   onFinishEditing: () => void;
+  onScaleChange?: (scale: number) => void;
+  activeEditRef?: React.MutableRefObject<HTMLElement | null>;
 }
 
-export function Canvas({
+export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
   page, selectedId, editingId, canvasPreset,
   onSelectElement, onUpdateElement, onDoubleClickElement,
-  onTextChange, onFinishEditing,
-}: CanvasProps) {
+  onTextChange, onFinishEditing, onScaleChange, activeEditRef,
+}, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
   const [isManualZoom, setIsManualZoom] = useState(false);
@@ -35,8 +43,10 @@ export function Canvas({
 
   const updateScale = useCallback(() => {
     if (isManualZoom) return;
-    setScale(getFitScale());
-  }, [getFitScale, isManualZoom]);
+    const s = getFitScale();
+    setScale(s);
+    onScaleChange?.(s);
+  }, [getFitScale, isManualZoom, onScaleChange]);
 
   useEffect(() => {
     updateScale();
@@ -45,20 +55,33 @@ export function Canvas({
     return () => observer.disconnect();
   }, [updateScale]);
 
-  const handleZoomIn = useCallback(() => {
-    setIsManualZoom(true);
-    setScale(prev => Math.min(prev + 0.1, 2));
-  }, []);
-
-  const handleZoomOut = useCallback(() => {
-    setIsManualZoom(true);
-    setScale(prev => Math.max(prev - 0.1, 0.1));
-  }, []);
-
-  const handleFitToScreen = useCallback(() => {
-    setIsManualZoom(false);
-    setScale(getFitScale());
-  }, [getFitScale]);
+  useImperativeHandle(ref, () => ({
+    zoomIn() {
+      setIsManualZoom(true);
+      setScale(prev => {
+        const next = Math.min(prev + 0.1, 2);
+        onScaleChange?.(next);
+        return next;
+      });
+    },
+    zoomOut() {
+      setIsManualZoom(true);
+      setScale(prev => {
+        const next = Math.max(prev - 0.1, 0.1);
+        onScaleChange?.(next);
+        return next;
+      });
+    },
+    fitToScreen() {
+      setIsManualZoom(false);
+      const s = getFitScale();
+      setScale(s);
+      onScaleChange?.(s);
+    },
+    getScale() {
+      return scale;
+    },
+  }), [getFitScale, scale, onScaleChange]);
 
   // Handle paste for image elements
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
@@ -93,37 +116,6 @@ export function Canvas({
       onClick={() => { onSelectElement(null); onFinishEditing(); }}
       onPaste={handlePaste}
     >
-      {/* Zoom Controls */}
-      <div
-        className="absolute bottom-4 right-4 z-50 flex items-center gap-1 bg-white border border-gray-200 rounded-lg shadow-sm px-1 py-1"
-        onClick={e => e.stopPropagation()}
-      >
-        <button
-          onClick={handleZoomOut}
-          className="p-1.5 rounded hover:bg-gray-100 transition-colors text-gray-600"
-          title="축소"
-        >
-          <ZoomOut size={16} />
-        </button>
-        <span className="text-xs font-medium text-gray-600 min-w-[44px] text-center select-none">
-          {Math.round(scale * 100)}%
-        </span>
-        <button
-          onClick={handleZoomIn}
-          className="p-1.5 rounded hover:bg-gray-100 transition-colors text-gray-600"
-          title="확대"
-        >
-          <ZoomIn size={16} />
-        </button>
-        <div className="w-px h-4 bg-gray-200 mx-0.5" />
-        <button
-          onClick={handleFitToScreen}
-          className="p-1.5 rounded hover:bg-gray-100 transition-colors text-gray-600"
-          title="화면에 맞추기"
-        >
-          <Maximize size={16} />
-        </button>
-      </div>
       <div className="min-w-max min-h-full flex items-center justify-center p-6">
         <div
           className="relative shadow-2xl flex-shrink-0"
@@ -151,10 +143,11 @@ export function Canvas({
               editingId={editingId}
               onTextChange={onTextChange}
               onFinishEditing={onFinishEditing}
+              activeEditRef={activeEditRef}
             />
           ))}
         </div>
       </div>
     </div>
   );
-}
+});

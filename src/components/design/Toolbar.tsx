@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Type, Square, Circle, Image, LayoutTemplate, FileText, Save, Cloud, CloudOff, Loader2 } from 'lucide-react';
+import { Type, Square, Circle, Image, LayoutTemplate, FileText, Save, Cloud, Loader2, ZoomIn, ZoomOut, Maximize, Undo2, Redo2 } from 'lucide-react';
 import type { SaveStatus } from '@/hooks/use-auto-save';
 import {
   DropdownMenu,
@@ -25,9 +25,24 @@ interface ToolbarProps {
   onChangePreset: (preset: CanvasPreset) => void;
   saveStatus: SaveStatus;
   onManualSave: () => void;
+  // Zoom
+  scale: number;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onFitToScreen: () => void;
+  // Undo/Redo
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
 }
 
-export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, currentPreset, onChangePreset, saveStatus, onManualSave }: ToolbarProps) {
+export function Toolbar({
+  onAddText, onAddShape, onAddImage, onApplyTemplate,
+  currentPreset, onChangePreset, saveStatus, onManualSave,
+  scale, onZoomIn, onZoomOut, onFitToScreen,
+  canUndo, canRedo, onUndo, onRedo,
+}: ToolbarProps) {
   return (
     <header className="h-12 border-b bg-card flex items-center px-3 gap-1">
       <div className="flex items-center gap-2 mr-3">
@@ -36,6 +51,16 @@ export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, cu
         </div>
         <span className="text-sm font-bold text-foreground hidden sm:inline">카드뉴스 디자이너</span>
       </div>
+
+      <Separator orientation="vertical" className="h-6 mx-1" />
+
+      {/* Undo / Redo */}
+      <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onUndo} disabled={!canUndo} title="실행 취소 (Ctrl+Z)">
+        <Undo2 className="w-4 h-4" />
+      </Button>
+      <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onRedo} disabled={!canRedo} title="다시 실행 (Ctrl+Shift+Z)">
+        <Redo2 className="w-4 h-4" />
+      </Button>
 
       <Separator orientation="vertical" className="h-6 mx-1" />
 
@@ -120,6 +145,22 @@ export function Toolbar({ onAddText, onAddShape, onAddImage, onApplyTemplate, cu
       </span>
 
       <div className="flex-1" />
+
+      {/* Zoom Controls */}
+      <div className="flex items-center gap-0.5 mr-2">
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onZoomOut} title="축소">
+          <ZoomOut className="w-4 h-4" />
+        </Button>
+        <span className="text-xs font-medium text-muted-foreground min-w-[44px] text-center select-none">
+          {Math.round(scale * 100)}%
+        </span>
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onZoomIn} title="확대">
+          <ZoomIn className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onFitToScreen} title="화면에 맞추기">
+          <Maximize className="w-3.5 h-3.5" />
+        </Button>
+      </div>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
