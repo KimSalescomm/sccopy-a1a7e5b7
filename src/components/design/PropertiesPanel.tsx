@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { DesignElement } from '@/types/design';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,18 +14,19 @@ interface PropertiesPanelProps {
   element: DesignElement | null;
   onUpdate: (id: string, updates: Partial<DesignElement>) => void;
   onDelete: (id: string) => void;
-  // Background
   bgColor: string;
   bgType: 'solid' | 'gradient';
   bgGradientFrom?: string;
   bgGradientTo?: string;
   bgGradientDir?: number;
   onBgChange: (bg: any) => void;
+  activeEditRef?: React.MutableRefObject<HTMLElement | null>;
 }
 
 export function PropertiesPanel({
   element, onUpdate, onDelete,
   bgColor, bgType, bgGradientFrom, bgGradientTo, bgGradientDir, onBgChange,
+  activeEditRef,
 }: PropertiesPanelProps) {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
@@ -36,6 +37,24 @@ export function PropertiesPanel({
       setAnalysisResult(null);
     }
   }, [element?.text, element?.type]);
+
+  const handleColorChange = useCallback((color: string) => {
+    if (!element) return;
+
+    // If actively editing (contentEditable), apply color to selection only
+    const editEl = activeEditRef?.current;
+    if (editEl) {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0 && !sel.isCollapsed && editEl.contains(sel.anchorNode)) {
+        // Apply color to selected text using execCommand
+        document.execCommand('foreColor', false, color);
+        return;
+      }
+    }
+
+    // Otherwise, change the whole element's text color
+    onUpdate(element.id, { textStyle: { ...element.textStyle!, color } });
+  }, [element, onUpdate, activeEditRef]);
 
   if (!element) {
     return (
@@ -161,9 +180,21 @@ export function PropertiesPanel({
             </div>
             <div className="space-y-1">
               <Label className="text-xs">색상</Label>
+              <p className="text-[10px] text-muted-foreground">텍스트를 드래그하면 선택 영역만 변경됩니다</p>
               <div className="flex gap-2">
-                <input type="color" value={element.textStyle.color} onChange={e => onUpdate(element.id, { textStyle: { ...element.textStyle!, color: e.target.value } })} className="w-8 h-7 rounded cursor-pointer border" />
-                <Input value={element.textStyle.color} onChange={e => onUpdate(element.id, { textStyle: { ...element.textStyle!, color: e.target.value } })} className="h-7 text-xs flex-1" />
+                <input
+                  type="color"
+                  value={element.textStyle.color}
+                  onChange={e => handleColorChange(e.target.value)}
+                  onMouseDown={e => e.stopPropagation()}
+                  className="w-8 h-7 rounded cursor-pointer border"
+                />
+                <Input
+                  value={element.textStyle.color}
+                  onChange={e => handleColorChange(e.target.value)}
+                  onMouseDown={e => e.stopPropagation()}
+                  className="h-7 text-xs flex-1"
+                />
               </div>
             </div>
             <div className="space-y-1">

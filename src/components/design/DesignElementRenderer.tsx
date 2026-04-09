@@ -14,13 +14,15 @@ interface DesignElementRendererProps {
   editingId: string | null;
   onTextChange: (id: string, text: string) => void;
   onFinishEditing: () => void;
+  activeEditRef?: React.MutableRefObject<HTMLElement | null>;
 }
 
 export function DesignElementRenderer({
   element, selected, scale, onSelect, onUpdate,
-  onDoubleClick, editingId, onTextChange, onFinishEditing,
+  onDoubleClick, editingId, onTextChange, onFinishEditing, activeEditRef,
 }: DesignElementRendererProps) {
   const elRef = useRef<HTMLDivElement>(null);
+  const editableRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number; handle: string } | null>(null);
@@ -41,6 +43,38 @@ export function DesignElementRenderer({
   useEffect(() => {
     if (!selected) setShowCorrectionPanel(false);
   }, [selected]);
+
+  // Track active editable ref
+  useEffect(() => {
+    if (isEditing && editableRef.current && activeEditRef) {
+      activeEditRef.current = editableRef.current;
+    }
+    return () => {
+      if (activeEditRef && activeEditRef.current === editableRef.current) {
+        activeEditRef.current = null;
+      }
+    };
+  }, [isEditing, activeEditRef]);
+
+  // Set initial content when entering edit mode
+  useEffect(() => {
+    if (isEditing && editableRef.current) {
+      // Only set if empty or different
+      const currentHtml = editableRef.current.innerHTML;
+      const text = element.text ?? '';
+      // If the element text is plain text (no HTML), set it as text
+      if (!currentHtml || editableRef.current.textContent === '') {
+        editableRef.current.innerText = text;
+      }
+      editableRef.current.focus();
+      // Place cursor at end
+      const sel = window.getSelection();
+      if (sel) {
+        sel.selectAllChildren(editableRef.current);
+        sel.collapseToEnd();
+      }
+    }
+  }, [isEditing]);
 
   const handleImageFile = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) return;
@@ -123,6 +157,13 @@ export function DesignElementRenderer({
     window.addEventListener('mouseup', handleMouseUp);
   }, [element, scale, onUpdate]);
 
+  const handleInput = useCallback(() => {
+    if (!editableRef.current) return;
+    // Extract plain text for the data model
+    const text = editableRef.current.innerText;
+    onTextChange(element.id, text);
+  }, [element.id, onTextChange]);
+
   const renderContent = () => {
     if (element.type === 'text') {
       const style: React.CSSProperties = {
@@ -139,7 +180,6 @@ export function DesignElementRenderer({
         outline: 'none',
         border: 'none',
         background: 'transparent',
-        resize: 'none',
         overflow: 'hidden',
         padding: 0,
         margin: 0,
@@ -147,11 +187,16 @@ export function DesignElementRenderer({
 
       if (isEditing) {
         return (
-          <textarea
-            autoFocus
-            value={element.text ?? ''}
-            onChange={e => onTextChange(element.id, e.target.value)}
-            onKeyDown={e => { if (e.key === 'Escape') onFinishEditing(); }}
+          <div
+            ref={editableRef}
+            contentEditable
+            suppressContentEditableWarning
+            onInput={handleInput}
+            onKeyDown={e => {
+              if (e.key === 'Escape') onFinishEditing();
+              // Allow Ctrl+Z to work within contentEditable (browser native undo)
+              e.stopPropagation();
+            }}
             style={style}
             className="cursor-text"
           />
