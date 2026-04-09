@@ -217,37 +217,65 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: mode === "refine" ? REFINE_PROMPT : SYSTEM_PROMPT },
-          { role: "user", content: text },
-        ],
-      }),
-    });
+    const models = ["google/gemini-3-flash-preview", "google/gemini-2.5-flash"];
+    let response: Response | null = null;
+    let lastError = "";
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+    for (const model of models) {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model,
+              messages: [
+                { role: "system", content: mode === "refine" ? REFINE_PROMPT : SYSTEM_PROMPT },
+                { role: "user", content: text },
+              ],
+            }),
+          });
+
+          if (response.ok) break;
+
+          if (response.status === 429) {
+            return new Response(
+              JSON.stringify({ error: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요." }),
+              { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          if (response.status === 402) {
+            return new Response(
+              JSON.stringify({ error: "크레딧이 부족합니다. Settings > Workspace > Usage에서 충전해주세요." }),
+              { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+
+          const errorText = await response.text();
+          lastError = `${model} ${response.status}: ${errorText}`;
+          console.error("AI gateway error:", lastError);
+          response = null;
+
+          // Wait briefly before retry
+          if (attempt === 0) await new Promise(r => setTimeout(r, 1000));
+        } catch (fetchErr) {
+          lastError = `${model} fetch error: ${fetchErr}`;
+          console.error(lastError);
+          response = null;
+          if (attempt === 0) await new Promise(r => setTimeout(r, 1000));
+        }
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "크레딧이 부족합니다. Settings > Workspace > Usage에서 충전해주세요." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      throw new Error(`AI gateway error: ${response.status}`);
+      if (response?.ok) break;
+    }
+
+    if (!response || !response.ok) {
+      return new Response(
+        JSON.stringify({ error: "AI 서비스가 일시적으로 불안정합니다. 잠시 후 다시 시도해주세요." }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const data = await response.json();

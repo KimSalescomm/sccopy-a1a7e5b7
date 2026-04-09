@@ -24,6 +24,11 @@ export async function correctText(text: string): Promise<CorrectionResult> {
     throw new Error(data.error);
   }
 
+  // Fallback: if AI returned error in 200 response
+  if (!data?.changes) {
+    return { corrected: text, changes: [] };
+  }
+
   return data as CorrectionResult;
 }
 
