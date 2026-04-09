@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Sparkles, Loader2, X, Check, ArrowRight, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { correctText, refineText, type CorrectionChange } from '@/lib/ai-correction';
 import { correctText, refineText, type CorrectionChange } from '@/lib/ai-correction';
 import { toast } from 'sonner';
 
