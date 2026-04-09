@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import type { Page, DesignElement, CanvasPreset } from '@/types/design';
 import { DesignElementRenderer } from './DesignElementRenderer';
+import { ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 
 interface CanvasProps {
   page: Page;
@@ -21,15 +22,21 @@ export function Canvas({
 }: CanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
+  const [isManualZoom, setIsManualZoom] = useState(false);
 
-  const updateScale = useCallback(() => {
-    if (!containerRef.current) return;
+  const getFitScale = useCallback(() => {
+    if (!containerRef.current) return 0.5;
     const { clientWidth, clientHeight } = containerRef.current;
     const padding = 48;
     const sx = (clientWidth - padding) / canvasPreset.width;
     const sy = (clientHeight - padding) / canvasPreset.height;
-    setScale(Math.min(sx, sy, 1));
+    return Math.min(sx, sy, 1);
   }, [canvasPreset]);
+
+  const updateScale = useCallback(() => {
+    if (isManualZoom) return;
+    setScale(getFitScale());
+  }, [getFitScale, isManualZoom]);
 
   useEffect(() => {
     updateScale();
@@ -37,6 +44,21 @@ export function Canvas({
     if (containerRef.current) observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, [updateScale]);
+
+  const handleZoomIn = useCallback(() => {
+    setIsManualZoom(true);
+    setScale(prev => Math.min(prev + 0.1, 2));
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    setIsManualZoom(true);
+    setScale(prev => Math.max(prev - 0.1, 0.1));
+  }, []);
+
+  const handleFitToScreen = useCallback(() => {
+    setIsManualZoom(false);
+    setScale(getFitScale());
+  }, [getFitScale]);
 
   // Handle paste for image elements
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
@@ -67,10 +89,41 @@ export function Canvas({
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-auto bg-muted/30"
+      className="flex-1 overflow-auto bg-muted/30 relative"
       onClick={() => { onSelectElement(null); onFinishEditing(); }}
       onPaste={handlePaste}
     >
+      {/* Zoom Controls */}
+      <div
+        className="absolute bottom-4 right-4 z-50 flex items-center gap-1 bg-white border border-gray-200 rounded-lg shadow-sm px-1 py-1"
+        onClick={e => e.stopPropagation()}
+      >
+        <button
+          onClick={handleZoomOut}
+          className="p-1.5 rounded hover:bg-gray-100 transition-colors text-gray-600"
+          title="축소"
+        >
+          <ZoomOut size={16} />
+        </button>
+        <span className="text-xs font-medium text-gray-600 min-w-[44px] text-center select-none">
+          {Math.round(scale * 100)}%
+        </span>
+        <button
+          onClick={handleZoomIn}
+          className="p-1.5 rounded hover:bg-gray-100 transition-colors text-gray-600"
+          title="확대"
+        >
+          <ZoomIn size={16} />
+        </button>
+        <div className="w-px h-4 bg-gray-200 mx-0.5" />
+        <button
+          onClick={handleFitToScreen}
+          className="p-1.5 rounded hover:bg-gray-100 transition-colors text-gray-600"
+          title="화면에 맞추기"
+        >
+          <Maximize size={16} />
+        </button>
+      </div>
       <div className="min-w-max min-h-full flex items-center justify-center p-6">
         <div
           className="relative shadow-2xl flex-shrink-0"
