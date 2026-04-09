@@ -95,28 +95,31 @@ export function DesignElementRenderer({
       startX: e.clientX, startY: e.clientY,
       origX: element.position.x, origY: element.position.y,
     };
+    onDragStart?.();
 
     const handleMouseMove = (ev: MouseEvent) => {
       if (!dragRef.current) return;
       const dx = (ev.clientX - dragRef.current.startX) / scale;
       const dy = (ev.clientY - dragRef.current.startY) / scale;
-      onUpdate(element.id, {
-        position: {
-          x: Math.round(dragRef.current.origX + dx),
-          y: Math.round(dragRef.current.origY + dy),
-        },
-      });
+      const newX = Math.round(dragRef.current.origX + dx);
+      const newY = Math.round(dragRef.current.origY + dy);
+      if (onDragMove) {
+        onDragMove(element.id, newX, newY);
+      } else {
+        onUpdate(element.id, { position: { x: newX, y: newY } });
+      }
     };
 
     const handleMouseUp = () => {
       dragRef.current = null;
+      onDragEnd?.();
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [element.id, element.position, element.locked, isEditing, scale, onSelect, onUpdate]);
+  }, [element.id, element.position, element.locked, isEditing, scale, onSelect, onUpdate, onDragMove, onDragEnd, onDragStart]);
 
   const handleResizeMouseDown = useCallback((e: React.MouseEvent, handle: string) => {
     e.stopPropagation();
