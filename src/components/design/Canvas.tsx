@@ -62,7 +62,7 @@ export function Canvas({
           }}
           onClick={e => e.stopPropagation()}
           onMouseDown={e => {
-            if (e.target === e.currentTarget) onSelectElement(null);
+            if (e.target === e.currentTarget) { onSelectElement(null); onFinishEditing(); }
           }}
         >
           {page.elements.map(el => (
