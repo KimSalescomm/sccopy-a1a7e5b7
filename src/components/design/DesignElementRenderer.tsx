@@ -159,10 +159,21 @@ export function DesignElementRenderer({
 
   const handleInput = useCallback(() => {
     if (!editableRef.current) return;
-    // Extract plain text for the data model
     const text = editableRef.current.innerText;
-    onTextChange(element.id, text);
-  }, [element.id, onTextChange]);
+
+    // Auto-expand: measure natural content height
+    const el = editableRef.current;
+    const prevH = el.style.height;
+    el.style.height = 'auto';
+    const naturalHeight = Math.max(24, el.scrollHeight);
+    el.style.height = prevH;
+
+    const updates: Partial<DesignElement> = { text };
+    if (Math.abs(naturalHeight - element.size.height) >= 1) {
+      updates.size = { ...element.size, height: naturalHeight };
+    }
+    onUpdate(element.id, updates);
+  }, [element.id, element.size, onUpdate]);
 
   const renderContent = () => {
     if (element.type === 'text') {
@@ -288,7 +299,7 @@ export function DesignElementRenderer({
             style={{ width: 32, height: 32, color: '#9CA3AF', marginBottom: 12 }}
           />
           <span style={{ color: '#9CA3AF', fontSize: 14, textAlign: 'center', lineHeight: 1.5, padding: '0 20px' }}>
-            이미지를 드래그하거나<br />클릭하여 업로드하세요
+            이미지를 드래그하거나,<br />Ctrl+V로 붙여넣기
           </span>
           <input
             ref={fileInputRef}
