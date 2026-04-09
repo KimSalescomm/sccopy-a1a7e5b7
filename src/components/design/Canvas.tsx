@@ -38,6 +38,26 @@ export function Canvas({
     return () => observer.disconnect();
   }, [updateScale]);
 
+  // Handle paste for image elements
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    if (!selectedId) return;
+    const selectedEl = page.elements.find(el => el.id === selectedId);
+    if (!selectedEl || selectedEl.type !== 'image') return;
+
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        e.preventDefault();
+        const file = items[i].getAsFile();
+        if (file) {
+          const url = URL.createObjectURL(file);
+          onUpdateElement(selectedId, { imageUrl: url });
+        }
+        return;
+      }
+    }
+  }, [selectedId, page.elements, onUpdateElement]);
+
   const bgStyle: React.CSSProperties = page.background.type === 'gradient'
     ? {
         background: `linear-gradient(${page.background.gradientDirection ?? 180}deg, ${page.background.gradientFrom ?? '#fff'}, ${page.background.gradientTo ?? '#eee'})`,
@@ -49,6 +69,7 @@ export function Canvas({
       ref={containerRef}
       className="flex-1 overflow-auto bg-muted/30"
       onClick={() => { onSelectElement(null); onFinishEditing(); }}
+      onPaste={handlePaste}
     >
       <div className="min-w-max min-h-full flex items-center justify-center p-6">
         <div
