@@ -42,9 +42,10 @@ export function DesignElementRenderer({
   }, [selected]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (element.locked || isEditing) return;
+    if (element.locked) return;
     e.stopPropagation();
     onSelect(element.id);
+    if (isEditing) return;
     dragRef.current = {
       startX: e.clientX, startY: e.clientY,
       origX: element.position.x, origY: element.position.y,

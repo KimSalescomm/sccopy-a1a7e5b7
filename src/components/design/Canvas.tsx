@@ -48,7 +48,7 @@ export function Canvas({
     <div
       ref={containerRef}
       className="flex-1 overflow-auto bg-muted/30"
-      onClick={() => onSelectElement(null)}
+      onClick={() => { onSelectElement(null); onFinishEditing(); }}
     >
       <div className="min-w-max min-h-full flex items-center justify-center p-6">
         <div
@@ -62,7 +62,7 @@ export function Canvas({
           }}
           onClick={e => e.stopPropagation()}
           onMouseDown={e => {
-            if (e.target === e.currentTarget) onSelectElement(null);
+            if (e.target === e.currentTarget) { onSelectElement(null); onFinishEditing(); }
           }}
         >
           {page.elements.map(el => (
