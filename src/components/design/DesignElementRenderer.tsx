@@ -15,11 +15,15 @@ interface DesignElementRendererProps {
   onTextChange: (id: string, text: string) => void;
   onFinishEditing: () => void;
   activeEditRef?: React.MutableRefObject<HTMLElement | null>;
+  onDragMove?: (id: string, x: number, y: number) => void;
+  onDragEnd?: () => void;
+  onDragStart?: () => void;
 }
 
 export function DesignElementRenderer({
   element, selected, scale, onSelect, onUpdate,
   onDoubleClick, editingId, onTextChange, onFinishEditing, activeEditRef,
+  onDragMove, onDragEnd, onDragStart,
 }: DesignElementRendererProps) {
   const elRef = useRef<HTMLDivElement>(null);
   const editableRef = useRef<HTMLDivElement>(null);
