@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import type { Page, DesignElement, CanvasPreset } from '@/types/design';
+import type { Page, DesignElement, CanvasPreset, Position, Size } from '@/types/design';
 import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId, DEFAULT_PRESET, CANVAS_PRESETS } from '@/types/design';
 import { getTemplatePages, getTemplatePresetId } from '@/lib/templates';
 import { Toolbar } from '@/components/design/Toolbar';
@@ -8,6 +8,73 @@ import { Canvas, type CanvasHandle } from '@/components/design/Canvas';
 import { PropertiesPanel } from '@/components/design/PropertiesPanel';
 import { toast } from '@/hooks/use-toast';
 import { useAutoSave, hasSavedData, loadSavedData, clearSavedData } from '@/hooks/use-auto-save';
+
+// When a text element's height changes, adjust sibling elements in the same card
+function syncLayoutAfterResize(
+  elements: DesignElement[],
+  changedId: string,
+  oldHeight: number,
+  newHeight: number
+): DesignElement[] {
+  const delta = newHeight - oldHeight;
+  if (Math.abs(delta) < 1) return elements;
+
+  const changed = elements.find(e => e.id === changedId);
+  if (!changed) return elements;
+
+  // Find containing card shape (rounded rect that encloses this element)
+  const parentCard = elements.find(e =>
+    e.type === 'shape' &&
+    e.id !== changedId &&
+    (e.shapeStyle?.borderRadius ?? 0) > 0 &&
+    e.position.x <= changed.position.x &&
+    e.position.y <= changed.position.y &&
+    e.position.x + e.size.width >= changed.position.x + changed.size.width &&
+    e.position.y + e.size.height >= changed.position.y + oldHeight
+  );
+
+  if (!parentCard) return elements;
+
+  const changedOldBottom = changed.position.y + oldHeight;
+  const cardOriginalBottom = parentCard.position.y + parentCard.size.height;
+
+  return elements.map(e => {
+    if (e.id === changedId) return e;
+
+    // Expand parent card
+    if (e.id === parentCard.id) {
+      return { ...e, size: { ...e.size, height: e.size.height + delta } };
+    }
+
+    // Elements inside the card, below the changed text → shift
+    const isInsideCard =
+      e.position.x >= parentCard.position.x &&
+      e.position.x < parentCard.position.x + parentCard.size.width &&
+      e.position.y >= changedOldBottom &&
+      e.position.y < cardOriginalBottom;
+
+    if (isInsideCard) {
+      return { ...e, position: { ...e.position, y: e.position.y + delta } };
+    }
+
+    // Elements below the card entirely → shift
+    if (e.position.y >= cardOriginalBottom) {
+      return { ...e, position: { ...e.position, y: e.position.y + delta } };
+    }
+
+    // Image element on the left → expand height
+    if (
+      e.type === 'image' &&
+      e.position.x < parentCard.position.x &&
+      e.position.y < cardOriginalBottom &&
+      e.position.y + e.size.height >= cardOriginalBottom - 10
+    ) {
+      return { ...e, size: { ...e.size, height: e.size.height + delta } };
+    }
+
+    return e;
+  });
+}
 import {
   AlertDialog,
   AlertDialogAction,
@@ -121,10 +188,23 @@ const Index = () => {
   }, []);
 
   const handleUpdateElement = useCallback((id: string, updates: Partial<DesignElement>) => {
-    updatePage(currentPageIndex, page => ({
-      ...page,
-      elements: page.elements.map(e => e.id === id ? { ...e, ...updates } as DesignElement : e),
-    }));
+    updatePage(currentPageIndex, page => {
+      const oldEl = page.elements.find(e => e.id === id);
+      let newElements = page.elements.map(e => e.id === id ? { ...e, ...updates } as DesignElement : e);
+
+      // Auto-sync card layout when text element height changes
+      if (
+        oldEl?.type === 'text' &&
+        updates.size &&
+        updates.size.height !== oldEl.size.height
+      ) {
+        newElements = syncLayoutAfterResize(
+          newElements, id, oldEl.size.height, updates.size.height
+        );
+      }
+
+      return { ...page, elements: newElements };
+    });
   }, [currentPageIndex, updatePage]);
 
   const handleDeleteElement = useCallback((id: string) => {
