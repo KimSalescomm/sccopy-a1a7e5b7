@@ -1,7 +1,7 @@
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import type { DesignElement, Position, Size } from '@/types/design';
 import { analyzeText, type AnalysisError } from '@/lib/analysis-engine';
-import { AlertTriangle, Sparkles } from 'lucide-react';
+import { AlertTriangle, Sparkles, Upload } from 'lucide-react';
 import { AICorrectionPanel } from './AICorrectionPanel';
 
 interface DesignElementRendererProps {
@@ -21,11 +21,13 @@ export function DesignElementRenderer({
   onDoubleClick, editingId, onTextChange, onFinishEditing,
 }: DesignElementRendererProps) {
   const elRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number; handle: string } | null>(null);
   const isEditing = editingId === element.id;
   const [analysisErrors, setAnalysisErrors] = useState<AnalysisError[]>([]);
   const [showCorrectionPanel, setShowCorrectionPanel] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   useEffect(() => {
     if (element.type === 'text' && element.text) {
@@ -36,10 +38,15 @@ export function DesignElementRenderer({
     }
   }, [element.text, element.type]);
 
-  // Close panel when element is deselected
   useEffect(() => {
     if (!selected) setShowCorrectionPanel(false);
   }, [selected]);
+
+  const handleImageFile = useCallback((file: File) => {
+    if (!file.type.startsWith('image/')) return;
+    const url = URL.createObjectURL(file);
+    onUpdate(element.id, { imageUrl: url });
+  }, [element.id, onUpdate]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (element.locked) return;
@@ -174,17 +181,68 @@ export function DesignElementRenderer({
     }
 
     if (element.type === 'image') {
-      return element.imageUrl ? (
-        <img
-          src={element.imageUrl}
-          alt=""
-          className="w-full h-full pointer-events-none"
-          style={{ objectFit: element.objectFit ?? 'cover', borderRadius: 'inherit' }}
-          draggable={false}
-        />
-      ) : (
-        <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground text-sm">
-          이미지 없음
+      if (element.imageUrl) {
+        return (
+          <img
+            src={element.imageUrl}
+            alt=""
+            className="w-full h-full pointer-events-none"
+            style={{ objectFit: element.objectFit ?? 'cover', borderRadius: 16 }}
+            draggable={false}
+          />
+        );
+      }
+
+      // Upload Zone UI
+      return (
+        <div
+          className="w-full h-full flex flex-col items-center justify-center cursor-pointer"
+          style={{
+            background: '#F9FAFB',
+            border: `2px dashed ${isDragOver ? '#6366F1' : '#D1D5DB'}`,
+            borderRadius: 16,
+            transition: 'border-color 0.2s, background 0.2s',
+            ...(isDragOver ? { background: '#EEF2FF' } : {}),
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            fileInputRef.current?.click();
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDragOver(true);
+          }}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDragOver(false);
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDragOver(false);
+            const file = e.dataTransfer.files?.[0];
+            if (file) handleImageFile(file);
+          }}
+        >
+          <Upload
+            style={{ width: 32, height: 32, color: '#9CA3AF', marginBottom: 12 }}
+          />
+          <span style={{ color: '#9CA3AF', fontSize: 14, textAlign: 'center', lineHeight: 1.5, padding: '0 20px' }}>
+            이미지를 드래그하거나<br />클릭하여 업로드하세요
+          </span>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleImageFile(file);
+              e.target.value = '';
+            }}
+          />
         </div>
       );
     }
