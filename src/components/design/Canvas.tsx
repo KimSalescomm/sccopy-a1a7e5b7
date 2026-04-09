@@ -180,7 +180,12 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
               element={el}
               selected={selectedIds.includes(el.id)}
               scale={scale}
-              onSelect={(id) => onSelectElement(id, (window.event as any)?.shiftKey)}
+              onSelect={(id) => {
+                // Check if shift is held for multi-select
+                const lastEvent = window.event as KeyboardEvent | MouseEvent | null;
+                const additive = lastEvent && 'shiftKey' in lastEvent ? lastEvent.shiftKey : false;
+                onSelectElement(id, additive);
+              }}
               onUpdate={onUpdateElement}
               onDoubleClick={onDoubleClickElement}
               editingId={editingId}
