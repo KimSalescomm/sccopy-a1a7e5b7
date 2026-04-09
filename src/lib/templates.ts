@@ -21,7 +21,7 @@ export const TEMPLATES: Template[] = [
           // ══════════════════════════════════════
           // HEADER (y:3–76)
           // ══════════════════════════════════════
-          { id: createId(), type: 'text', position: { x: 60, y: 20 }, size: { width: 1800, height: 44 }, rotation: 0, locked: false, text: '{제품명} | {신제품 특장점}', textStyle: { fontSize: 28, fontWeight: 700, color: '#111827', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
+          { id: createId(), type: 'text', position: { x: 60, y: 20 }, size: { width: 1800, height: 44 }, rotation: 0, locked: false, text: '{제품명} | {신제품 특장점}', textStyle: { fontSize: 30, fontWeight: 700, color: '#111827', textAlign: 'left', lineHeight: 1.3, fontFamily: 'Noto Sans KR' } },
           { id: createId(), type: 'shape', position: { x: 0, y: 76 }, size: { width: 1920, height: 1 }, rotation: 0, locked: true, shapeType: 'rectangle', shapeStyle: { fill: '#EEEEEE', borderRadius: 0, borderWidth: 0, borderColor: 'transparent', opacity: 1 } },
 
           // ══════════════════════════════════════
