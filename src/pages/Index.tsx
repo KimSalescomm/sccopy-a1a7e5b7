@@ -405,6 +405,8 @@ const Index = () => {
         onRedo={handleRedo}
         multiSelectCount={selectedIds.length}
         onAlign={handleAlign}
+        onExportPng={handleExportPng}
+        onExportPdf={handleExportPdf}
       />
       <div className="flex-1 flex overflow-hidden">
         <PageSidebar
