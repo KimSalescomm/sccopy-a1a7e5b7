@@ -114,3 +114,19 @@
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   }
 }
+
+/* Export mode: hide editing UI */
+.export-mode [data-editing-ui],
+.export-mode .group > button,
+.export-mode [style*="outline"] {
+  outline: none !important;
+}
+.export-mode .group > div[class*="bg-primary"][class*="rounded-sm"] {
+  display: none !important;
+}
+.export-mode .group > div[class*="bg-warning"] {
+  display: none !important;
+}
+.export-mode button[class*="AI"] {
+  display: none !important;
+}

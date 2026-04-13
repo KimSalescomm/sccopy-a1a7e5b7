@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Type, Square, Circle, Image, LayoutTemplate, FileText, Save, Cloud, Loader2, ZoomIn, ZoomOut, Maximize, Undo2, Redo2, AlignLeft, AlignCenter, AlignRight, AlignStartVertical, AlignCenterVertical, AlignEndVertical, GripHorizontal, GripVertical } from 'lucide-react';
+import { Type, Square, Circle, Image, LayoutTemplate, FileText, Save, Cloud, Loader2, ZoomIn, ZoomOut, Maximize, Undo2, Redo2, AlignLeft, AlignCenter, AlignRight, AlignStartVertical, AlignCenterVertical, AlignEndVertical, GripHorizontal, GripVertical, Download } from 'lucide-react';
 import type { SaveStatus } from '@/hooks/use-auto-save';
 import type { AlignAction } from './AlignmentGuides';
 import {
@@ -42,6 +42,8 @@ interface ToolbarProps {
   onRedo: () => void;
   multiSelectCount: number;
   onAlign: (action: AlignAction) => void;
+  onExportPng: () => void;
+  onExportPdf: () => void;
 }
 
 export function Toolbar({
@@ -49,7 +51,7 @@ export function Toolbar({
   currentPreset, onChangePreset, saveStatus, onManualSave,
   scale, onZoomIn, onZoomOut, onFitToScreen,
   canUndo, canRedo, onUndo, onRedo,
-  multiSelectCount, onAlign,
+  multiSelectCount, onAlign, onExportPng, onExportPdf,
 }: ToolbarProps) {
   const showAlign = multiSelectCount >= 2;
 
@@ -144,6 +146,23 @@ export function Toolbar({
         <Save className="w-3.5 h-3.5" />
         저장
       </Button>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="text-xs gap-1.5">
+            <Download className="w-3.5 h-3.5" />
+            내보내기
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={onExportPng}>
+            <Image className="w-3.5 h-3.5 mr-2" /> PNG 이미지
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onExportPdf}>
+            <FileText className="w-3.5 h-3.5 mr-2" /> PDF 문서
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <span className="text-[10px] text-muted-foreground ml-1 min-w-[60px]">
         {saveStatus === 'saving' && (

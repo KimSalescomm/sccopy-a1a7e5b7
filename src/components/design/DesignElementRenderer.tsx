@@ -2,6 +2,7 @@ import React, { useRef, useCallback, useState, useEffect } from 'react';
 import type { DesignElement, Position, Size } from '@/types/design';
 import { analyzeText, type AnalysisError } from '@/lib/analysis-engine';
 import { AlertTriangle, Sparkles, Upload } from 'lucide-react';
+import { toast } from 'sonner';
 import { AICorrectionPanel } from './AICorrectionPanel';
 
 interface DesignElementRendererProps {
@@ -263,7 +264,7 @@ export function DesignElementRenderer({
             src={element.imageUrl}
             alt=""
             className="w-full h-full pointer-events-none"
-            style={{ objectFit: element.objectFit ?? 'cover', borderRadius: 16 }}
+            style={{ objectFit: element.objectFit ?? 'contain', borderRadius: 16 }}
             draggable={false}
           />
         );
@@ -272,17 +273,13 @@ export function DesignElementRenderer({
       // Upload Zone UI
       return (
         <div
-          className="w-full h-full flex flex-col items-center justify-center cursor-pointer"
+          className="w-full h-full flex flex-col items-center justify-center"
           style={{
             background: '#F9FAFB',
             border: `2px dashed ${isDragOver ? '#6366F1' : '#D1D5DB'}`,
             borderRadius: 16,
             transition: 'border-color 0.2s, background 0.2s',
             ...(isDragOver ? { background: '#EEF2FF' } : {}),
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            fileInputRef.current?.click();
           }}
           onDragOver={(e) => {
             e.preventDefault();
@@ -305,9 +302,41 @@ export function DesignElementRenderer({
           <Upload
             style={{ width: 32, height: 32, color: '#9CA3AF', marginBottom: 12 }}
           />
-          <span style={{ color: '#9CA3AF', fontSize: 14, textAlign: 'center', lineHeight: 1.5, padding: '0 20px' }}>
-            이미지를 드래그하거나,<br />Ctrl+V로 붙여넣기
+          <span style={{ color: '#9CA3AF', fontSize: 13, textAlign: 'center', lineHeight: 1.5, padding: '0 16px', marginBottom: 12 }}>
+            파일을 선택하거나,<br />이미지를 붙여넣어 추가하세요
           </span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              style={{
+                fontSize: 12, padding: '6px 14px', borderRadius: 6,
+                border: '1px solid #D1D5DB', background: '#fff', color: '#374151',
+                cursor: 'pointer', fontWeight: 500,
+              }}
+              onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                fileInputRef.current?.click();
+              }}
+            >
+              파일 선택
+            </button>
+            <button
+              style={{
+                fontSize: 12, padding: '6px 14px', borderRadius: 6,
+                border: '1px solid #D1D5DB', background: '#fff', color: '#374151',
+                cursor: 'pointer', fontWeight: 500,
+              }}
+              onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                // Focus the canvas area so Ctrl+V works, and select this element
+                onSelect(element.id);
+                toast('이미지를 복사한 후 Ctrl+V를 눌러 붙여넣으세요');
+              }}
+            >
+              붙여넣기
+            </button>
+          </div>
           <input
             ref={fileInputRef}
             type="file"

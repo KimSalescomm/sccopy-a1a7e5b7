@@ -8,6 +8,7 @@ export interface CanvasHandle {
   zoomOut: () => void;
   fitToScreen: () => void;
   getScale: () => number;
+  getCanvasElement: () => HTMLElement | null;
 }
 
 interface CanvasProps {
@@ -85,6 +86,9 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
     getScale() {
       return scale;
     },
+    getCanvasElement() {
+      return containerRef.current?.querySelector('[data-canvas-content]') as HTMLElement | null;
+    },
   }), [getFitScale, scale, onScaleChange]);
 
   // Handle paste for image elements
@@ -161,6 +165,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
     >
       <div className="min-w-max min-h-full flex items-center justify-center p-6">
         <div
+          data-canvas-content
           className="relative shadow-2xl flex-shrink-0"
           style={{
             width: canvasPreset.width,

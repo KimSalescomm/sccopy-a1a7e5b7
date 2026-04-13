@@ -5,6 +5,7 @@ import { getTemplatePages, getTemplatePresetId } from '@/lib/templates';
 import { Toolbar } from '@/components/design/Toolbar';
 import { PageSidebar } from '@/components/design/PageSidebar';
 import { Canvas, type CanvasHandle } from '@/components/design/Canvas';
+import { exportAsPng, exportAsPdf } from '@/lib/export-canvas';
 import { PropertiesPanel } from '@/components/design/PropertiesPanel';
 import { toast } from '@/hooks/use-toast';
 import { useAutoSave, hasSavedData, loadSavedData, clearSavedData } from '@/hooks/use-auto-save';
@@ -334,6 +335,20 @@ const Index = () => {
     }));
   }, [selectedIds, currentPageIndex, updatePage]);
 
+  const handleExportPng = useCallback(async () => {
+    const el = canvasRef.current?.getCanvasElement();
+    if (!el) return;
+    toast({ title: '내보내기 중...', description: 'PNG 파일을 생성하고 있습니다.' });
+    await exportAsPng(el);
+  }, []);
+
+  const handleExportPdf = useCallback(async () => {
+    const el = canvasRef.current?.getCanvasElement();
+    if (!el) return;
+    toast({ title: '내보내기 중...', description: 'PDF 파일을 생성하고 있습니다.' });
+    await exportAsPdf(el, canvasPreset.width, canvasPreset.height);
+  }, [canvasPreset]);
+
   // Keyboard shortcuts
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     // Undo: Ctrl+Z
@@ -390,6 +405,8 @@ const Index = () => {
         onRedo={handleRedo}
         multiSelectCount={selectedIds.length}
         onAlign={handleAlign}
+        onExportPng={handleExportPng}
+        onExportPdf={handleExportPdf}
       />
       <div className="flex-1 flex overflow-hidden">
         <PageSidebar
