@@ -1,48 +1,104 @@
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
-/**
- * Capture the canvas element as a high-res image (2x for retina).
- * Temporarily removes scale transform and hides editing UI for a clean capture.
- */
-async function captureCanvas(canvasEl: HTMLElement): Promise<HTMLCanvasElement> {
-  // Save original styles
-  const originalTransform = canvasEl.style.transform;
-  const originalTransformOrigin = canvasEl.style.transformOrigin;
+function waitForNextPaint() {
+  return new Promise<void>(resolve => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
+}
 
-  // Remove scale transform so html2canvas captures at actual size
-  canvasEl.style.transform = 'none';
-  canvasEl.style.transformOrigin = 'top left';
-
-  // Hide editing UI
-  canvasEl.classList.add('export-mode');
-
-  // Ensure the parent scrolls to show the full canvas
-  const parent = canvasEl.parentElement;
-  const parentOverflow = parent?.style.overflow;
-  if (parent) {
-    parent.style.overflow = 'visible';
+async function waitForAssets(root: HTMLElement) {
+  if ('fonts' in document) {
+    await document.fonts.ready;
   }
 
-  try {
-    const result = await html2canvas(canvasEl, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: null,
-      logging: false,
-      width: canvasEl.scrollWidth || canvasEl.offsetWidth,
-      height: canvasEl.scrollHeight || canvasEl.offsetHeight,
-    });
-    return result;
-  } finally {
-    // Restore everything
-    canvasEl.style.transform = originalTransform;
-    canvasEl.style.transformOrigin = originalTransformOrigin;
-    canvasEl.classList.remove('export-mode');
-    if (parent && parentOverflow !== undefined) {
-      parent.style.overflow = parentOverflow;
+  const images = Array.from(root.querySelectorAll('img'));
+  await Promise.all(images.map(async (img) => {
+    if (img.complete && img.naturalWidth > 0) {
+      if ('decode' in img) {
+        try {
+          await img.decode();
+        } catch {
+          // ignore decode failures and continue export
+        }
+      }
+      return;
     }
+
+    await new Promise<void>(resolve => {
+      const done = () => resolve();
+      img.addEventListener('load', done, { once: true });
+      img.addEventListener('error', done, { once: true });
+    });
+  }));
+
+  await waitForNextPaint();
+}
+
+function createCaptureOptions(canvasEl: HTMLElement, exportId: string) {
+  const width = Math.round(canvasEl.offsetWidth);
+  const height = Math.round(canvasEl.offsetHeight);
+
+  return {
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: null,
+    logging: false,
+    width,
+    height,
+    windowWidth: width,
+    windowHeight: height,
+    scrollX: 0,
+    scrollY: 0,
+    onclone: (clonedDoc: Document) => {
+      const clonedCanvas = clonedDoc.querySelector(`[data-export-id="${exportId}"]`) as HTMLElement | null;
+      if (!clonedCanvas) return;
+
+      clonedCanvas.classList.add('export-mode');
+      clonedCanvas.style.transform = 'none';
+      clonedCanvas.style.transformOrigin = 'top left';
+      clonedCanvas.style.boxShadow = 'none';
+
+      clonedCanvas.querySelectorAll('[data-editing-ui]').forEach((node) => {
+        (node as HTMLElement).style.display = 'none';
+      });
+
+      clonedCanvas.querySelectorAll('[data-design-element-type="text"] > div').forEach((node) => {
+        const textNode = node as HTMLElement;
+        textNode.style.overflow = 'visible';
+      });
+    },
+  };
+}
+
+/**
+ * Capture the visible canvas at its real size without editor-only UI.
+ */
+async function captureCanvas(canvasEl: HTMLElement): Promise<HTMLCanvasElement> {
+  const exportId = `export-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  canvasEl.setAttribute('data-export-id', exportId);
+
+  try {
+    await waitForAssets(canvasEl);
+
+    const captureOptions = createCaptureOptions(canvasEl, exportId);
+
+    try {
+      return await html2canvas(canvasEl, {
+        ...captureOptions,
+        foreignObjectRendering: true,
+      });
+    } catch {
+      return await html2canvas(canvasEl, {
+        ...captureOptions,
+        foreignObjectRendering: false,
+      });
+    }
+  } finally {
+    canvasEl.removeAttribute('data-export-id');
   }
 }
 
@@ -59,7 +115,7 @@ function downloadBlob(blob: Blob, filename: string) {
 
 export async function exportAsPng(canvasEl: HTMLElement, filename = '카드뉴스.png') {
   const captured = await captureCanvas(canvasEl);
-  captured.toBlob(blob => {
+  captured.toBlob((blob) => {
     if (blob) downloadBlob(blob, filename);
   }, 'image/png');
 }
