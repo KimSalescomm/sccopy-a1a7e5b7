@@ -2,6 +2,7 @@ import React, { useRef, useCallback, useState, useEffect } from 'react';
 import type { DesignElement, Position, Size } from '@/types/design';
 import { analyzeText, type AnalysisError } from '@/lib/analysis-engine';
 import { AlertTriangle, Sparkles, Upload } from 'lucide-react';
+import { toast } from 'sonner';
 import { AICorrectionPanel } from './AICorrectionPanel';
 
 interface DesignElementRendererProps {
