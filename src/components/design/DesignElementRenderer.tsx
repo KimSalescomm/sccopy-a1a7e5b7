@@ -63,23 +63,39 @@ export function DesignElementRenderer({
 
   // Set initial content when entering edit mode
   useEffect(() => {
-    if (isEditing && editableRef.current) {
-      // Only set if empty or different
-      const currentHtml = editableRef.current.innerHTML;
-      const text = element.text ?? '';
-      // If the element text is plain text (no HTML), set it as text
-      if (!currentHtml || editableRef.current.textContent === '') {
-        editableRef.current.innerText = text;
-      }
-      editableRef.current.focus();
-      // Place cursor at end
+    if (!isEditing || !editableRef.current) return;
+
+    const text = element.text ?? '';
+    if (editableRef.current.innerText !== text) {
+      editableRef.current.innerText = text;
+    }
+
+    editableRef.current.focus();
+    const sel = window.getSelection();
+    if (sel) {
+      sel.selectAllChildren(editableRef.current);
+      sel.collapseToEnd();
+    }
+  }, [isEditing]);
+
+  // Keep contentEditable in sync when text changes externally (e.g. AI correction apply)
+  useEffect(() => {
+    if (!isEditing || !editableRef.current) return;
+
+    const text = element.text ?? '';
+    if (editableRef.current.innerText === text) return;
+
+    const wasFocused = document.activeElement === editableRef.current;
+    editableRef.current.innerText = text;
+
+    if (wasFocused) {
       const sel = window.getSelection();
       if (sel) {
         sel.selectAllChildren(editableRef.current);
         sel.collapseToEnd();
       }
     }
-  }, [isEditing]);
+  }, [isEditing, element.text]);
 
   const handleImageFile = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) return;
