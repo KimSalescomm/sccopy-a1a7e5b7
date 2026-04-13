@@ -5,6 +5,7 @@ import { getTemplatePages, getTemplatePresetId } from '@/lib/templates';
 import { Toolbar } from '@/components/design/Toolbar';
 import { PageSidebar } from '@/components/design/PageSidebar';
 import { Canvas, type CanvasHandle } from '@/components/design/Canvas';
+import { exportAsPng, exportAsPdf } from '@/lib/export-canvas';
 import { PropertiesPanel } from '@/components/design/PropertiesPanel';
 import { toast } from '@/hooks/use-toast';
 import { useAutoSave, hasSavedData, loadSavedData, clearSavedData } from '@/hooks/use-auto-save';

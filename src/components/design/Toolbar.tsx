@@ -147,6 +147,23 @@ export function Toolbar({
         저장
       </Button>
 
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="text-xs gap-1.5">
+            <Download className="w-3.5 h-3.5" />
+            내보내기
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={onExportPng}>
+            <Image className="w-3.5 h-3.5 mr-2" /> PNG 이미지
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onExportPdf}>
+            <FileText className="w-3.5 h-3.5 mr-2" /> PDF 문서
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       <span className="text-[10px] text-muted-foreground ml-1 min-w-[60px]">
         {saveStatus === 'saving' && (
           <span className="flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" />저장 중...</span>
