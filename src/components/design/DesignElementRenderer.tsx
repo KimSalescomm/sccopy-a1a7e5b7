@@ -390,6 +390,7 @@ export function DesignElementRenderer({
     <div
       ref={elRef}
       className="absolute group"
+      data-design-element-type={element.type}
       style={{
         left: element.position.x,
         top: element.position.y,
@@ -408,6 +409,7 @@ export function DesignElementRenderer({
       {/* AI 첨삭 버튼 */}
       {showAIButton && (
         <button
+          data-editing-ui
           className="absolute flex items-center gap-[5px] px-[11px] rounded-md font-semibold shadow-sm transition-all bg-primary text-primary-foreground hover:bg-primary/90 z-50"
           style={{ top: -36, right: 0, fontSize: 13, height: 30 }}
           onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
@@ -421,6 +423,7 @@ export function DesignElementRenderer({
       {/* Error indicator badge */}
       {hasErrors && (
         <div
+          data-editing-ui
           className="absolute flex items-center gap-1 px-1.5 py-0.5 rounded bg-warning text-warning-foreground shadow-sm"
           style={{ top: -24, right: showAIButton ? 80 : 0, fontSize: 10 }}
         >
@@ -433,6 +436,7 @@ export function DesignElementRenderer({
       {selected && !element.locked && !isEditing && handles.map(h => (
         <div
           key={h}
+          data-editing-ui
           className="absolute w-2 h-2 bg-primary rounded-sm border border-primary-foreground shadow-sm"
           style={{ ...handlePositions[h], cursor: handleCursors[h] }}
           onMouseDown={e => handleResizeMouseDown(e, h)}
@@ -441,12 +445,14 @@ export function DesignElementRenderer({
 
       {/* Inline AI Correction Panel */}
       {showCorrectionPanel && element.text && (
-        <AICorrectionPanel
-          text={element.text}
-          elementId={element.id}
-          onTextChange={onTextChange}
-          onClose={() => setShowCorrectionPanel(false)}
-        />
+        <div data-editing-ui>
+          <AICorrectionPanel
+            text={element.text}
+            elementId={element.id}
+            onTextChange={onTextChange}
+            onClose={() => setShowCorrectionPanel(false)}
+          />
+        </div>
       )}
     </div>
   );
