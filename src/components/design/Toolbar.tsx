@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Type, Square, Circle, Image, LayoutTemplate, FileText, Save, Cloud, Loader2, ZoomIn, ZoomOut, Maximize, Undo2, Redo2, AlignLeft, AlignCenter, AlignRight, AlignStartVertical, AlignCenterVertical, AlignEndVertical, GripHorizontal, GripVertical } from 'lucide-react';
+import { Type, Square, Circle, Image, LayoutTemplate, FileText, Save, Cloud, Loader2, ZoomIn, ZoomOut, Maximize, Undo2, Redo2, AlignLeft, AlignCenter, AlignRight, AlignStartVertical, AlignCenterVertical, AlignEndVertical, GripHorizontal, GripVertical, Download } from 'lucide-react';
 import type { SaveStatus } from '@/hooks/use-auto-save';
 import type { AlignAction } from './AlignmentGuides';
 import {

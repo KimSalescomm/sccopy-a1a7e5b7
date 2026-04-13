@@ -165,6 +165,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
     >
       <div className="min-w-max min-h-full flex items-center justify-center p-6">
         <div
+          data-canvas-content
           className="relative shadow-2xl flex-shrink-0"
           style={{
             width: canvasPreset.width,
