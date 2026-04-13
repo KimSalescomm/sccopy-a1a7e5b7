@@ -260,13 +260,15 @@ export function DesignElementRenderer({
     if (element.type === 'image') {
       if (element.imageUrl) {
         return (
-          <img
-            src={element.imageUrl}
-            alt=""
-            className="w-full h-full pointer-events-none"
-            style={{ objectFit: element.objectFit ?? 'contain', borderRadius: 16 }}
-            draggable={false}
-          />
+          <div className="w-full h-full" style={{ borderRadius: 16, overflow: 'hidden' }}>
+            <img
+              src={element.imageUrl}
+              alt=""
+              className="w-full h-full pointer-events-none select-none"
+              style={{ objectFit: element.objectFit ?? 'contain' }}
+              draggable={false}
+            />
+          </div>
         );
       }
 
@@ -327,11 +329,23 @@ export function DesignElementRenderer({
                 cursor: 'pointer', fontWeight: 500,
               }}
               onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.stopPropagation();
-                // Focus the canvas area so Ctrl+V works, and select this element
-                onSelect(element.id);
-                toast('이미지를 복사한 후 Ctrl+V를 눌러 붙여넣으세요');
+                try {
+                  const items = await navigator.clipboard.read();
+                  for (const item of items) {
+                    const imageType = item.types.find(t => t.startsWith('image/'));
+                    if (imageType) {
+                      const blob = await item.getType(imageType);
+                      const url = URL.createObjectURL(blob);
+                      onUpdate(element.id, { imageUrl: url });
+                      return;
+                    }
+                  }
+                  toast('클립보드에 이미지가 없습니다');
+                } catch {
+                  toast('클립보드 접근 권한이 필요합니다. Ctrl+V를 사용해주세요.');
+                }
               }}
             >
               붙여넣기
