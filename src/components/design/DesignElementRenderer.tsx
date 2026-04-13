@@ -264,7 +264,7 @@ export function DesignElementRenderer({
             src={element.imageUrl}
             alt=""
             className="w-full h-full pointer-events-none"
-            style={{ objectFit: element.objectFit ?? 'cover', borderRadius: 16 }}
+            style={{ objectFit: element.objectFit ?? 'contain', borderRadius: 16 }}
             draggable={false}
           />
         );
