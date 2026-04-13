@@ -3,11 +3,27 @@ import { jsPDF } from 'jspdf';
 
 /**
  * Capture the canvas element as a high-res image (2x for retina).
- * Temporarily hides selection outlines, guides, resize handles etc.
+ * Temporarily removes scale transform and hides editing UI for a clean capture.
  */
 async function captureCanvas(canvasEl: HTMLElement): Promise<HTMLCanvasElement> {
-  // Temporarily hide editing UI
+  // Save original styles
+  const originalTransform = canvasEl.style.transform;
+  const originalTransformOrigin = canvasEl.style.transformOrigin;
+
+  // Remove scale transform so html2canvas captures at actual size
+  canvasEl.style.transform = 'none';
+  canvasEl.style.transformOrigin = 'top left';
+
+  // Hide editing UI
   canvasEl.classList.add('export-mode');
+
+  // Ensure the parent scrolls to show the full canvas
+  const parent = canvasEl.parentElement;
+  const parentOverflow = parent?.style.overflow;
+  if (parent) {
+    parent.style.overflow = 'visible';
+  }
+
   try {
     const result = await html2canvas(canvasEl, {
       scale: 2,
@@ -15,10 +31,18 @@ async function captureCanvas(canvasEl: HTMLElement): Promise<HTMLCanvasElement> 
       allowTaint: true,
       backgroundColor: null,
       logging: false,
+      width: canvasEl.scrollWidth || canvasEl.offsetWidth,
+      height: canvasEl.scrollHeight || canvasEl.offsetHeight,
     });
     return result;
   } finally {
+    // Restore everything
+    canvasEl.style.transform = originalTransform;
+    canvasEl.style.transformOrigin = originalTransformOrigin;
     canvasEl.classList.remove('export-mode');
+    if (parent && parentOverflow !== undefined) {
+      parent.style.overflow = parentOverflow;
+    }
   }
 }
 
@@ -49,7 +73,6 @@ export async function exportAsPdf(
   const captured = await captureCanvas(canvasEl);
   const imgData = captured.toDataURL('image/png');
 
-  // Create PDF with exact canvas aspect ratio
   const orientation = width >= height ? 'landscape' : 'portrait';
   const pdf = new jsPDF({
     orientation,
