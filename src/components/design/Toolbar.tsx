@@ -42,6 +42,8 @@ interface ToolbarProps {
   onRedo: () => void;
   multiSelectCount: number;
   onAlign: (action: AlignAction) => void;
+  onExportPng: () => void;
+  onExportPdf: () => void;
 }
 
 export function Toolbar({
@@ -49,7 +51,7 @@ export function Toolbar({
   currentPreset, onChangePreset, saveStatus, onManualSave,
   scale, onZoomIn, onZoomOut, onFitToScreen,
   canUndo, canRedo, onUndo, onRedo,
-  multiSelectCount, onAlign,
+  multiSelectCount, onAlign, onExportPng, onExportPdf,
 }: ToolbarProps) {
   const showAlign = multiSelectCount >= 2;
 
