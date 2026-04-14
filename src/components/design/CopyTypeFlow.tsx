@@ -140,7 +140,7 @@ export function CopyTypeFlow({ text, elementId, onTextChange, onClose }: CopyTyp
   return (
     <TooltipProvider delayDuration={300}>
       <div
-        className="absolute left-0 right-0 z-[200] bg-background border border-border rounded-lg shadow-xl overflow-hidden"
+        className="absolute left-0 right-0 z-[200] bg-background border border-border rounded-lg shadow-xl"
         style={{ top: '100%', marginTop: 8, minWidth: 300, maxWidth: 440 }}
         onMouseDown={e => e.stopPropagation()}
         onClick={e => e.stopPropagation()}
