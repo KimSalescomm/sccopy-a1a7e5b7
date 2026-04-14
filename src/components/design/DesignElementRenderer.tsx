@@ -568,6 +568,18 @@ export function DesignElementRenderer({
           />
         </div>
       )}
+
+      {/* Inline Copy Type Flow Panel */}
+      {showCopyTypeFlow && element.text && (
+        <div data-editing-ui>
+          <CopyTypeFlow
+            text={element.text}
+            elementId={element.id}
+            onTextChange={onTextChange}
+            onClose={() => setShowCopyTypeFlow(false)}
+          />
+        </div>
+      )}
     </div>
   );
 }
