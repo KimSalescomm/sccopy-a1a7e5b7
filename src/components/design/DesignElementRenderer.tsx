@@ -499,11 +499,6 @@ export function DesignElementRenderer({
     </div>
   );
 }
-
-  return (
-    <div
-      ref={elRef}
-      className="absolute group"
       data-design-element-type={element.type}
       style={{
         left: element.position.x,
