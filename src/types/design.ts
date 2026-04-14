@@ -36,6 +36,7 @@ export interface DesignElement {
   locked: boolean;
   // Text
   text?: string;
+  placeholder?: string;
   textStyle?: TextStyle;
   // Image
   imageUrl?: string;
@@ -130,6 +131,7 @@ export function createTextElement(overrides?: Partial<DesignElement>): DesignEle
     rotation: 0,
     locked: false,
     text: '텍스트를 입력하세요',
+    placeholder: '텍스트를 입력하세요',
     textStyle: {
       fontSize: 34,
       fontWeight: 700,

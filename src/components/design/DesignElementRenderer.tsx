@@ -5,6 +5,9 @@ import { toast } from 'sonner';
 import { AICorrectionPanel } from './AICorrectionPanel';
 import { CopyTypeFlow } from './CopyTypeFlow';
 
+const DRAG_THRESHOLD = 6; // px before drag starts
+const BORDER_HIT_AREA = 10; // px from edge for border-drag on text
+
 interface DesignElementRendererProps {
   element: DesignElement;
   selected: boolean;
@@ -21,6 +24,23 @@ interface DesignElementRendererProps {
   onDragStart?: () => void;
 }
 
+function isOnBorder(e: React.MouseEvent, el: HTMLElement): boolean {
+  const rect = el.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  return (
+    x < BORDER_HIT_AREA ||
+    y < BORDER_HIT_AREA ||
+    x > rect.width - BORDER_HIT_AREA ||
+    y > rect.height - BORDER_HIT_AREA
+  );
+}
+
+function isPlaceholderText(element: DesignElement): boolean {
+  if (!element.placeholder) return false;
+  return !element.text || element.text === element.placeholder;
+}
+
 export function DesignElementRenderer({
   element, selected, scale, onSelect, onUpdate,
   onDoubleClick, editingId, onTextChange, onFinishEditing, activeEditRef,
@@ -29,12 +49,14 @@ export function DesignElementRenderer({
   const elRef = useRef<HTMLDivElement>(null);
   const editableRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
+  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number; started: boolean } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number; handle: string } | null>(null);
   const isEditing = editingId === element.id;
   const [showCorrectionPanel, setShowCorrectionPanel] = useState(false);
   const [showCopyTypeFlow, setShowCopyTypeFlow] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+
+  const isPlaceholder = isPlaceholderText(element);
 
   useEffect(() => {
     if (!selected) {
@@ -59,16 +81,19 @@ export function DesignElementRenderer({
   useEffect(() => {
     if (!isEditing || !editableRef.current) return;
 
-    const text = element.text ?? '';
-    if (editableRef.current.innerText !== text) {
-      editableRef.current.innerText = text;
-    }
+    // If placeholder, show empty or select-all the placeholder text
+    const text = isPlaceholder ? '' : (element.text ?? '');
+    editableRef.current.innerText = text;
 
     editableRef.current.focus();
     const sel = window.getSelection();
     if (sel) {
       sel.selectAllChildren(editableRef.current);
-      sel.collapseToEnd();
+      if (text) {
+        // Select all so user can type to replace
+      } else {
+        sel.collapseToEnd();
+      }
     }
   }, [isEditing]);
 
@@ -77,6 +102,7 @@ export function DesignElementRenderer({
     if (!isEditing || !editableRef.current) return;
 
     const text = element.text ?? '';
+    if (isPlaceholder) return; // don't sync placeholder back
     if (editableRef.current.innerText === text) return;
 
     const wasFocused = document.activeElement === editableRef.current;
@@ -102,14 +128,30 @@ export function DesignElementRenderer({
     e.stopPropagation();
     onSelect(element.id);
     if (isEditing) return;
+
+    // For text elements, only allow drag from border area
+    if (element.type === 'text' && elRef.current && !isOnBorder(e, elRef.current)) {
+      // Click inside text area — don't start drag, will trigger edit on double-click
+      return;
+    }
+
     dragRef.current = {
       startX: e.clientX, startY: e.clientY,
       origX: element.position.x, origY: element.position.y,
+      started: false,
     };
-    onDragStart?.();
 
     const handleMouseMove = (ev: MouseEvent) => {
       if (!dragRef.current) return;
+
+      // Check threshold before starting drag
+      if (!dragRef.current.started) {
+        const dist = Math.hypot(ev.clientX - dragRef.current.startX, ev.clientY - dragRef.current.startY);
+        if (dist < DRAG_THRESHOLD) return;
+        dragRef.current.started = true;
+        onDragStart?.();
+      }
+
       const dx = (ev.clientX - dragRef.current.startX) / scale;
       const dy = (ev.clientY - dragRef.current.startY) / scale;
       const newX = Math.round(dragRef.current.origX + dx);
@@ -122,15 +164,17 @@ export function DesignElementRenderer({
     };
 
     const handleMouseUp = () => {
+      if (dragRef.current?.started) {
+        onDragEnd?.();
+      }
       dragRef.current = null;
-      onDragEnd?.();
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [element.id, element.position, element.locked, isEditing, scale, onSelect, onUpdate, onDragMove, onDragEnd, onDragStart]);
+  }, [element.id, element.position, element.locked, element.type, isEditing, scale, onSelect, onUpdate, onDragMove, onDragEnd, onDragStart]);
 
   const handleResizeMouseDown = useCallback((e: React.MouseEvent, handle: string) => {
     e.stopPropagation();
@@ -193,12 +237,26 @@ export function DesignElementRenderer({
     onUpdate(element.id, updates);
   }, [element.id, element.size, onUpdate]);
 
+  // Handle finishing edit — restore placeholder if empty
+  const handleFinishEditingWithPlaceholder = useCallback(() => {
+    if (element.type === 'text' && element.placeholder) {
+      const currentText = editableRef.current?.innerText?.trim() ?? '';
+      if (!currentText) {
+        // Restore placeholder
+        onUpdate(element.id, { text: element.placeholder });
+      }
+    }
+    onFinishEditing();
+  }, [element.id, element.type, element.placeholder, onUpdate, onFinishEditing]);
+
   const renderContent = () => {
     if (element.type === 'text') {
       const style: React.CSSProperties = {
         fontSize: element.textStyle?.fontSize ?? 32,
         fontWeight: element.textStyle?.fontWeight ?? 400,
-        color: element.textStyle?.color ?? '#000',
+        color: isPlaceholder && !isEditing
+          ? '#999999'
+          : (element.textStyle?.color ?? '#000'),
         textAlign: element.textStyle?.textAlign ?? 'left',
         lineHeight: element.textStyle?.lineHeight ?? 1.5,
         fontFamily: element.textStyle?.fontFamily ?? 'Pretendard',
@@ -221,6 +279,7 @@ export function DesignElementRenderer({
             contentEditable
             suppressContentEditableWarning
             onInput={handleInput}
+            onBlur={handleFinishEditingWithPlaceholder}
             onPaste={e => {
               e.preventDefault();
               const plain = e.clipboardData.getData('text/plain');
@@ -236,7 +295,7 @@ export function DesignElementRenderer({
               handleInput();
             }}
             onKeyDown={e => {
-              if (e.key === 'Escape') onFinishEditing();
+              if (e.key === 'Escape') handleFinishEditingWithPlaceholder();
               e.stopPropagation();
             }}
             style={style}
@@ -393,7 +452,15 @@ export function DesignElementRenderer({
     w: { top: '50%', left: -4, transform: 'translateY(-50%)' },
   };
 
-  const showAIButton = element.type === 'text' && selected && !!element.text?.trim() && !showCorrectionPanel && !showCopyTypeFlow;
+  const showAIButton = element.type === 'text' && selected && !!element.text?.trim() && !isPlaceholder && !showCorrectionPanel && !showCopyTypeFlow;
+
+  // Cursor logic: text interior = text cursor, border = move cursor
+  const getCursor = () => {
+    if (element.locked) return 'default';
+    if (isEditing) return 'text';
+    if (element.type === 'text') return 'default';
+    return 'move';
+  };
 
   return (
     <div
@@ -405,12 +472,18 @@ export function DesignElementRenderer({
         top: element.position.y,
         width: element.size.width,
         height: element.size.height,
-        cursor: element.locked ? 'default' : (isEditing ? 'text' : 'move'),
+        cursor: getCursor(),
         outline: selected ? '2px solid hsl(230, 65%, 55%)' : 'none',
         outlineOffset: 1,
         zIndex: selected ? 100 : 'auto',
       }}
       onMouseDown={handleMouseDown}
+      onMouseMove={(e) => {
+        // Dynamic cursor for text elements: move on border, text inside
+        if (element.type === 'text' && !isEditing && !element.locked && elRef.current) {
+          elRef.current.style.cursor = isOnBorder(e, elRef.current) ? 'move' : 'default';
+        }
+      }}
       onDoubleClick={() => onDoubleClick(element.id)}
     >
       {renderContent()}
