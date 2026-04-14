@@ -334,8 +334,8 @@ const Index = () => {
     const el = canvasRef.current?.getCanvasElement();
     if (!el) return;
     toast({ title: '내보내기 중...', description: 'PNG 파일을 생성하고 있습니다.' });
-    await exportAsPng(el);
-  }, []);
+    await exportAsPng(el, canvasPreset.width, canvasPreset.height);
+  }, [canvasPreset]);
 
   const handleExportPdf = useCallback(async () => {
     const el = canvasRef.current?.getCanvasElement();
