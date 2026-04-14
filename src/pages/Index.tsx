@@ -349,6 +349,111 @@ const Index = () => {
     await exportAsPdf(el, canvasPreset.width, canvasPreset.height);
   }, [canvasPreset]);
 
+  // Clipboard for copy/paste
+  const clipboardRef = useRef<DesignElement[]>([]);
+
+  const handleCopy = useCallback(() => {
+    if (selectedIds.length === 0 || editingId) return;
+    const els = currentPage.elements.filter(e => selectedIds.includes(e.id));
+    clipboardRef.current = JSON.parse(JSON.stringify(els));
+  }, [selectedIds, editingId, currentPage]);
+
+  const handlePaste = useCallback(() => {
+    if (clipboardRef.current.length === 0) return;
+    const newEls = clipboardRef.current.map(el => ({
+      ...JSON.parse(JSON.stringify(el)),
+      id: createId(),
+      position: { x: el.position.x + 20, y: el.position.y + 20 },
+    }));
+    updatePage(currentPageIndex, page => ({
+      ...page,
+      elements: [...page.elements, ...newEls],
+    }));
+    setSelectedIds(newEls.map(e => e.id));
+  }, [currentPageIndex, updatePage]);
+
+  const handleDuplicate = useCallback(() => {
+    if (selectedIds.length === 0 || editingId) return;
+    const els = currentPage.elements.filter(e => selectedIds.includes(e.id));
+    const newEls = els.map(el => ({
+      ...JSON.parse(JSON.stringify(el)),
+      id: createId(),
+      position: { x: el.position.x + 20, y: el.position.y + 20 },
+    }));
+    updatePage(currentPageIndex, page => ({
+      ...page,
+      elements: [...page.elements, ...newEls],
+    }));
+    setSelectedIds(newEls.map(e => e.id));
+  }, [selectedIds, editingId, currentPage, currentPageIndex, updatePage]);
+
+  // Group / Ungroup
+  const handleGroup = useCallback(() => {
+    if (selectedIds.length < 2) return;
+    const gid = createId();
+    updatePage(currentPageIndex, page => ({
+      ...page,
+      elements: page.elements.map(e =>
+        selectedIds.includes(e.id) ? { ...e, groupId: gid } : e
+      ),
+    }));
+    toast({ title: '그룹화 완료', description: `${selectedIds.length}개 요소가 그룹화되었습니다.` });
+  }, [selectedIds, currentPageIndex, updatePage]);
+
+  const handleUngroup = useCallback(() => {
+    if (selectedIds.length === 0) return;
+    const groupIds = new Set(
+      currentPage.elements
+        .filter(e => selectedIds.includes(e.id) && e.groupId)
+        .map(e => e.groupId!)
+    );
+    if (groupIds.size === 0) return;
+    updatePage(currentPageIndex, page => ({
+      ...page,
+      elements: page.elements.map(e =>
+        e.groupId && groupIds.has(e.groupId) ? { ...e, groupId: undefined } : e
+      ),
+    }));
+    toast({ title: '그룹 해제 완료' });
+  }, [selectedIds, currentPage, currentPageIndex, updatePage]);
+
+  // Marquee select handler
+  const handleMarqueeSelect = useCallback((ids: string[], additive: boolean) => {
+    if (additive) {
+      setSelectedIds(prev => {
+        const set = new Set(prev);
+        ids.forEach(id => set.add(id));
+        return Array.from(set);
+      });
+    } else {
+      setSelectedIds(ids);
+    }
+  }, []);
+
+  // Select element with group awareness
+  const handleSelectElement = useCallback((id: string | null, additive?: boolean) => {
+    if (!id) {
+      setSelectedIds([]);
+      return;
+    }
+    // If element is in a group and not additive, select whole group
+    const el = currentPage?.elements.find(e => e.id === id);
+    if (el?.groupId && !additive) {
+      const groupMembers = currentPage.elements
+        .filter(e => e.groupId === el.groupId)
+        .map(e => e.id);
+      setSelectedIds(groupMembers);
+      return;
+    }
+    if (additive) {
+      setSelectedIds(prev =>
+        prev.includes(id) ? prev.filter(sid => sid !== id) : [...prev, id]
+      );
+    } else {
+      setSelectedIds([id]);
+    }
+  }, [currentPage]);
+
   // Keyboard shortcuts
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     // Undo: Ctrl+Z
@@ -361,6 +466,36 @@ const Index = () => {
     if ((e.ctrlKey || e.metaKey) && (e.key === 'Z' || e.key === 'y') && (e.shiftKey || e.key === 'y')) {
       e.preventDefault();
       handleRedo();
+      return;
+    }
+    // Copy: Ctrl+C
+    if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !editingId) {
+      e.preventDefault();
+      handleCopy();
+      return;
+    }
+    // Paste: Ctrl+V
+    if ((e.ctrlKey || e.metaKey) && e.key === 'v' && !editingId) {
+      e.preventDefault();
+      handlePaste();
+      return;
+    }
+    // Duplicate: Ctrl+D
+    if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+      e.preventDefault();
+      handleDuplicate();
+      return;
+    }
+    // Group: Ctrl+G
+    if ((e.ctrlKey || e.metaKey) && e.key === 'g' && !e.shiftKey) {
+      e.preventDefault();
+      handleGroup();
+      return;
+    }
+    // Ungroup: Ctrl+Shift+G
+    if ((e.ctrlKey || e.metaKey) && e.key === 'G' && e.shiftKey) {
+      e.preventDefault();
+      handleUngroup();
       return;
     }
     if (editingId) return;
@@ -382,7 +517,7 @@ const Index = () => {
       if (e.key === 'ArrowRight') dx = step;
       handleMoveSelected(dx, dy);
     }
-  }, [editingId, selectedIds, handleDeleteElement, handleUndo, handleRedo, handleMoveSelected]);
+  }, [editingId, selectedIds, handleDeleteElement, handleUndo, handleRedo, handleMoveSelected, handleCopy, handlePaste, handleDuplicate, handleGroup, handleUngroup]);
 
   return (
     <div className="h-screen flex flex-col bg-background" onKeyDown={handleKeyDown} tabIndex={0}>
