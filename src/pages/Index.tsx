@@ -200,13 +200,20 @@ const Index = () => {
   const handleMoveSelected = useCallback((dx: number, dy: number) => {
     updatePage(currentPageIndex, page => ({
       ...page,
-      elements: page.elements.map(e =>
-        selectedIds.includes(e.id) && !e.locked
-          ? { ...e, position: { x: Math.round(e.position.x + dx), y: Math.round(e.position.y + dy) } }
-          : e
-      ),
+      elements: page.elements.map(e => {
+        if (!selectedIds.includes(e.id) || e.locked || e.pinToBottom) return e;
+        const newY = Math.round(e.position.y + dy);
+        const clampedY = Math.min(newY, canvasPreset.height - e.size.height);
+        return {
+          ...e,
+          position: {
+            x: Math.round(e.position.x + dx),
+            y: Math.max(0, clampedY),
+          },
+        };
+      }),
     }));
-  }, [currentPageIndex, selectedIds, updatePage]);
+  }, [currentPageIndex, selectedIds, updatePage, canvasPreset.height]);
 
   const handleDeleteElement = useCallback((id: string) => {
     updatePage(currentPageIndex, page => ({
