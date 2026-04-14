@@ -48,7 +48,10 @@ export function DesignElementRenderer({
   }, [element.text, element.type]);
 
   useEffect(() => {
-    if (!selected) setShowCorrectionPanel(false);
+    if (!selected) {
+      setShowCorrectionPanel(false);
+      setShowCopyTypeFlow(false);
+    }
   }, [selected]);
 
   // Track active editable ref
