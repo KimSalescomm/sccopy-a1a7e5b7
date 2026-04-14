@@ -12,6 +12,7 @@ interface DesignElementRendererProps {
   element: DesignElement;
   selected: boolean;
   scale: number;
+  isExporting?: boolean;
   onSelect: (id: string) => void;
   onUpdate: (id: string, updates: Partial<DesignElement>) => void;
   onDoubleClick: (id: string) => void;
@@ -42,7 +43,7 @@ function isPlaceholderText(element: DesignElement): boolean {
 }
 
 export function DesignElementRenderer({
-  element, selected, scale, onSelect, onUpdate,
+  element, selected, scale, isExporting = false, onSelect, onUpdate,
   onDoubleClick, editingId, onTextChange, onFinishEditing, activeEditRef,
   onDragMove, onDragEnd, onDragStart,
 }: DesignElementRendererProps) {
@@ -456,6 +457,7 @@ export function DesignElementRenderer({
 
   // Cursor logic: text interior = text cursor, border = move cursor
   const getCursor = () => {
+    if (isExporting) return 'default';
     if (element.locked) return 'default';
     if (isEditing) return 'text';
     if (element.type === 'text') return 'default';
@@ -466,16 +468,18 @@ export function DesignElementRenderer({
     <div
       ref={elRef}
       className="absolute group"
+      data-design-element-id={element.id}
       data-design-element-type={element.type}
+      data-pin-to-bottom={element.pinToBottom ? 'true' : undefined}
       style={{
         left: element.position.x,
         top: element.position.y,
         width: element.size.width,
         height: element.size.height,
         cursor: getCursor(),
-        outline: selected ? '2px solid hsl(230, 65%, 55%)' : 'none',
+        outline: selected && !isExporting ? '2px solid hsl(230, 65%, 55%)' : 'none',
         outlineOffset: 1,
-        zIndex: selected ? 100 : 'auto',
+        zIndex: selected && !isExporting ? 100 : 'auto',
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={(e) => {
@@ -489,7 +493,7 @@ export function DesignElementRenderer({
       {renderContent()}
 
       {/* AI buttons */}
-      {showAIButton && (
+      {!isExporting && showAIButton && (
         <div data-editing-ui className="absolute z-50 flex items-center gap-1.5" style={{ top: -36, right: 0 }}>
           <button
             className="flex items-center gap-[5px] px-[11px] rounded-md font-semibold shadow-sm transition-all border border-input bg-background text-foreground hover:bg-accent"
@@ -513,7 +517,7 @@ export function DesignElementRenderer({
 
 
       {/* Resize handles */}
-      {selected && !element.locked && !isEditing && handles.map(h => (
+      {!isExporting && selected && !element.locked && !isEditing && handles.map(h => (
         <div
           key={h}
           data-editing-ui
@@ -524,7 +528,7 @@ export function DesignElementRenderer({
       ))}
 
       {/* Inline AI Correction Panel */}
-      {showCorrectionPanel && element.text && (
+      {!isExporting && showCorrectionPanel && element.text && (
         <div data-editing-ui>
           <AICorrectionPanel
             text={element.text}
@@ -536,7 +540,7 @@ export function DesignElementRenderer({
       )}
 
       {/* Inline Copy Type Flow Panel */}
-      {showCopyTypeFlow && element.text && (
+      {!isExporting && showCopyTypeFlow && element.text && (
         <div data-editing-ui>
           <CopyTypeFlow
             text={element.text}
