@@ -4,6 +4,7 @@ import { analyzeText, type AnalysisError } from '@/lib/analysis-engine';
 import { AlertTriangle, Sparkles, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { AICorrectionPanel } from './AICorrectionPanel';
+import { CopyTypeFlow } from './CopyTypeFlow';
 
 interface DesignElementRendererProps {
   element: DesignElement;
@@ -34,6 +35,7 @@ export function DesignElementRenderer({
   const isEditing = editingId === element.id;
   const [analysisErrors, setAnalysisErrors] = useState<AnalysisError[]>([]);
   const [showCorrectionPanel, setShowCorrectionPanel] = useState(false);
+  const [showCopyTypeFlow, setShowCopyTypeFlow] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
 
   useEffect(() => {
@@ -46,7 +48,10 @@ export function DesignElementRenderer({
   }, [element.text, element.type]);
 
   useEffect(() => {
-    if (!selected) setShowCorrectionPanel(false);
+    if (!selected) {
+      setShowCorrectionPanel(false);
+      setShowCopyTypeFlow(false);
+    }
   }, [selected]);
 
   // Track active editable ref
@@ -400,7 +405,7 @@ export function DesignElementRenderer({
   };
 
   const hasErrors = element.type === 'text' && analysisErrors.length > 0 && !isEditing;
-  const showAIButton = element.type === 'text' && selected && !!element.text?.trim() && !showCorrectionPanel;
+  const showAIButton = element.type === 'text' && selected && !!element.text?.trim() && !showCorrectionPanel && !showCopyTypeFlow;
 
   return (
     <div
@@ -422,18 +427,27 @@ export function DesignElementRenderer({
     >
       {renderContent()}
 
-      {/* AI 첨삭 버튼 */}
+      {/* AI buttons */}
       {showAIButton && (
-        <button
-          data-editing-ui
-          className="absolute flex items-center gap-[5px] px-[11px] rounded-md font-semibold shadow-sm transition-all bg-primary text-primary-foreground hover:bg-primary/90 z-50"
-          style={{ top: -36, right: 0, fontSize: 13, height: 30 }}
-          onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
-          onClick={e => { e.stopPropagation(); setShowCorrectionPanel(true); }}
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-          AI 첨삭
-        </button>
+        <div data-editing-ui className="absolute z-50 flex items-center gap-1.5" style={{ top: -36, right: 0 }}>
+          <button
+            className="flex items-center gap-[5px] px-[11px] rounded-md font-semibold shadow-sm transition-all border border-input bg-background text-foreground hover:bg-accent"
+            style={{ fontSize: 13, height: 30 }}
+            onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
+            onClick={e => { e.stopPropagation(); setShowCopyTypeFlow(true); }}
+          >
+            카피 분석
+          </button>
+          <button
+            className="flex items-center gap-[5px] px-[11px] rounded-md font-semibold shadow-sm transition-all bg-primary text-primary-foreground hover:bg-primary/90"
+            style={{ fontSize: 13, height: 30 }}
+            onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
+            onClick={e => { e.stopPropagation(); setShowCorrectionPanel(true); }}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            AI 첨삭
+          </button>
+        </div>
       )}
 
       {/* Error indicator badge */}
@@ -441,7 +455,7 @@ export function DesignElementRenderer({
         <div
           data-editing-ui
           className="absolute flex items-center gap-1 px-1.5 py-0.5 rounded bg-warning text-warning-foreground shadow-sm"
-          style={{ top: -24, right: showAIButton ? 80 : 0, fontSize: 10 }}
+          style={{ top: -24, right: showAIButton ? 160 : 0, fontSize: 10 }}
         >
           <AlertTriangle className="w-3 h-3" />
           {analysisErrors.length}
@@ -467,6 +481,18 @@ export function DesignElementRenderer({
             elementId={element.id}
             onTextChange={onTextChange}
             onClose={() => setShowCorrectionPanel(false)}
+          />
+        </div>
+      )}
+
+      {/* Inline Copy Type Flow Panel */}
+      {showCopyTypeFlow && element.text && (
+        <div data-editing-ui>
+          <CopyTypeFlow
+            text={element.text}
+            elementId={element.id}
+            onTextChange={onTextChange}
+            onClose={() => setShowCopyTypeFlow(false)}
           />
         </div>
       )}
