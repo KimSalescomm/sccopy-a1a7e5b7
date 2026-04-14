@@ -34,6 +34,7 @@ export interface DesignElement {
   size: Size;
   rotation: number;
   locked: boolean;
+  groupId?: string;
   // Text
   text?: string;
   placeholder?: string;
@@ -44,6 +45,8 @@ export interface DesignElement {
   // Shape
   shapeType?: 'rectangle' | 'circle' | 'line';
   shapeStyle?: ShapeStyle;
+  // Layout pinning
+  pinToBottom?: boolean;
 }
 
 export interface PageBackground {
