@@ -4,6 +4,7 @@ import { analyzeText, type AnalysisError } from '@/lib/analysis-engine';
 import { AlertTriangle, Sparkles, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { AICorrectionPanel } from './AICorrectionPanel';
+import { CopyTypeFlow } from './CopyTypeFlow';
 
 interface DesignElementRendererProps {
   element: DesignElement;
