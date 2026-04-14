@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { ChevronDown, Loader2, Sparkles, RefreshCw, Check, X } from 'lucide-react';
+import { Loader2, Sparkles, RefreshCw, Check, X, ArrowRight } from 'lucide-react';
 import { analyzeCopyType, convertCopy, COPY_TYPE_LABELS, COPY_TYPES, type CopyType, type CopySuggestion } from '@/lib/copy-analysis';
 import { correctText, CATEGORY_TOOLTIPS, type CorrectionChange } from '@/lib/ai-correction';
 import { toast } from 'sonner';
@@ -16,8 +16,9 @@ type FlowStep = 'analyze' | 'suggest' | 'correct';
 
 export function CopyTypeFlow({ text, elementId, onTextChange, onClose }: CopyTypeFlowProps) {
   const [currentType, setCurrentType] = useState<CopyType | null>(null);
+  const [analysisReason, setAnalysisReason] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(true);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showTypeSelector, setShowTypeSelector] = useState(false);
   const [step, setStep] = useState<FlowStep>('analyze');
 
   // Suggestion state
@@ -37,6 +38,7 @@ export function CopyTypeFlow({ text, elementId, onTextChange, onClose }: CopyTyp
       try {
         const result = await analyzeCopyType(text);
         setCurrentType(result.type);
+        setAnalysisReason(result.reason || '');
       } catch (err: any) {
         toast.error(err.message || '카피 유형 분석 실패');
       } finally {
@@ -46,7 +48,7 @@ export function CopyTypeFlow({ text, elementId, onTextChange, onClose }: CopyTyp
   }, []);
 
   const handleSelectType = useCallback(async (type: CopyType) => {
-    setDropdownOpen(false);
+    setShowTypeSelector(false);
     if (type === currentType) return;
 
     setSelectedTargetType(type);
@@ -66,7 +68,6 @@ export function CopyTypeFlow({ text, elementId, onTextChange, onClose }: CopyTyp
   }, [currentType, currentText]);
 
   const handleApplySuggestion = useCallback(async (suggestion: CopySuggestion) => {
-    // Apply suggestion to text
     setCurrentText(suggestion.text);
     onTextChange(elementId, suggestion.text);
     setCurrentType(selectedTargetType);
@@ -137,6 +138,13 @@ export function CopyTypeFlow({ text, elementId, onTextChange, onClose }: CopyTyp
     toast.success('수정이 적용되었습니다.');
   }, [currentText, elementId, onTextChange, appliedCorrections, applyCorrection]);
 
+  const handleCloseSuggestions = useCallback(() => {
+    setStep('analyze');
+    setSuggestions([]);
+    setSelectedTargetType(null);
+    setShowTypeSelector(false);
+  }, []);
+
   return (
     <TooltipProvider delayDuration={300}>
       <div
@@ -159,70 +167,103 @@ export function CopyTypeFlow({ text, elementId, onTextChange, onClose }: CopyTyp
         <div className="px-4 py-3" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {/* Step 1: Copy Type Analysis */}
           <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.05em' }}>카피 유형</span>
-            </div>
-
             {isAnalyzing ? (
               <div className="flex items-center gap-2 text-muted-foreground" style={{ fontSize: 13 }}>
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 분석 중...
               </div>
-            ) : (
-              <div className="relative">
-                <button
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border bg-card hover:bg-accent transition-colors w-full text-left"
-                  style={{ fontSize: 13 }}
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                >
-                  <span className="font-medium text-foreground">{currentType}</span>
-                  <span className="text-muted-foreground" style={{ fontSize: 12 }}>
-                    {currentType && COPY_TYPE_LABELS[currentType]}
-                  </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground ml-auto" />
-                </button>
+            ) : currentType ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {/* Type + Change button */}
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground" style={{ fontSize: 12 }}>카피 유형:</span>
+                  <span className="font-semibold text-foreground" style={{ fontSize: 14 }}>{currentType}</span>
+                  <button
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                    style={{ fontSize: 13, marginLeft: 'auto', padding: '2px 0' }}
+                    onClick={() => setShowTypeSelector(!showTypeSelector)}
+                  >
+                    바꿔보기
+                  </button>
+                </div>
 
-                {dropdownOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-popover border border-border rounded-md shadow-lg z-10 overflow-hidden">
-                    {COPY_TYPES.map(type => (
-                      <button
-                        key={type}
-                        className={`w-full text-left px-3 py-2 hover:bg-accent transition-colors flex items-center justify-between ${
-                          type === currentType ? 'bg-accent/50' : ''
-                        }`}
-                        style={{ fontSize: 13 }}
-                        onClick={() => handleSelectType(type)}
-                      >
-                        <div>
-                          <span className="font-medium text-foreground">{type}</span>
-                          <span className="text-muted-foreground ml-2" style={{ fontSize: 12 }}>{COPY_TYPE_LABELS[type]}</span>
-                        </div>
-                        {type === currentType && <Check className="w-3.5 h-3.5 text-primary" />}
-                      </button>
-                    ))}
+                {/* Dynamic reason */}
+                {analysisReason && (
+                  <div className="flex items-start gap-1.5">
+                    <ArrowRight className="w-3 h-3 text-muted-foreground mt-0.5 shrink-0" />
+                    <span className="text-muted-foreground" style={{ fontSize: 12, lineHeight: 1.5 }}>
+                      {analysisReason}
+                    </span>
                   </div>
                 )}
+
+                {/* Inline type selector (expanded) */}
+                <div
+                  style={{
+                    maxHeight: showTypeSelector ? 120 : 0,
+                    opacity: showTypeSelector ? 1 : 0,
+                    overflow: 'hidden',
+                    transition: 'max-height 0.25s ease, opacity 0.2s ease',
+                  }}
+                >
+                  <div style={{ paddingTop: 4 }}>
+                    <p className="text-muted-foreground" style={{ fontSize: 12, marginBottom: 8 }}>
+                      다른 방식으로도 표현해볼까요?
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {COPY_TYPES.map(type => (
+                        <button
+                          key={type}
+                          className={`rounded-full border transition-colors font-medium ${
+                            type === currentType
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'border-border bg-card text-foreground hover:bg-accent hover:border-accent'
+                          }`}
+                          style={{ fontSize: 13, padding: '6px 12px' }}
+                          onClick={() => handleSelectType(type)}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
+            ) : null}
           </div>
 
           {/* Step 2: Suggestions */}
           {step !== 'analyze' && (
-            <div className="border-t border-border/50 pt-3">
+            <div
+              className="border-t border-border/50 pt-3"
+              style={{ animation: 'fadeSlideIn 0.25s ease' }}
+            >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.05em' }}>
-                  {selectedTargetType} 유형 제안
-                </span>
-                {!isSuggesting && suggestions.length > 0 && (
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-primary" />
+                  <span className="font-medium text-foreground" style={{ fontSize: 13 }}>
+                    {selectedTargetType}형 카피 제안
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {!isSuggesting && suggestions.length > 0 && (
+                    <button
+                      className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+                      style={{ fontSize: 12, padding: '2px 6px' }}
+                      onClick={handleRetry}
+                    >
+                      <RefreshCw className="w-3 h-3" />
+                      다른 제안
+                    </button>
+                  )}
                   <button
-                    className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
-                    style={{ fontSize: 11 }}
-                    onClick={handleRetry}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    style={{ fontSize: 12, padding: '2px 6px' }}
+                    onClick={handleCloseSuggestions}
                   >
-                    <RefreshCw className="w-3 h-3" />
-                    다른 제안
+                    닫기
                   </button>
-                )}
+                </div>
               </div>
 
               {isSuggesting ? (
@@ -233,8 +274,14 @@ export function CopyTypeFlow({ text, elementId, onTextChange, onClose }: CopyTyp
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {suggestions.map((s, i) => (
-                    <div key={i} className="rounded-lg border border-border bg-card p-3" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <p className="text-foreground font-medium" style={{ fontSize: 13, lineHeight: 1.6 }}>{s.text}</p>
+                    <div
+                      key={i}
+                      className="rounded-lg bg-muted/40 border border-border/60"
+                      style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}
+                    >
+                      <p className="text-foreground font-medium" style={{ fontSize: 13, lineHeight: 1.6 }}>
+                        {s.text}
+                      </p>
                       <p className="text-muted-foreground" style={{ fontSize: 11 }}>{s.description}</p>
                       <div className="flex justify-end">
                         <button
@@ -254,7 +301,10 @@ export function CopyTypeFlow({ text, elementId, onTextChange, onClose }: CopyTyp
 
           {/* Step 3: Corrections */}
           {step === 'correct' && (
-            <div className="border-t border-border/50 pt-3">
+            <div
+              className="border-t border-border/50 pt-3"
+              style={{ animation: 'fadeSlideIn 0.25s ease' }}
+            >
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-3.5 h-3.5 text-primary" />
                 <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.05em' }}>고객언어 첨삭</span>
@@ -335,6 +385,13 @@ export function CopyTypeFlow({ text, elementId, onTextChange, onClose }: CopyTyp
           </button>
         </div>
       </div>
+
+      <style>{`
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateY(-4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </TooltipProvider>
   );
 }
