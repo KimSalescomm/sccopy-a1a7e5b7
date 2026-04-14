@@ -34,6 +34,7 @@ export function DesignElementRenderer({
   const isEditing = editingId === element.id;
   const [showCorrectionPanel, setShowCorrectionPanel] = useState(false);
   const [showCopyTypeFlow, setShowCopyTypeFlow] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   useEffect(() => {
     if (!selected) {
