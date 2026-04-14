@@ -35,6 +35,7 @@ export function DesignElementRenderer({
   const isEditing = editingId === element.id;
   const [analysisErrors, setAnalysisErrors] = useState<AnalysisError[]>([]);
   const [showCorrectionPanel, setShowCorrectionPanel] = useState(false);
+  const [showCopyTypeFlow, setShowCopyTypeFlow] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
 
   useEffect(() => {
