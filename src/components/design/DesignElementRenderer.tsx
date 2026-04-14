@@ -32,19 +32,8 @@ export function DesignElementRenderer({
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number; handle: string } | null>(null);
   const isEditing = editingId === element.id;
-  const [analysisErrors, setAnalysisErrors] = useState<AnalysisError[]>([]);
   const [showCorrectionPanel, setShowCorrectionPanel] = useState(false);
   const [showCopyTypeFlow, setShowCopyTypeFlow] = useState(false);
-  const [isDragOver, setIsDragOver] = useState(false);
-
-  useEffect(() => {
-    if (element.type === 'text' && element.text) {
-      const result = analyzeText(element.text);
-      setAnalysisErrors(result.errors);
-    } else {
-      setAnalysisErrors([]);
-    }
-  }, [element.text, element.type]);
 
   useEffect(() => {
     if (!selected) {
