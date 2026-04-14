@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Type, Square, Circle, Image, LayoutTemplate, FileText, Save, Cloud, Loader2, ZoomIn, ZoomOut, Maximize, Undo2, Redo2, AlignLeft, AlignCenter, AlignRight, AlignStartVertical, AlignCenterVertical, AlignEndVertical, GripHorizontal, GripVertical, Download } from 'lucide-react';
+import { Type, Square, Circle, Image, LayoutTemplate, FileText, Save, Cloud, Loader2, ZoomIn, ZoomOut, Maximize, Undo2, Redo2, AlignLeft, AlignCenter, AlignRight, AlignStartVertical, AlignCenterVertical, AlignEndVertical, GripHorizontal, GripVertical, Download, Group, Ungroup } from 'lucide-react';
 import type { SaveStatus } from '@/hooks/use-auto-save';
 import type { AlignAction } from './AlignmentGuides';
 import {
@@ -44,6 +44,9 @@ interface ToolbarProps {
   onAlign: (action: AlignAction) => void;
   onExportPng: () => void;
   onExportPdf: () => void;
+  onGroup: () => void;
+  onUngroup: () => void;
+  hasGroupInSelection: boolean;
 }
 
 export function Toolbar({
@@ -52,6 +55,7 @@ export function Toolbar({
   scale, onZoomIn, onZoomOut, onFitToScreen,
   canUndo, canRedo, onUndo, onRedo,
   multiSelectCount, onAlign, onExportPng, onExportPdf,
+  onGroup, onUngroup, hasGroupInSelection,
 }: ToolbarProps) {
   const showAlign = multiSelectCount >= 2;
 
@@ -228,6 +232,24 @@ export function Toolbar({
               </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">세로 간격 균등</p></TooltipContent></Tooltip>
             </div>
           </TooltipProvider>
+          <Separator orientation="vertical" className="h-4 mx-1" />
+
+          {hasGroupInSelection ? (
+            <Tooltip><TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-7 gap-1 px-2 text-xs" onClick={onUngroup}>
+                <Ungroup className="w-3.5 h-3.5" />
+                그룹 해제
+              </Button>
+            </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">Ctrl+Shift+G</p></TooltipContent></Tooltip>
+          ) : (
+            <Tooltip><TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-7 gap-1 px-2 text-xs" onClick={onGroup} disabled={multiSelectCount < 2}>
+                <Group className="w-3.5 h-3.5" />
+                그룹화
+              </Button>
+            </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">Ctrl+G</p></TooltipContent></Tooltip>
+          )}
+
           <span className="text-[10px] text-muted-foreground ml-1">{multiSelectCount}개 선택</span>
         </>
       )}
