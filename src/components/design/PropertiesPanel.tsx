@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import type { DesignElement } from '@/types/design';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,8 +7,6 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { AlignLeft, AlignCenter, AlignRight, Trash2, Lock, Unlock } from 'lucide-react';
-import { analyzeText, type AnalysisResult, getCategoryLabel, getSeverityLabel } from '@/lib/analysis-engine';
-import { Badge } from '@/components/ui/badge';
 
 interface PropertiesPanelProps {
   element: DesignElement | null;
@@ -28,15 +26,6 @@ export function PropertiesPanel({
   bgColor, bgType, bgGradientFrom, bgGradientTo, bgGradientDir, onBgChange,
   activeEditRef,
 }: PropertiesPanelProps) {
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-
-  useEffect(() => {
-    if (element?.type === 'text' && element.text) {
-      setAnalysisResult(analyzeText(element.text));
-    } else {
-      setAnalysisResult(null);
-    }
-  }, [element?.text, element?.type]);
 
   const handleColorChange = useCallback((color: string) => {
     if (!element) return;
@@ -258,49 +247,6 @@ export function PropertiesPanel({
           </div>
         )}
 
-        {/* Writing Analysis */}
-        {element.type === 'text' && analysisResult && analysisResult.errors.length > 0 && (
-          <>
-            <Separator />
-            <div className="space-y-2">
-              <h4 className="text-xs font-semibold text-warning flex items-center gap-1">
-                ✍️ 글쓰기 분석 ({analysisResult.errors.length}건)
-              </h4>
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                {analysisResult.errors.map((err, i) => (
-                  <div key={i} className="rounded-md border p-2 space-y-1 text-[11px]">
-                    <div className="flex gap-1">
-                      <Badge variant={err.severity === 'error' ? 'destructive' : 'secondary'} className="text-[9px] px-1 py-0">
-                        {getSeverityLabel(err.severity)}
-                      </Badge>
-                      <Badge variant="outline" className="text-[9px] px-1 py-0">
-                        {getCategoryLabel(err.category)}
-                      </Badge>
-                    </div>
-                    <p className="text-foreground">{err.description}</p>
-                    {err.suggestions.length > 0 && (
-                      <div className="space-y-0.5">
-                        {err.suggestions.map((s, j) => (
-                          <button
-                            key={j}
-                            className="block text-primary hover:underline text-left"
-                            onClick={() => {
-                              if (element.text) {
-                                onUpdate(element.id, { text: element.text.replace(err.original, s) });
-                              }
-                            }}
-                          >
-                            → {s}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
       </div>
     </div>
   );

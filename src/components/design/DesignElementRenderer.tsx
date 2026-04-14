@@ -1,7 +1,6 @@
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import type { DesignElement, Position, Size } from '@/types/design';
-import { analyzeText, type AnalysisError } from '@/lib/analysis-engine';
-import { AlertTriangle, Sparkles, Upload } from 'lucide-react';
+import { Sparkles, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { AICorrectionPanel } from './AICorrectionPanel';
 import { CopyTypeFlow } from './CopyTypeFlow';
@@ -33,19 +32,9 @@ export function DesignElementRenderer({
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number; handle: string } | null>(null);
   const isEditing = editingId === element.id;
-  const [analysisErrors, setAnalysisErrors] = useState<AnalysisError[]>([]);
   const [showCorrectionPanel, setShowCorrectionPanel] = useState(false);
   const [showCopyTypeFlow, setShowCopyTypeFlow] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-
-  useEffect(() => {
-    if (element.type === 'text' && element.text) {
-      const result = analyzeText(element.text);
-      setAnalysisErrors(result.errors);
-    } else {
-      setAnalysisErrors([]);
-    }
-  }, [element.text, element.type]);
 
   useEffect(() => {
     if (!selected) {
@@ -404,7 +393,6 @@ export function DesignElementRenderer({
     w: { top: '50%', left: -4, transform: 'translateY(-50%)' },
   };
 
-  const hasErrors = element.type === 'text' && analysisErrors.length > 0 && !isEditing;
   const showAIButton = element.type === 'text' && selected && !!element.text?.trim() && !showCorrectionPanel && !showCopyTypeFlow;
 
   return (
@@ -418,7 +406,7 @@ export function DesignElementRenderer({
         width: element.size.width,
         height: element.size.height,
         cursor: element.locked ? 'default' : (isEditing ? 'text' : 'move'),
-        outline: selected ? '2px solid hsl(230, 65%, 55%)' : (hasErrors ? '2px dashed hsl(30, 90%, 52%)' : 'none'),
+        outline: selected ? '2px solid hsl(230, 65%, 55%)' : 'none',
         outlineOffset: 1,
         zIndex: selected ? 100 : 'auto',
       }}
@@ -450,17 +438,6 @@ export function DesignElementRenderer({
         </div>
       )}
 
-      {/* Error indicator badge */}
-      {hasErrors && (
-        <div
-          data-editing-ui
-          className="absolute flex items-center gap-1 px-1.5 py-0.5 rounded bg-warning text-warning-foreground shadow-sm"
-          style={{ top: -24, right: showAIButton ? 160 : 0, fontSize: 10 }}
-        >
-          <AlertTriangle className="w-3 h-3" />
-          {analysisErrors.length}
-        </div>
-      )}
 
       {/* Resize handles */}
       {selected && !element.locked && !isEditing && handles.map(h => (
