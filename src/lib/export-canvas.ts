@@ -37,63 +37,64 @@ async function waitForAssets(root: HTMLElement) {
   await waitForNextPaint();
 }
 
-function createCaptureOptions(canvasEl: HTMLElement, exportId: string, realWidth: number, realHeight: number) {
-  return {
-    scale: 2,
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: null,
-    logging: false,
-    width: realWidth,
-    height: realHeight,
-    windowWidth: realWidth,
-    windowHeight: realHeight,
-    scrollX: 0,
-    scrollY: 0,
-    onclone: (clonedDoc: Document) => {
-      const clonedCanvas = clonedDoc.querySelector(`[data-export-id="${exportId}"]`) as HTMLElement | null;
-      if (!clonedCanvas) return;
-
-      clonedCanvas.classList.add('export-mode');
-      clonedCanvas.style.transform = 'none';
-      clonedCanvas.style.transformOrigin = 'top left';
-      clonedCanvas.style.boxShadow = 'none';
-      clonedCanvas.style.width = `${realWidth}px`;
-      clonedCanvas.style.height = `${realHeight}px`;
-
-      clonedCanvas.querySelectorAll('[data-editing-ui]').forEach((node) => {
-        (node as HTMLElement).style.display = 'none';
-      });
-
-      clonedCanvas.querySelectorAll('[data-design-element-type="text"] > div').forEach((node) => {
-        const textNode = node as HTMLElement;
-        textNode.style.overflow = 'visible';
-      });
-    },
-  };
-}
-
 /**
  * Capture the visible canvas at its real size without editor-only UI.
  */
-async function captureCanvas(canvasEl: HTMLElement): Promise<HTMLCanvasElement> {
+async function captureCanvas(canvasEl: HTMLElement, canvasWidth: number, canvasHeight: number): Promise<HTMLCanvasElement> {
   const exportId = `export-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   canvasEl.setAttribute('data-export-id', exportId);
 
-  // Read the real canvas dimensions from the style (before transform scaling)
-  const realWidth = parseInt(canvasEl.style.width) || canvasEl.offsetWidth;
-  const realHeight = parseInt(canvasEl.style.height) || canvasEl.offsetHeight;
-
-  // Temporarily remove transform for accurate capture
+  // Save original styles
   const origTransform = canvasEl.style.transform;
   const origTransformOrigin = canvasEl.style.transformOrigin;
+  const origOverflow = canvasEl.style.overflow;
+
+  // Temporarily reset for accurate capture
   canvasEl.style.transform = 'none';
   canvasEl.style.transformOrigin = 'top left';
+  canvasEl.style.overflow = 'visible';
 
   try {
     await waitForAssets(canvasEl);
 
-    const captureOptions = createCaptureOptions(canvasEl, exportId, realWidth, realHeight);
+    const captureOptions = {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null as string | null,
+      logging: false,
+      width: canvasWidth,
+      height: canvasHeight,
+      windowWidth: canvasWidth,
+      windowHeight: canvasHeight,
+      scrollX: 0,
+      scrollY: 0,
+      x: 0,
+      y: 0,
+      onclone: (clonedDoc: Document) => {
+        const clonedCanvas = clonedDoc.querySelector(`[data-export-id="${exportId}"]`) as HTMLElement | null;
+        if (!clonedCanvas) return;
+
+        clonedCanvas.classList.add('export-mode');
+        clonedCanvas.style.transform = 'none';
+        clonedCanvas.style.transformOrigin = 'top left';
+        clonedCanvas.style.boxShadow = 'none';
+        clonedCanvas.style.overflow = 'hidden';
+        clonedCanvas.style.width = `${canvasWidth}px`;
+        clonedCanvas.style.height = `${canvasHeight}px`;
+
+        // Hide all editing UI
+        clonedCanvas.querySelectorAll('[data-editing-ui]').forEach((node) => {
+          (node as HTMLElement).style.display = 'none';
+        });
+
+        // Ensure text doesn't clip
+        clonedCanvas.querySelectorAll('[data-design-element-type="text"] > div').forEach((node) => {
+          const textNode = node as HTMLElement;
+          textNode.style.overflow = 'visible';
+        });
+      },
+    };
 
     try {
       return await html2canvas(canvasEl, {
@@ -109,6 +110,7 @@ async function captureCanvas(canvasEl: HTMLElement): Promise<HTMLCanvasElement> 
   } finally {
     canvasEl.style.transform = origTransform;
     canvasEl.style.transformOrigin = origTransformOrigin;
+    canvasEl.style.overflow = origOverflow;
     canvasEl.removeAttribute('data-export-id');
   }
 }
@@ -124,8 +126,8 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-export async function exportAsPng(canvasEl: HTMLElement, filename = '카드뉴스.png') {
-  const captured = await captureCanvas(canvasEl);
+export async function exportAsPng(canvasEl: HTMLElement, canvasWidth: number, canvasHeight: number, filename = '카드뉴스.png') {
+  const captured = await captureCanvas(canvasEl, canvasWidth, canvasHeight);
   captured.toBlob((blob) => {
     if (blob) downloadBlob(blob, filename);
   }, 'image/png');
@@ -137,7 +139,7 @@ export async function exportAsPdf(
   height: number,
   filename = '카드뉴스.pdf',
 ) {
-  const captured = await captureCanvas(canvasEl);
+  const captured = await captureCanvas(canvasEl, width, height);
   const imgData = captured.toDataURL('image/png');
 
   const orientation = width >= height ? 'landscape' : 'portrait';
