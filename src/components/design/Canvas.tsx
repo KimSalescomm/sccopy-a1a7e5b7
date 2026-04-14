@@ -128,6 +128,19 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
     const el = page.elements.find(e => e.id === elementId);
     if (!el) return;
 
+    // Only compute snap guides during actual drag (isDragging is set by onDragStart)
+    if (!isDragging) {
+      // Not yet dragging, just update position
+      if (selectedIds.length > 1 && selectedIds.includes(elementId)) {
+        const dx = newX - el.position.x;
+        const dy = newY - el.position.y;
+        onMoveSelected(dx, dy);
+      } else {
+        onUpdateElement(elementId, { position: { x: Math.round(newX), y: Math.round(newY) } });
+      }
+      return;
+    }
+
     const snap = computeSnap(
       selectedIds,
       page.elements,
@@ -147,7 +160,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
     } else {
       onUpdateElement(elementId, { position: { x: Math.round(finalX), y: Math.round(finalY) } });
     }
-  }, [selectedIds, page.elements, canvasPreset, onUpdateElement, onMoveSelected]);
+  }, [selectedIds, page.elements, canvasPreset, onUpdateElement, onMoveSelected, isDragging]);
 
   const handleDragEnd = useCallback(() => {
     setGuides([]);

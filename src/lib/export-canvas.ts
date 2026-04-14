@@ -37,20 +37,17 @@ async function waitForAssets(root: HTMLElement) {
   await waitForNextPaint();
 }
 
-function createCaptureOptions(canvasEl: HTMLElement, exportId: string) {
-  const width = Math.round(canvasEl.offsetWidth);
-  const height = Math.round(canvasEl.offsetHeight);
-
+function createCaptureOptions(canvasEl: HTMLElement, exportId: string, realWidth: number, realHeight: number) {
   return {
     scale: 2,
     useCORS: true,
     allowTaint: true,
     backgroundColor: null,
     logging: false,
-    width,
-    height,
-    windowWidth: width,
-    windowHeight: height,
+    width: realWidth,
+    height: realHeight,
+    windowWidth: realWidth,
+    windowHeight: realHeight,
     scrollX: 0,
     scrollY: 0,
     onclone: (clonedDoc: Document) => {
@@ -61,6 +58,8 @@ function createCaptureOptions(canvasEl: HTMLElement, exportId: string) {
       clonedCanvas.style.transform = 'none';
       clonedCanvas.style.transformOrigin = 'top left';
       clonedCanvas.style.boxShadow = 'none';
+      clonedCanvas.style.width = `${realWidth}px`;
+      clonedCanvas.style.height = `${realHeight}px`;
 
       clonedCanvas.querySelectorAll('[data-editing-ui]').forEach((node) => {
         (node as HTMLElement).style.display = 'none';
@@ -81,10 +80,20 @@ async function captureCanvas(canvasEl: HTMLElement): Promise<HTMLCanvasElement> 
   const exportId = `export-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   canvasEl.setAttribute('data-export-id', exportId);
 
+  // Read the real canvas dimensions from the style (before transform scaling)
+  const realWidth = parseInt(canvasEl.style.width) || canvasEl.offsetWidth;
+  const realHeight = parseInt(canvasEl.style.height) || canvasEl.offsetHeight;
+
+  // Temporarily remove transform for accurate capture
+  const origTransform = canvasEl.style.transform;
+  const origTransformOrigin = canvasEl.style.transformOrigin;
+  canvasEl.style.transform = 'none';
+  canvasEl.style.transformOrigin = 'top left';
+
   try {
     await waitForAssets(canvasEl);
 
-    const captureOptions = createCaptureOptions(canvasEl, exportId);
+    const captureOptions = createCaptureOptions(canvasEl, exportId, realWidth, realHeight);
 
     try {
       return await html2canvas(canvasEl, {
@@ -98,6 +107,8 @@ async function captureCanvas(canvasEl: HTMLElement): Promise<HTMLCanvasElement> 
       });
     }
   } finally {
+    canvasEl.style.transform = origTransform;
+    canvasEl.style.transformOrigin = origTransformOrigin;
     canvasEl.removeAttribute('data-export-id');
   }
 }
