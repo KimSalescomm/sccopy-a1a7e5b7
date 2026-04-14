@@ -552,6 +552,7 @@ const Index = () => {
           onTextChange={handleTextChange}
           onFinishEditing={handleFinishEditing}
           onScaleChange={setScale}
+          onMarqueeSelect={handleMarqueeSelect}
           activeEditRef={activeEditRef}
         />
         <PropertiesPanel
