@@ -216,19 +216,7 @@ const Index = () => {
     setSelectedIds(prev => prev.filter(sid => sid !== id));
   }, [currentPageIndex, updatePage]);
 
-  const handleSelectElement = useCallback((id: string | null, additive?: boolean) => {
-    if (!id) {
-      setSelectedIds([]);
-      return;
-    }
-    if (additive) {
-      setSelectedIds(prev =>
-        prev.includes(id) ? prev.filter(sid => sid !== id) : [...prev, id]
-      );
-    } else {
-      setSelectedIds([id]);
-    }
-  }, []);
+  // handleSelectElement is defined below with group awareness
 
   const handleAddText = useCallback(() => {
     const el = createTextElement();
