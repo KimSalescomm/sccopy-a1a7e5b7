@@ -405,7 +405,100 @@ export function DesignElementRenderer({
   };
 
   const hasErrors = element.type === 'text' && analysisErrors.length > 0 && !isEditing;
-  const showAIButton = element.type === 'text' && selected && !!element.text?.trim() && !showCorrectionPanel;
+  const showAIButton = element.type === 'text' && selected && !!element.text?.trim() && !showCorrectionPanel && !showCopyTypeFlow;
+
+  return (
+    <div
+      ref={elRef}
+      className="absolute group"
+      data-design-element-type={element.type}
+      style={{
+        left: element.position.x,
+        top: element.position.y,
+        width: element.size.width,
+        height: element.size.height,
+        cursor: element.locked ? 'default' : (isEditing ? 'text' : 'move'),
+        outline: selected ? '2px solid hsl(230, 65%, 55%)' : (hasErrors ? '2px dashed hsl(30, 90%, 52%)' : 'none'),
+        outlineOffset: 1,
+        zIndex: selected ? 100 : 'auto',
+      }}
+      onMouseDown={handleMouseDown}
+      onDoubleClick={() => onDoubleClick(element.id)}
+    >
+      {renderContent()}
+
+      {/* AI buttons */}
+      {showAIButton && (
+        <div data-editing-ui className="absolute z-50 flex items-center gap-1.5" style={{ top: -36, right: 0 }}>
+          <button
+            className="flex items-center gap-[5px] px-[11px] rounded-md font-semibold shadow-sm transition-all border border-input bg-background text-foreground hover:bg-accent"
+            style={{ fontSize: 13, height: 30 }}
+            onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
+            onClick={e => { e.stopPropagation(); setShowCopyTypeFlow(true); }}
+          >
+            카피 분석
+          </button>
+          <button
+            className="flex items-center gap-[5px] px-[11px] rounded-md font-semibold shadow-sm transition-all bg-primary text-primary-foreground hover:bg-primary/90"
+            style={{ fontSize: 13, height: 30 }}
+            onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
+            onClick={e => { e.stopPropagation(); setShowCorrectionPanel(true); }}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            AI 첨삭
+          </button>
+        </div>
+      )}
+
+      {/* Error indicator badge */}
+      {hasErrors && (
+        <div
+          data-editing-ui
+          className="absolute flex items-center gap-1 px-1.5 py-0.5 rounded bg-warning text-warning-foreground shadow-sm"
+          style={{ top: -24, right: showAIButton ? 160 : 0, fontSize: 10 }}
+        >
+          <AlertTriangle className="w-3 h-3" />
+          {analysisErrors.length}
+        </div>
+      )}
+
+      {/* Resize handles */}
+      {selected && !element.locked && !isEditing && handles.map(h => (
+        <div
+          key={h}
+          data-editing-ui
+          className="absolute w-2 h-2 bg-primary rounded-sm border border-primary-foreground shadow-sm"
+          style={{ ...handlePositions[h], cursor: handleCursors[h] }}
+          onMouseDown={e => handleResizeMouseDown(e, h)}
+        />
+      ))}
+
+      {/* Inline AI Correction Panel */}
+      {showCorrectionPanel && element.text && (
+        <div data-editing-ui>
+          <AICorrectionPanel
+            text={element.text}
+            elementId={element.id}
+            onTextChange={onTextChange}
+            onClose={() => setShowCorrectionPanel(false)}
+          />
+        </div>
+      )}
+
+      {/* Inline Copy Type Flow Panel */}
+      {showCopyTypeFlow && element.text && (
+        <div data-editing-ui>
+          <CopyTypeFlow
+            text={element.text}
+            elementId={element.id}
+            onTextChange={onTextChange}
+            onClose={() => setShowCopyTypeFlow(false)}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
 
   return (
     <div
