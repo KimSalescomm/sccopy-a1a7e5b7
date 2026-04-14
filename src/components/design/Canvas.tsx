@@ -16,6 +16,7 @@ interface CanvasProps {
   selectedIds: string[];
   editingId: string | null;
   canvasPreset: CanvasPreset;
+  isExporting?: boolean;
   onSelectElement: (id: string | null, additive?: boolean) => void;
   onUpdateElement: (id: string, updates: Partial<DesignElement>) => void;
   onMoveSelected: (dx: number, dy: number) => void;
@@ -37,7 +38,7 @@ interface MarqueeState {
 }
 
 export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
-  page, selectedIds, editingId, canvasPreset,
+  page, selectedIds, editingId, canvasPreset, isExporting = false,
   onSelectElement, onUpdateElement, onMoveSelected, onDoubleClickElement,
   onTextChange, onFinishEditing, onScaleChange, activeEditRef, onMarqueeSelect,
 }, ref) {
@@ -288,6 +289,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
               onTextChange={onTextChange}
               onFinishEditing={onFinishEditing}
               activeEditRef={activeEditRef}
+              isExporting={isExporting}
               onDragMove={handleElementDrag}
               onDragEnd={handleDragEnd}
               onDragStart={handleDragStart}
@@ -295,8 +297,9 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
           ))}
 
           {/* Marquee selection overlay */}
-          {marqueeRect && marqueeRect.width > 2 && marqueeRect.height > 2 && (
+          {!isExporting && marqueeRect && marqueeRect.width > 2 && marqueeRect.height > 2 && (
             <div
+              data-editing-ui
               className="absolute pointer-events-none"
               style={{
                 left: marqueeRect.left,
@@ -310,12 +313,14 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
             />
           )}
 
-          <AlignmentGuidesOverlay
-            guides={guides}
-            spacingLabels={spacingLabels}
-            canvasWidth={canvasPreset.width}
-            canvasHeight={canvasPreset.height}
-          />
+          {!isExporting && (
+            <AlignmentGuidesOverlay
+              guides={guides}
+              spacingLabels={spacingLabels}
+              canvasWidth={canvasPreset.width}
+              canvasHeight={canvasPreset.height}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -80,6 +80,14 @@ import {
 
 const MAX_HISTORY = 50;
 
+function waitForExportRender() {
+  return new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
+}
+
 const Index = () => {
   const [pages, setPages] = useState<Page[]>([createDefaultPage()]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -88,6 +96,7 @@ const Index = () => {
   const [canvasPreset, setCanvasPreset] = useState<CanvasPreset>(DEFAULT_PRESET);
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
   const [scale, setScale] = useState(0.5);
+  const [isExporting, setIsExporting] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<CanvasHandle>(null);
   const activeEditRef = useRef<HTMLElement | null>(null);
@@ -330,19 +339,43 @@ const Index = () => {
     }));
   }, [selectedIds, currentPageIndex, updatePage]);
 
-  const handleExportPng = useCallback(async () => {
+  const runExport = useCallback(async (format: 'png' | 'pdf') => {
     const el = canvasRef.current?.getCanvasElement();
-    if (!el) return;
-    toast({ title: '내보내기 중...', description: 'PNG 파일을 생성하고 있습니다.' });
-    await exportAsPng(el, canvasPreset.width, canvasPreset.height);
-  }, [canvasPreset]);
+    if (!el || isExporting) return;
+
+    activeEditRef.current?.blur();
+    handleFinishEditing();
+    setIsExporting(true);
+    await waitForExportRender();
+
+    try {
+      toast({
+        title: '내보내기 중...',
+        description: format === 'png' ? 'PNG 파일을 생성하고 있습니다.' : 'PDF 파일을 생성하고 있습니다.',
+      });
+
+      if (format === 'png') {
+        await exportAsPng(el, canvasPreset.width, canvasPreset.height);
+      } else {
+        await exportAsPdf(el, canvasPreset.width, canvasPreset.height);
+      }
+    } catch (error) {
+      toast({
+        title: '내보내기 중단',
+        description: error instanceof Error ? error.message : '내보내기에 실패했습니다.',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  }, [canvasPreset.height, canvasPreset.width, handleFinishEditing, isExporting]);
+
+  const handleExportPng = useCallback(async () => {
+    await runExport('png');
+  }, [runExport]);
 
   const handleExportPdf = useCallback(async () => {
-    const el = canvasRef.current?.getCanvasElement();
-    if (!el) return;
-    toast({ title: '내보내기 중...', description: 'PDF 파일을 생성하고 있습니다.' });
-    await exportAsPdf(el, canvasPreset.width, canvasPreset.height);
-  }, [canvasPreset]);
+    await runExport('pdf');
+  }, [runExport]);
 
   // Clipboard for copy/paste
   const clipboardRef = useRef<DesignElement[]>([]);
@@ -555,6 +588,7 @@ const Index = () => {
           selectedIds={selectedIds}
           editingId={editingId}
           canvasPreset={canvasPreset}
+          isExporting={isExporting}
           onSelectElement={handleSelectElement}
           onUpdateElement={handleUpdateElement}
           onMoveSelected={handleMoveSelected}

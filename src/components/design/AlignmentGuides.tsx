@@ -181,6 +181,7 @@ export function AlignmentGuidesOverlay({ guides, spacingLabels, canvasWidth, can
 
   return (
     <svg
+      data-editing-ui
       className="absolute inset-0 pointer-events-none"
       width={canvasWidth}
       height={canvasHeight}
