@@ -537,6 +537,9 @@ const Index = () => {
         onAlign={handleAlign}
         onExportPng={handleExportPng}
         onExportPdf={handleExportPdf}
+        onGroup={handleGroup}
+        onUngroup={handleUngroup}
+        hasGroupInSelection={selectedIds.some(id => currentPage.elements.find(e => e.id === id)?.groupId)}
       />
       <div className="flex-1 flex overflow-hidden">
         <PageSidebar
