@@ -314,13 +314,22 @@ const Index = () => {
       if (preset) setCanvasPreset(preset);
     }
 
-    updatePage(currentPageIndex, () => templatePages[0]);
+    // Lock all shape elements so background decorations cannot be selected or moved
+    const lockShapes = (page: Page): Page => ({
+      ...page,
+      elements: page.elements.map(el =>
+        el.type === 'shape' ? { ...el, locked: true } : el
+      ),
+    });
+    const lockedTemplatePages = templatePages.map(lockShapes);
 
-    if (templatePages.length > 1) {
+    updatePage(currentPageIndex, () => lockedTemplatePages[0]);
+
+    if (lockedTemplatePages.length > 1) {
       setPages(prev => {
         const newPages = [...prev];
-        for (let i = 1; i < templatePages.length; i++) {
-          newPages.splice(currentPageIndex + i, 0, templatePages[i]);
+        for (let i = 1; i < lockedTemplatePages.length; i++) {
+          newPages.splice(currentPageIndex + i, 0, lockedTemplatePages[i]);
         }
         return newPages;
       });
