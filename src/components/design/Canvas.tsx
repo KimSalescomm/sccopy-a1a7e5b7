@@ -215,6 +215,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
       if (selX2 - selX1 > 5 || selY2 - selY1 > 5) {
         const hitIds = page.elements
           .filter(el => {
+            if (el.locked) return false;
             const elX1 = el.position.x;
             const elY1 = el.position.y;
             const elX2 = el.position.x + el.size.width;
