@@ -54,8 +54,16 @@ export function useAutoSave(
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       setStatus('saved');
       setTimeout(() => setStatus(prev => prev === 'saved' ? 'idle' : prev), 2000);
-    } catch {
+    } catch (err: unknown) {
       setStatus('idle');
+      // 5MB 한도 초과 시 사용자에게 알림
+      const isQuota = err instanceof DOMException && (
+        err.name === 'QuotaExceededError' ||
+        err.name === 'NS_ERROR_DOM_QUOTA_REACHED'
+      );
+      if (isQuota) {
+        console.warn('[AutoSave] localStorage 용량 초과 — 이미지 포함 시 세션 간 복원 불가');
+      }
     }
   }, [pages, canvasPresetId]);
 

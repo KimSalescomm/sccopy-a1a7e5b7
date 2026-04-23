@@ -104,7 +104,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
     },
   }), [getFitScale, scale, onScaleChange]);
 
-  // Handle paste for image elements
+  // Handle paste for image elements (클립보드 전용)
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
     if (selectedIds.length !== 1) return;
     const selectedEl = page.elements.find(el => el.id === selectedIds[0]);
@@ -116,8 +116,13 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
         e.preventDefault();
         const file = items[i].getAsFile();
         if (file) {
+          const prevUrl = selectedEl.imageUrl;
           const url = URL.createObjectURL(file);
           onUpdateElement(selectedIds[0], { imageUrl: url });
+          // 이전 objectURL 메모리 해제
+          if (prevUrl && prevUrl.startsWith('blob:')) {
+            setTimeout(() => URL.revokeObjectURL(prevUrl), 500);
+          }
         }
         return;
       }

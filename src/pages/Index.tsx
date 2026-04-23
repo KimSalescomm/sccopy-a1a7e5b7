@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Page, DesignElement, CanvasPreset, Position, Size } from '@/types/design';
 import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId, DEFAULT_PRESET, CANVAS_PRESETS } from '@/types/design';
 import { getTemplatePages, getTemplatePresetId } from '@/lib/templates';
-import { Toolbar } from '@/components/design/Toolbar';
+import { Toolbar, StatusBar } from '@/components/design/Toolbar';
 import { PageSidebar } from '@/components/design/PageSidebar';
 import { Canvas, type CanvasHandle } from '@/components/design/Canvas';
 import { exportAsPng, exportAsPdf } from '@/lib/export-canvas';
@@ -100,7 +100,6 @@ const Index = () => {
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
   const [scale, setScale] = useState(0.5);
   const [isExporting, setIsExporting] = useState(false);
-  const imageInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<CanvasHandle>(null);
   const activeEditRef = useRef<HTMLElement | null>(null);
 
@@ -259,17 +258,10 @@ const Index = () => {
   }, [currentPageIndex, updatePage]);
 
   const handleAddImage = useCallback(() => {
-    imageInputRef.current?.click();
-  }, []);
-
-  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    const el = createImageElement(url);
+    // 이미지 요소를 추가하면 캔버스에 클립보드 붙여넣기 존이 나타남
+    const el = createImageElement('');
     updatePage(currentPageIndex, page => ({ ...page, elements: [...page.elements, el] }));
     setSelectedIds([el.id]);
-    e.target.value = '';
   }, [currentPageIndex, updatePage]);
 
   const handleApplyTemplate = useCallback((templateId: string) => {
@@ -562,9 +554,6 @@ const Index = () => {
         saveStatus={saveStatus}
         onManualSave={handleManualSave}
         scale={scale}
-        onZoomIn={() => canvasRef.current?.zoomIn()}
-        onZoomOut={() => canvasRef.current?.zoomOut()}
-        onFitToScreen={() => canvasRef.current?.fitToScreen()}
         canUndo={canUndo}
         canRedo={canRedo}
         onUndo={handleUndo}
@@ -615,8 +604,13 @@ const Index = () => {
           activeEditRef={activeEditRef}
         />
       </div>
-      <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-
+      {/* PPT 스타일 하단 상태바 — 줌 컨트롤 오른쪽 하단 배치 */}
+      <StatusBar
+        scale={scale}
+        onZoomIn={() => canvasRef.current?.zoomIn()}
+        onZoomOut={() => canvasRef.current?.zoomOut()}
+        onFitToScreen={() => canvasRef.current?.fitToScreen()}
+      />
       <AlertDialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
