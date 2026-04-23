@@ -1,3 +1,6 @@
+// NOTE: 이 훅은 현재 사용되지 않습니다.
+// Index.tsx에서 historyRef/pointerRef 기반 inline 구현을 사용 중입니다.
+// 추후 리팩토링 시 이 훅으로 대체 가능합니다.
 import { useState, useCallback, useRef } from 'react';
 import type { Page } from '@/types/design';
 

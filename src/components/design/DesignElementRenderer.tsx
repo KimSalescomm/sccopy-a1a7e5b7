@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import type { DesignElement, Position, Size } from '@/types/design';
-import { Sparkles, Upload } from 'lucide-react';
+import { Sparkles, Clipboard } from 'lucide-react';
 import { toast } from 'sonner';
 import { AICorrectionPanel } from './AICorrectionPanel';
 import { CopyTypeFlow } from './CopyTypeFlow';
@@ -49,13 +49,11 @@ export function DesignElementRenderer({
 }: DesignElementRendererProps) {
   const elRef = useRef<HTMLDivElement>(null);
   const editableRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number; started: boolean } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number; handle: string } | null>(null);
   const isEditing = editingId === element.id;
   const [showCorrectionPanel, setShowCorrectionPanel] = useState(false);
   const [showCopyTypeFlow, setShowCopyTypeFlow] = useState(false);
-  const [isDragOver, setIsDragOver] = useState(false);
 
   const isPlaceholder = isPlaceholderText(element);
 
@@ -118,11 +116,29 @@ export function DesignElementRenderer({
     }
   }, [isEditing, element.text]);
 
-  const handleImageFile = useCallback((file: File) => {
-    if (!file.type.startsWith('image/')) return;
-    const url = URL.createObjectURL(file);
-    onUpdate(element.id, { imageUrl: url });
-  }, [element.id, onUpdate]);
+  // Clipboard-only image paste (보안 환경: 파일 업로드 불가)
+  const handleClipboardPaste = useCallback(async () => {
+    try {
+      const items = await navigator.clipboard.read();
+      for (const item of items) {
+        const imageType = item.types.find(t => t.startsWith('image/'));
+        if (imageType) {
+          const blob = await item.getType(imageType);
+          const prevUrl = element.imageUrl;
+          const url = URL.createObjectURL(blob);
+          onUpdate(element.id, { imageUrl: url });
+          // revoke previous objectURL to avoid memory leak
+          if (prevUrl && prevUrl.startsWith('blob:')) {
+            setTimeout(() => URL.revokeObjectURL(prevUrl), 500);
+          }
+          return;
+        }
+      }
+      toast('클립보드에 이미지가 없습니다. 이미지를 먼저 복사해 주세요.');
+    } catch {
+      toast('Ctrl+V 로 이미지를 붙여넣어 주세요.');
+    }
+  }, [element.id, element.imageUrl, onUpdate]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (element.locked) return;
@@ -342,96 +358,33 @@ export function DesignElementRenderer({
         );
       }
 
-      // Upload Zone UI
+      // Clipboard-only Upload Zone
       return (
         <div
-          className="w-full h-full flex flex-col items-center justify-center"
+          className="w-full h-full flex flex-col items-center justify-center gap-3"
           style={{
             background: '#F9FAFB',
-            border: `2px dashed ${isDragOver ? '#6366F1' : '#D1D5DB'}`,
+            border: '2px dashed #D1D5DB',
             borderRadius: 16,
-            transition: 'border-color 0.2s, background 0.2s',
-            ...(isDragOver ? { background: '#EEF2FF' } : {}),
-          }}
-          onDragOver={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsDragOver(true);
-          }}
-          onDragLeave={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsDragOver(false);
-          }}
-          onDrop={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsDragOver(false);
-            const file = e.dataTransfer.files?.[0];
-            if (file) handleImageFile(file);
           }}
         >
-          <Upload
-            style={{ width: 32, height: 32, color: '#9CA3AF', marginBottom: 12 }}
-          />
-          <span style={{ color: '#9CA3AF', fontSize: 13, textAlign: 'center', lineHeight: 1.5, padding: '0 16px', marginBottom: 12 }}>
-            파일을 선택하거나,<br />이미지를 붙여넣어 추가하세요
+          <Clipboard style={{ width: 32, height: 32, color: '#9CA3AF' }} />
+          <span style={{ color: '#6B7280', fontSize: 13, textAlign: 'center', lineHeight: 1.6, padding: '0 20px' }}>
+            이미지를 복사한 후<br />
+            <strong>Ctrl+V</strong> 또는 아래 버튼으로 붙여넣으세요
           </span>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              style={{
-                fontSize: 12, padding: '6px 14px', borderRadius: 6,
-                border: '1px solid #D1D5DB', background: '#fff', color: '#374151',
-                cursor: 'pointer', fontWeight: 500,
-              }}
-              onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
-              onClick={(e) => {
-                e.stopPropagation();
-                fileInputRef.current?.click();
-              }}
-            >
-              파일 선택
-            </button>
-            <button
-              style={{
-                fontSize: 12, padding: '6px 14px', borderRadius: 6,
-                border: '1px solid #D1D5DB', background: '#fff', color: '#374151',
-                cursor: 'pointer', fontWeight: 500,
-              }}
-              onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
-              onClick={async (e) => {
-                e.stopPropagation();
-                try {
-                  const items = await navigator.clipboard.read();
-                  for (const item of items) {
-                    const imageType = item.types.find(t => t.startsWith('image/'));
-                    if (imageType) {
-                      const blob = await item.getType(imageType);
-                      const url = URL.createObjectURL(blob);
-                      onUpdate(element.id, { imageUrl: url });
-                      return;
-                    }
-                  }
-                  toast('클립보드에 이미지가 없습니다');
-                } catch {
-                  toast('클립보드 접근 권한이 필요합니다. Ctrl+V를 사용해주세요.');
-                }
-              }}
-            >
-              붙여넣기
-            </button>
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleImageFile(file);
-              e.target.value = '';
+          <button
+            style={{
+              fontSize: 13, padding: '7px 18px', borderRadius: 6,
+              border: '1px solid #D1D5DB', background: '#fff', color: '#374151',
+              cursor: 'pointer', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6,
             }}
-          />
+            onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}
+            onClick={(e) => { e.stopPropagation(); void handleClipboardPaste(); }}
+          >
+            <Clipboard style={{ width: 14, height: 14 }} />
+            클립보드에서 붙여넣기
+          </button>
         </div>
       );
     }
