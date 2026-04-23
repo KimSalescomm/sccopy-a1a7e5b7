@@ -89,7 +89,10 @@ function waitForExportRender() {
 }
 
 const Index = () => {
-  const [pages, setPages] = useState<Page[]>([createDefaultPage()]);
+  const [pages, setPages] = useState<Page[]>(() => {
+    const tplPages = getTemplatePages('basic-usp');
+    return tplPages.length > 0 ? tplPages : [createDefaultPage()];
+  });
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
