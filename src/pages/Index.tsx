@@ -227,12 +227,35 @@ const Index = () => {
   }, [currentPageIndex, selectedIds, updatePage, canvasPreset.height]);
 
   const handleDeleteElement = useCallback((id: string) => {
-    updatePage(currentPageIndex, page => ({
-      ...page,
-      elements: page.elements.filter(e => e.id !== id),
-    }));
-    setSelectedIds(prev => prev.filter(sid => sid !== id));
-  }, [currentPageIndex, updatePage]);
+    updatePage(currentPageIndex, page => {
+      const target = page.elements.find(e => e.id === id);
+      // 이미지가 들어있는 image 요소는 element 자체를 지우는 대신
+      // imageUrl만 비워서 업로드(붙여넣기) 영역으로 되돌린다
+      if (target && target.type === 'image' && target.imageUrl) {
+        const prevUrl = target.imageUrl;
+        if (prevUrl.startsWith('blob:')) {
+          try { URL.revokeObjectURL(prevUrl); } catch { /* noop */ }
+        }
+        return {
+          ...page,
+          elements: page.elements.map(e =>
+            e.id === id ? { ...e, imageUrl: '' } : e
+          ),
+        };
+      }
+      return {
+        ...page,
+        elements: page.elements.filter(e => e.id !== id),
+      };
+    });
+    // 빈 이미지 요소는 선택 상태를 유지해야 붙여넣기 안내가 계속 보인다
+    const isEmptyingImage = pages[currentPageIndex]?.elements.find(
+      e => e.id === id && e.type === 'image' && !!e.imageUrl
+    );
+    if (!isEmptyingImage) {
+      setSelectedIds(prev => prev.filter(sid => sid !== id));
+    }
+  }, [currentPageIndex, updatePage, pages]);
 
   // handleSelectElement is defined below with group awareness
 
