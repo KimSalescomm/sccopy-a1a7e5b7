@@ -107,7 +107,7 @@ export const CANVAS_PRESETS: CanvasPreset[] = [
   { id: '16:9', label: '16:9 가로형', width: 1920, height: 1080, ratio: '16:9' },
 ];
 
-export const DEFAULT_PRESET = CANVAS_PRESETS[2]; // 3:4
+export const DEFAULT_PRESET = CANVAS_PRESETS[6]; // 16:9
 
 // Legacy constants for compatibility
 export const CANVAS_WIDTH = DEFAULT_PRESET.width;
