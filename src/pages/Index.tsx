@@ -227,15 +227,18 @@ const Index = () => {
   }, [currentPageIndex, selectedIds, updatePage, canvasPreset.height]);
 
   const handleDeleteElement = useCallback((id: string) => {
+    let keptAsPlaceholder = false;
     updatePage(currentPageIndex, page => {
       const target = page.elements.find(e => e.id === id);
-      // 이미지가 들어있는 image 요소는 element 자체를 지우는 대신
-      // imageUrl만 비워서 업로드(붙여넣기) 영역으로 되돌린다
-      if (target && target.type === 'image' && target.imageUrl) {
+      if (!target) return page;
+
+      // 이미지가 들어있는 image 요소: imageUrl만 비워서 업로드 영역으로 되돌린다
+      if (target.type === 'image' && target.imageUrl) {
         const prevUrl = target.imageUrl;
         if (prevUrl.startsWith('blob:')) {
           try { URL.revokeObjectURL(prevUrl); } catch { /* noop */ }
         }
+        keptAsPlaceholder = true;
         return {
           ...page,
           elements: page.elements.map(e =>
@@ -243,19 +246,33 @@ const Index = () => {
           ),
         };
       }
+
+      // placeholder가 있는 텍스트 요소: 내용만 비워서 입력 대기 상태로 되돌린다
+      if (
+        target.type === 'text' &&
+        target.placeholder &&
+        target.text &&
+        target.text !== target.placeholder
+      ) {
+        keptAsPlaceholder = true;
+        return {
+          ...page,
+          elements: page.elements.map(e =>
+            e.id === id ? { ...e, text: e.placeholder ?? '' } : e
+          ),
+        };
+      }
+
       return {
         ...page,
         elements: page.elements.filter(e => e.id !== id),
       };
     });
-    // 빈 이미지 요소는 선택 상태를 유지해야 붙여넣기 안내가 계속 보인다
-    const isEmptyingImage = pages[currentPageIndex]?.elements.find(
-      e => e.id === id && e.type === 'image' && !!e.imageUrl
-    );
-    if (!isEmptyingImage) {
+    // 입력 대기 상태로 되돌린 요소는 선택 유지 (안내가 계속 보이도록)
+    if (!keptAsPlaceholder) {
       setSelectedIds(prev => prev.filter(sid => sid !== id));
     }
-  }, [currentPageIndex, updatePage, pages]);
+  }, [currentPageIndex, updatePage]);
 
   // handleSelectElement is defined below with group awareness
 
