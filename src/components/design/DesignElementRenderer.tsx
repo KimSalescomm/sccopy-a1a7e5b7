@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import type { DesignElement, Position, Size } from '@/types/design';
-import { Sparkles, Clipboard } from 'lucide-react';
+import { Sparkles, Clipboard, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { AICorrectionPanel } from './AICorrectionPanel';
 import { CopyTypeFlow } from './CopyTypeFlow';
