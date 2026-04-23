@@ -392,6 +392,19 @@ serve(async (req) => {
       result = { corrected: content.trim(), changes: [] };
     }
 
+    // Anti-hallucination guard: drop suggestions whose `original` is not actually present in the user input
+    if (mode !== "refine" && Array.isArray(result?.changes)) {
+      const before = result.changes.length;
+      result.changes = result.changes.filter((c: any) => {
+        const orig = typeof c?.original === "string" ? c.original.trim() : "";
+        if (!orig) return false;
+        return text.includes(orig);
+      });
+      if (result.changes.length !== before) {
+        console.log(`Filtered ${before - result.changes.length} hallucinated suggestion(s) for input: "${text}"`);
+      }
+    }
+
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
