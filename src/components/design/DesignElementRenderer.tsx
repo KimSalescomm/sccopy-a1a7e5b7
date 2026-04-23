@@ -445,6 +445,23 @@ export function DesignElementRenderer({
     >
       {renderContent()}
 
+      {/* Lock indicator on hover for locked elements */}
+      {!isExporting && element.locked && (
+        <div
+          data-editing-ui
+          className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ zIndex: 40 }}
+        >
+          <div
+            className="absolute flex items-center gap-1.5 px-2 py-1 rounded-md shadow-md bg-foreground/85 text-background"
+            style={{ top: 6, right: 6, fontSize: 11, fontWeight: 500 }}
+          >
+            <Lock className="w-3 h-3" />
+            <span>잠김</span>
+          </div>
+        </div>
+      )}
+
       {/* AI buttons */}
       {!isExporting && showAIButton && (
         <div data-editing-ui className="absolute z-50 flex items-center gap-1.5" style={{ top: -36, right: 0 }}>
