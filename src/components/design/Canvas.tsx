@@ -52,10 +52,10 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
 
   const getFitScale = useCallback(() => {
     if (!containerRef.current) return 0.5;
-    const { clientWidth, clientHeight } = containerRef.current;
+    const rect = containerRef.current.getBoundingClientRect();
     const padding = 48;
-    const sx = (clientWidth - padding) / canvasPreset.width;
-    const sy = (clientHeight - padding) / canvasPreset.height;
+    const sx = (rect.width - padding) / canvasPreset.width;
+    const sy = (rect.height - padding) / canvasPreset.height;
     return Math.min(sx, sy, 1);
   }, [canvasPreset]);
 
