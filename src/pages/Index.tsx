@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Page, DesignElement, CanvasPreset, Position, Size } from '@/types/design';
-import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId, DEFAULT_PRESET, CANVAS_PRESETS } from '@/types/design';
+import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId, DEFAULT_PRESET, CANVAS_PRESETS, getElementImageSrc } from '@/types/design';
 import { getTemplatePages, getTemplatePresetId } from '@/lib/templates';
 import { Toolbar, StatusBar } from '@/components/design/Toolbar';
 import { PageSidebar } from '@/components/design/PageSidebar';
@@ -88,6 +88,21 @@ function waitForExportRender() {
   });
 }
 
+function isDataImage(value: unknown): value is string {
+  return typeof value === 'string' && value.startsWith('data:image/');
+}
+
+function normalizeImageUpdates(oldEl: DesignElement | undefined, updates: Partial<DesignElement>): Partial<DesignElement> {
+  if (oldEl?.type !== 'image' && updates.type !== 'image') return updates;
+  const legacyUpdates = updates as Partial<DesignElement> & { dataUrl?: string; image?: string; src?: string };
+  const legacyOld = oldEl as (DesignElement & { dataUrl?: string; image?: string; src?: string }) | undefined;
+  const dataImage = [updates.imageData, updates.imageUrl, legacyUpdates.dataUrl, legacyUpdates.image, legacyUpdates.src].find(isDataImage);
+  if (dataImage) return { ...updates, imageData: dataImage, imageUrl: dataImage };
+  const existingDataImage = [oldEl?.imageData, oldEl?.imageUrl, legacyOld?.dataUrl, legacyOld?.image, legacyOld?.src].find(isDataImage);
+  if (existingDataImage && !('imageData' in updates) && !('imageUrl' in updates)) return { ...updates, imageData: existingDataImage, imageUrl: existingDataImage };
+  return updates;
+}
+
 const Index = () => {
   const [pages, setPages] = useState<Page[]>(() => {
     const tplPages = getTemplatePages('basic-usp');
@@ -159,6 +174,11 @@ const Index = () => {
   const handleRestore = useCallback(async () => {
     const data = await loadSavedData();
     if (data) {
+      const restoredImage = data.pages.flatMap(page => page.elements).find(element => element.type === 'image' && getElementImageSrc(element));
+      if (restoredImage) {
+        const src = getElementImageSrc(restoredImage);
+        console.log('[ImagePersistence] restore/set-pages imageData prefix', restoredImage.imageData?.slice(0, 30) ?? '', 'src prefix', src.slice(0, 30), 'length', src.length);
+      }
       setPages(data.pages);
       const preset = CANVAS_PRESETS.find(p => p.id === data.canvasPresetId);
       if (preset) setCanvasPreset(preset);
@@ -192,7 +212,8 @@ const Index = () => {
   const handleUpdateElement = useCallback((id: string, updates: Partial<DesignElement>) => {
     updatePage(currentPageIndex, page => {
       const oldEl = page.elements.find(e => e.id === id);
-      let newElements = page.elements.map(e => e.id === id ? { ...e, ...updates } as DesignElement : e);
+      const normalizedUpdates = normalizeImageUpdates(oldEl, updates);
+      let newElements = page.elements.map(e => e.id === id ? { ...e, ...normalizedUpdates } as DesignElement : e);
 
       if (
         oldEl?.type === 'text' &&
@@ -233,8 +254,8 @@ const Index = () => {
       if (!target) return page;
 
       // 이미지가 들어있는 image 요소: imageUrl만 비워서 업로드 영역으로 되돌린다
-      if (target.type === 'image' && target.imageUrl) {
-        const prevUrl = target.imageUrl;
+      if (target.type === 'image' && getElementImageSrc(target)) {
+        const prevUrl = getElementImageSrc(target);
         if (prevUrl.startsWith('blob:')) {
           try { URL.revokeObjectURL(prevUrl); } catch { /* noop */ }
         }
@@ -242,7 +263,7 @@ const Index = () => {
         return {
           ...page,
           elements: page.elements.map(e =>
-            e.id === id ? { ...e, imageUrl: '' } : e
+            e.id === id ? { ...e, imageData: '', imageUrl: '' } : e
           ),
         };
       }
