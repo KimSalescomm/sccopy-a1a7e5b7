@@ -117,12 +117,16 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
         const file = items[i].getAsFile();
         if (file) {
           const prevUrl = selectedEl.imageUrl;
-          const url = URL.createObjectURL(file);
-          onUpdateElement(selectedIds[0], { imageUrl: url });
-          // 이전 objectURL 메모리 해제
-          if (prevUrl && prevUrl.startsWith('blob:')) {
-            setTimeout(() => URL.revokeObjectURL(prevUrl), 500);
-          }
+          // base64 data URL로 저장 → 새로고침/복원 시에도 유지됨
+          const reader = new FileReader();
+          reader.onload = () => {
+            const dataUrl = reader.result as string;
+            onUpdateElement(selectedIds[0], { imageUrl: dataUrl });
+            if (prevUrl && prevUrl.startsWith('blob:')) {
+              setTimeout(() => URL.revokeObjectURL(prevUrl), 500);
+            }
+          };
+          reader.readAsDataURL(file);
         }
         return;
       }

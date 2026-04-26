@@ -125,9 +125,14 @@ export function DesignElementRenderer({
         if (imageType) {
           const blob = await item.getType(imageType);
           const prevUrl = element.imageUrl;
-          const url = URL.createObjectURL(blob);
-          onUpdate(element.id, { imageUrl: url });
-          // revoke previous objectURL to avoid memory leak
+          // base64 data URL로 저장 → 새로고침/복원 시에도 유지됨
+          const dataUrl: string = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(blob);
+          });
+          onUpdate(element.id, { imageUrl: dataUrl });
           if (prevUrl && prevUrl.startsWith('blob:')) {
             setTimeout(() => URL.revokeObjectURL(prevUrl), 500);
           }
