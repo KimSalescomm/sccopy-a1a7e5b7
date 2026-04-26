@@ -40,6 +40,9 @@ export interface DesignElement {
   placeholder?: string;
   textStyle?: TextStyle;
   // Image
+  /** Canonical persisted image source. Must be a data:image/... URL for restored images. */
+  imageData?: string;
+  /** Legacy/display mirror kept for compatibility with existing saved designs. */
   imageUrl?: string;
   objectFit?: 'cover' | 'contain' | 'fill';
   // Shape
@@ -168,6 +171,7 @@ export function createShapeElement(overrides?: Partial<DesignElement>): DesignEl
 }
 
 export function createImageElement(imageUrl: string, overrides?: Partial<DesignElement>): DesignElement {
+  const imageData = imageUrl.startsWith('data:image/') ? imageUrl : undefined;
   return {
     id: createId(),
     type: 'image',
@@ -175,8 +179,14 @@ export function createImageElement(imageUrl: string, overrides?: Partial<DesignE
     size: { width: 880, height: 600 },
     rotation: 0,
     locked: false,
+    imageData,
     imageUrl,
     objectFit: 'cover',
     ...overrides,
   };
+}
+
+export function getElementImageSrc(element: DesignElement): string {
+  if (element.type !== 'image') return '';
+  return element.imageData || element.imageUrl || '';
 }
