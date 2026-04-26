@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import type { Page, DesignElement, CanvasPreset } from '@/types/design';
+import { getElementImageSrc } from '@/types/design';
 import { DesignElementRenderer } from './DesignElementRenderer';
 import { AlignmentGuidesOverlay, computeSnap, computeSpacingLabels, type GuideLine } from './AlignmentGuides';
 
@@ -116,12 +117,13 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
         e.preventDefault();
         const file = items[i].getAsFile();
         if (file) {
-          const prevUrl = selectedEl.imageUrl;
+          const prevUrl = getElementImageSrc(selectedEl);
           // base64 data URL로 저장 → 새로고침/복원 시에도 유지됨
           const reader = new FileReader();
           reader.onload = () => {
             const dataUrl = reader.result as string;
-            onUpdateElement(selectedIds[0], { imageUrl: dataUrl });
+            console.log('[ImagePersistence] paste/update imageData prefix', dataUrl.slice(0, 30), 'length', dataUrl.length);
+            onUpdateElement(selectedIds[0], { imageData: dataUrl, imageUrl: dataUrl });
             if (prevUrl && prevUrl.startsWith('blob:')) {
               setTimeout(() => URL.revokeObjectURL(prevUrl), 500);
             }
