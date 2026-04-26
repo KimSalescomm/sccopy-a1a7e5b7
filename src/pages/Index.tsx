@@ -156,8 +156,8 @@ const Index = () => {
     }
   }, []);
 
-  const handleRestore = useCallback(() => {
-    const data = loadSavedData();
+  const handleRestore = useCallback(async () => {
+    const data = await loadSavedData();
     if (data) {
       setPages(data.pages);
       const preset = CANVAS_PRESETS.find(p => p.id === data.canvasPresetId);
@@ -171,7 +171,7 @@ const Index = () => {
   }, []);
 
   const handleDismissRestore = useCallback(() => {
-    clearSavedData();
+    void clearSavedData();
     setShowRestoreDialog(false);
   }, []);
 
