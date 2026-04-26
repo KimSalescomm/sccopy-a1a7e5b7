@@ -1,5 +1,6 @@
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import type { DesignElement, Position, Size } from '@/types/design';
+import { getElementImageSrc } from '@/types/design';
 import { Sparkles, Clipboard, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { AICorrectionPanel } from './AICorrectionPanel';
@@ -124,7 +125,7 @@ export function DesignElementRenderer({
         const imageType = item.types.find(t => t.startsWith('image/'));
         if (imageType) {
           const blob = await item.getType(imageType);
-          const prevUrl = element.imageUrl;
+          const prevUrl = getElementImageSrc(element);
           // base64 data URL로 저장 → 새로고침/복원 시에도 유지됨
           const dataUrl: string = await new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -132,7 +133,8 @@ export function DesignElementRenderer({
             reader.onerror = () => reject(reader.error);
             reader.readAsDataURL(blob);
           });
-          onUpdate(element.id, { imageUrl: dataUrl });
+          console.log('[ImagePersistence] clipboard-button/update imageData prefix', dataUrl.slice(0, 30), 'length', dataUrl.length);
+          onUpdate(element.id, { imageData: dataUrl, imageUrl: dataUrl });
           if (prevUrl && prevUrl.startsWith('blob:')) {
             setTimeout(() => URL.revokeObjectURL(prevUrl), 500);
           }
@@ -143,7 +145,7 @@ export function DesignElementRenderer({
     } catch {
       toast('Ctrl+V 로 이미지를 붙여넣어 주세요.');
     }
-  }, [element.id, element.imageUrl, onUpdate]);
+  }, [element.id, element.imageData, element.imageUrl, onUpdate]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (element.locked) return;
@@ -349,11 +351,15 @@ export function DesignElementRenderer({
     }
 
     if (element.type === 'image') {
-      if (element.imageUrl) {
+      const imageSrc = getElementImageSrc(element);
+      if (imageSrc) {
+        if (imageSrc.startsWith('data:image/')) {
+          console.log('[ImagePersistence] render/img-src prefix', imageSrc.slice(0, 30), 'length', imageSrc.length);
+        }
         return (
           <div className="w-full h-full" style={{ borderRadius: 16, overflow: 'hidden' }}>
             <img
-              src={element.imageUrl}
+              src={imageSrc}
               alt=""
               className="w-full h-full pointer-events-none select-none"
               style={{ objectFit: element.objectFit ?? 'contain' }}
