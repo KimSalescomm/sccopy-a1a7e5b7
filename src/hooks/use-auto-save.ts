@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import type { Page, CanvasPreset } from '@/types/design';
+import type { Page } from '@/types/design';
 
 const STORAGE_KEY = 'cardnews-designer-save';
+const DB_NAME = 'cardnews-designer';
+const DB_STORE = 'saves';
+const DB_KEY = 'current';
 
 export type SaveStatus = 'idle' | 'saving' | 'saved';
 
@@ -11,15 +14,76 @@ interface SaveData {
   savedAt: string;
 }
 
+// ---------- IndexedDB helpers (큰 이미지/base64 저장 지원) ----------
+function openDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(DB_STORE)) {
+        db.createObjectStore(DB_STORE);
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbGet(): Promise<SaveData | null> {
+  try {
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readonly');
+      const req = tx.objectStore(DB_STORE).get(DB_KEY);
+      req.onsuccess = () => resolve((req.result as SaveData) ?? null);
+      req.onerror = () => reject(req.error);
+    });
+  } catch {
+    return null;
+  }
+}
+
+async function idbSet(data: SaveData): Promise<void> {
+  const db = await openDB();
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    tx.objectStore(DB_STORE).put(data, DB_KEY);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+async function idbDel(): Promise<void> {
+  try {
+    const db = await openDB();
+    await new Promise<void>((resolve) => {
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).delete(DB_KEY);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    });
+  } catch {}
+}
+
+// 메타데이터(저장 여부 플래그)는 빠른 동기 확인을 위해 localStorage에 별도 보관
+const META_KEY = STORAGE_KEY + ':meta';
+
 export function hasSavedData(): boolean {
   try {
+    if (localStorage.getItem(META_KEY)) return true;
+    // 레거시: 이전 버전이 localStorage에 직접 저장한 경우
     return !!localStorage.getItem(STORAGE_KEY);
   } catch {
     return false;
   }
 }
 
-export function loadSavedData(): SaveData | null {
+export async function loadSavedData(): Promise<SaveData | null> {
+  // 1) IndexedDB 우선
+  const fromIdb = await idbGet();
+  if (fromIdb) return fromIdb;
+  // 2) 레거시 localStorage 폴백
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
@@ -29,10 +93,10 @@ export function loadSavedData(): SaveData | null {
   }
 }
 
-export function clearSavedData(): void {
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch {}
+export async function clearSavedData(): Promise<void> {
+  try { localStorage.removeItem(META_KEY); } catch {}
+  try { localStorage.removeItem(STORAGE_KEY); } catch {}
+  await idbDel();
 }
 
 export function useAutoSave(
@@ -43,27 +107,25 @@ export function useAutoSave(
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isFirstRender = useRef(true);
 
-  const saveNow = useCallback(() => {
+  const saveNow = useCallback(async () => {
     setStatus('saving');
+    const data: SaveData = {
+      pages,
+      canvasPresetId,
+      savedAt: new Date().toISOString(),
+    };
     try {
-      const data: SaveData = {
-        pages,
-        canvasPresetId,
-        savedAt: new Date().toISOString(),
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      await idbSet(data);
+      try {
+        localStorage.setItem(META_KEY, JSON.stringify({ savedAt: data.savedAt }));
+        // 레거시 키는 정리 (용량 차지 방지)
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {}
       setStatus('saved');
       setTimeout(() => setStatus(prev => prev === 'saved' ? 'idle' : prev), 2000);
-    } catch (err: unknown) {
+    } catch (err) {
       setStatus('idle');
-      // 5MB 한도 초과 시 사용자에게 알림
-      const isQuota = err instanceof DOMException && (
-        err.name === 'QuotaExceededError' ||
-        err.name === 'NS_ERROR_DOM_QUOTA_REACHED'
-      );
-      if (isQuota) {
-        console.warn('[AutoSave] localStorage 용량 초과 — 이미지 포함 시 세션 간 복원 불가');
-      }
+      console.warn('[AutoSave] IndexedDB 저장 실패', err);
     }
   }, [pages, canvasPresetId]);
 
@@ -76,7 +138,7 @@ export function useAutoSave(
     setStatus('saving');
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
-      saveNow();
+      void saveNow();
     }, 1500);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
