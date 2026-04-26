@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import type { Page } from '@/types/design';
+import type { DesignElement, Page } from '@/types/design';
+import { getElementImageSrc } from '@/types/design';
 
 const STORAGE_KEY = 'cardnews-designer-save';
 const DB_NAME = 'cardnews-designer';
@@ -12,6 +13,38 @@ interface SaveData {
   pages: Page[];
   canvasPresetId: string;
   savedAt: string;
+}
+
+function isDataImage(value: unknown): value is string {
+  return typeof value === 'string' && value.startsWith('data:image/');
+}
+
+function normalizeImageElement(element: DesignElement): DesignElement {
+  if (element.type !== 'image') return element;
+  const legacy = element as DesignElement & { dataUrl?: string; image?: string; src?: string };
+  const dataImage = [element.imageData, element.imageUrl, legacy.dataUrl, legacy.image, legacy.src].find(isDataImage);
+  if (dataImage) {
+    return { ...element, imageData: dataImage, imageUrl: dataImage };
+  }
+  if (getElementImageSrc(element).startsWith('blob:')) {
+    console.warn('[ImagePersistence] blob URL detected and not persisted', element.id);
+    return { ...element, imageData: undefined, imageUrl: '' };
+  }
+  return element;
+}
+
+function normalizePagesForPersistence(pages: Page[]): Page[] {
+  return pages.map(page => ({
+    ...page,
+    elements: page.elements.map(normalizeImageElement),
+  }));
+}
+
+function logFirstImage(stage: string, pages: Page[]) {
+  const image = pages.flatMap(page => page.elements).find(element => element.type === 'image' && getElementImageSrc(element));
+  if (!image) return;
+  const src = getElementImageSrc(image);
+  console.log(`[ImagePersistence] ${stage} imageData prefix`, image.imageData?.slice(0, 30) ?? '', 'src prefix', src.slice(0, 30), 'length', src.length);
 }
 
 // ---------- IndexedDB helpers (큰 이미지/base64 저장 지원) ----------
@@ -32,12 +65,13 @@ function openDB(): Promise<IDBDatabase> {
 async function idbGet(): Promise<SaveData | null> {
   try {
     const db = await openDB();
-    return await new Promise((resolve, reject) => {
+    const data = await new Promise<SaveData | null>((resolve, reject) => {
       const tx = db.transaction(DB_STORE, 'readonly');
       const req = tx.objectStore(DB_STORE).get(DB_KEY);
       req.onsuccess = () => resolve((req.result as SaveData) ?? null);
       req.onerror = () => reject(req.error);
     });
+    return data ? { ...data, pages: normalizePagesForPersistence(data.pages) } : null;
   } catch {
     return null;
   }
@@ -82,12 +116,18 @@ export function hasSavedData(): boolean {
 export async function loadSavedData(): Promise<SaveData | null> {
   // 1) IndexedDB 우선
   const fromIdb = await idbGet();
-  if (fromIdb) return fromIdb;
+  if (fromIdb) {
+    logFirstImage('restore/from-indexeddb', fromIdb.pages);
+    return fromIdb;
+  }
   // 2) 레거시 localStorage 폴백
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as SaveData;
+    const parsed = JSON.parse(raw) as SaveData;
+    const normalized = { ...parsed, pages: normalizePagesForPersistence(parsed.pages) };
+    logFirstImage('restore/from-localstorage', normalized.pages);
+    return normalized;
   } catch {
     return null;
   }
@@ -109,13 +149,17 @@ export function useAutoSave(
 
   const saveNow = useCallback(async () => {
     setStatus('saving');
+    const persistedPages = normalizePagesForPersistence(pages);
+    logFirstImage('before-save', persistedPages);
     const data: SaveData = {
-      pages,
+      pages: persistedPages,
       canvasPresetId,
       savedAt: new Date().toISOString(),
     };
     try {
       await idbSet(data);
+      const stored = await idbGet();
+      if (stored) logFirstImage('after-indexeddb-save', stored.pages);
       try {
         localStorage.setItem(META_KEY, JSON.stringify({ savedAt: data.savedAt }));
         // 레거시 키는 정리 (용량 차지 방지)
