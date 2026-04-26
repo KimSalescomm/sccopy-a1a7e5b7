@@ -145,7 +145,7 @@ export function DesignElementRenderer({
     } catch {
       toast('Ctrl+V 로 이미지를 붙여넣어 주세요.');
     }
-  }, [element.id, element.imageUrl, onUpdate]);
+  }, [element.id, element.imageData, element.imageUrl, onUpdate]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (element.locked) return;
