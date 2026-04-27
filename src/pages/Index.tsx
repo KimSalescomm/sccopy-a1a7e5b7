@@ -433,10 +433,23 @@ const Index = () => {
         description: format === 'png' ? 'PNG 파일을 생성하고 있습니다.' : 'PDF 파일을 생성하고 있습니다.',
       });
 
+      // Compute actual content extent so PNG/PDF includes elements past the preset bounds
+      const currentPage = pages[currentPageIndex];
+      const elementsBottom = currentPage?.elements.reduce(
+        (max, e) => Math.max(max, e.position.y + e.size.height),
+        0
+      ) ?? 0;
+      const elementsRight = currentPage?.elements.reduce(
+        (max, e) => Math.max(max, e.position.x + e.size.width),
+        0
+      ) ?? 0;
+      const exportWidth = Math.max(canvasPreset.width, Math.ceil(elementsRight));
+      const exportHeight = Math.max(canvasPreset.height, Math.ceil(elementsBottom));
+
       if (format === 'png') {
-        await exportAsPng(el, canvasPreset.width, canvasPreset.height);
+        await exportAsPng(el, exportWidth, exportHeight);
       } else {
-        await exportAsPdf(el, canvasPreset.width, canvasPreset.height);
+        await exportAsPdf(el, exportWidth, exportHeight);
       }
     } catch (error) {
       toast({
