@@ -195,9 +195,11 @@ export function DesignElementRenderer({
   }, [element.id, element.imageData, element.imageUrl, onUpdate]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (element.locked) return;
     e.stopPropagation();
+    // Locked elements can still be selected (so they can be unlocked from the panel),
+    // but cannot be dragged or resized.
     onSelect(element.id);
+    if (element.locked) return;
     if (isEditing) return;
 
     // For text elements, only allow drag from border area
