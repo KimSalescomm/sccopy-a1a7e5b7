@@ -32,8 +32,10 @@ async function waitForAssets(root: HTMLElement) {
 function normalizeExportRoot(root: HTMLElement, w: number, h: number) {
   root.id = 'export-clone-root';
   root.setAttribute('data-export-clone-root', 'true');
+  // 화면 안에 표시 (html2canvas가 hidden/off-screen DOM을 빈 화면으로 캡처하는 문제 회피)
+  // 사용자에게는 0.25배 축소 + pointer-events: none 으로 잠깐만 보임
   root.style.position = 'fixed';
-  root.style.left = '-99999px';
+  root.style.left = '0';
   root.style.top = '0';
   root.style.width = `${w}px`;
   root.style.height = `${h}px`;
@@ -42,13 +44,15 @@ function normalizeExportRoot(root: HTMLElement, w: number, h: number) {
   root.style.maxWidth = 'none';
   root.style.maxHeight = 'none';
   root.style.overflow = 'visible';
-  root.style.transform = 'none';
+  root.style.transform = 'scale(0.25)';
   root.style.transformOrigin = 'top left';
   root.style.zoom = '1';
   root.style.boxShadow = 'none';
   root.style.borderRadius = '0';
   root.style.pointerEvents = 'none';
-  root.style.zIndex = '-1';
+  root.style.opacity = '1';
+  root.style.zIndex = '999999';
+  root.style.background = '#FAFAFA';
 
   root.querySelectorAll('[data-editing-ui]').forEach(n => n.remove());
 
