@@ -213,6 +213,7 @@ export function DesignElementRenderer({
   const handleResizeMouseDown = useCallback((e: React.MouseEvent, handle: string) => {
     e.stopPropagation();
     e.preventDefault();
+    setIsResizing(true);
     resizeRef.current = {
       startX: e.clientX, startY: e.clientY,
       origW: element.size.width, origH: element.size.height,
