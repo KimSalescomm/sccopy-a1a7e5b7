@@ -383,10 +383,7 @@ export function DesignElementRenderer({
           }}
           style={style}
           className={isTextEditable ? 'cursor-text select-text' : 'pointer-events-none select-none'}
-          dangerouslySetInnerHTML={!isPlaceholder && element.textHtml ? { __html: element.textHtml } : undefined}
-        >
-          {!element.textHtml ? element.text : undefined}
-        </div>
+        />
       );
     }
 
