@@ -127,6 +127,21 @@ export function DesignElementRenderer({
     }
   }, [isEditing, element.text]);
 
+  // Detect text overflow (content taller than the box) so we can highlight it during resize
+  useEffect(() => {
+    if (element.type !== 'text') {
+      if (textOverflow) setTextOverflow(false);
+      return;
+    }
+    const node = elRef.current;
+    if (!node) return;
+    // Find the inner text container (the first child div in renderContent)
+    const inner = node.firstElementChild as HTMLElement | null;
+    if (!inner) return;
+    const overflow = inner.scrollHeight > element.size.height + 1 || inner.scrollWidth > element.size.width + 1;
+    if (overflow !== textOverflow) setTextOverflow(overflow);
+  }, [element.type, element.text, element.textHtml, element.size.width, element.size.height, element.textStyle, isEditing, textOverflow]);
+
   // Clipboard-only image paste (보안 환경: 파일 업로드 불가)
   const handleClipboardPaste = useCallback(async () => {
     try {
