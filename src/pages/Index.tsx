@@ -459,7 +459,7 @@ const Index = () => {
     } finally {
       setIsExporting(false);
     }
-  }, [canvasPreset.height, canvasPreset.width, handleFinishEditing, isExporting]);
+  }, [canvasPreset.height, canvasPreset.width, handleFinishEditing, isExporting, pages, currentPageIndex]);
 
   const handleExportPng = useCallback(async () => {
     await runExport('png');
