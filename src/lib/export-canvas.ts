@@ -118,15 +118,18 @@ async function captureCanvas(
   canvasWidth: number,
   canvasHeight: number,
 ): Promise<HTMLCanvasElement> {
-  const exportRoot = await createExportClone(canvasEl, canvasWidth, canvasHeight);
+  const { wrapper, clone } = await createExportClone(canvasEl, canvasWidth, canvasHeight);
   const debug = isDebugExport();
 
   try {
-    const rect = exportRoot.getBoundingClientRect();
-    console.log('[Export] target selector', '#export-clone-root');
+    const rect = clone.getBoundingClientRect();
+    const computed = window.getComputedStyle(clone);
+    console.log('[Export] target selector', '#export-canvas');
     console.log('[Export] target width / height', canvasWidth, canvasHeight);
-    console.log('[Export] target scrollWidth / scrollHeight', exportRoot.scrollWidth, exportRoot.scrollHeight);
+    console.log('[Export] target offsetWidth / offsetHeight', clone.offsetWidth, clone.offsetHeight);
+    console.log('[Export] target scrollWidth / scrollHeight', clone.scrollWidth, clone.scrollHeight);
     console.log('[Export] target getBoundingClientRect()', rect.toJSON ? rect.toJSON() : rect);
+    console.log('[Export] target computed transform', computed.transform);
     console.log('[Export] debugExport mode', debug);
 
     const opts = {
@@ -147,18 +150,17 @@ async function captureCanvas(
 
     let captured: HTMLCanvasElement;
     try {
-      captured = await html2canvas(exportRoot, { ...opts, foreignObjectRendering: true });
+      captured = await html2canvas(clone, { ...opts, foreignObjectRendering: true });
     } catch {
-      captured = await html2canvas(exportRoot, { ...opts, foreignObjectRendering: false });
+      captured = await html2canvas(clone, { ...opts, foreignObjectRendering: false });
     }
     console.log('[Export] generated canvas width / height', captured.width, captured.height);
     return captured;
   } finally {
     if (debug) {
-      // 2초간 보여서 사용자가 export DOM 내용을 확인할 수 있게 함
-      setTimeout(() => exportRoot.remove(), 2000);
+      setTimeout(() => wrapper.remove(), 2000);
     } else {
-      exportRoot.remove();
+      wrapper.remove();
     }
   }
 }
