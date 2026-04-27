@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { AlignLeft, AlignCenter, AlignRight, Trash2, Lock, Unlock } from 'lucide-react';
+import { AlignLeft, AlignCenter, AlignRight, Trash2, Lock, Unlock, Bold, Underline, Highlighter } from 'lucide-react';
 
 interface PropertiesPanelProps {
   element: DesignElement | null;
