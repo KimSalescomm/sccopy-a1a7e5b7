@@ -211,6 +211,42 @@ export function PropertiesPanel({
               </div>
             </div>
             <div className="space-y-1">
+              <Label className="text-xs">부분 서식</Label>
+              <p className="text-[10px] text-muted-foreground">텍스트를 드래그한 뒤 클릭하세요</p>
+              <div className="flex gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  title="굵게 (선택 영역)"
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => applyInlineStyle('bold')}
+                >
+                  <Bold className="w-3 h-3" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  title="밑줄 (선택 영역)"
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => applyInlineStyle('underline')}
+                >
+                  <Underline className="w-3 h-3" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  title="형광펜 (선택 영역)"
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => applyInlineStyle('highlight')}
+                >
+                  <Highlighter className="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-1">
               <Label className="text-xs">정렬</Label>
               <div className="flex gap-1">
                 {(['left', 'center', 'right'] as const).map(align => (
