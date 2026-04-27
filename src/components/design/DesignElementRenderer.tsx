@@ -498,18 +498,14 @@ export function DesignElementRenderer({
           ? '2px solid hsl(230, 65%, 55%)'
           : (textOverflow && !isExporting ? '1px dashed hsl(0, 80%, 55%)' : 'none'),
         outlineOffset: 1,
-        // Layering: text is always above shapes, images sit between, selected goes on top.
-        // Resizing a shape temporarily drops its z-index further so any text remains visible.
-        zIndex: selected && !isExporting
-          ? 100
-          : element.type === 'text'
-            ? 30
-            : element.type === 'image'
-              ? 20
-              : (isResizing ? 5 : 10),
-        // Slight transparency on the shape itself while resizing so the user can see
-        // any text/content behind/inside the box outline.
-        opacity: isResizing && element.type === 'shape' ? 0.6 : 1,
+        // Keep card/background shapes below text even when selected/resizing.
+        // Text stays visible while the box is resized; handles sit on top of the shape only.
+        zIndex: element.type === 'text'
+          ? (selected && !isExporting ? 120 : 40)
+          : element.type === 'image'
+            ? (selected && !isExporting ? 110 : 20)
+            : 10,
+        opacity: 1,
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={(e) => {
@@ -569,7 +565,7 @@ export function DesignElementRenderer({
           key={h}
           data-editing-ui
           className="absolute w-2 h-2 bg-primary rounded-sm border border-primary-foreground shadow-sm"
-          style={{ ...handlePositions[h], cursor: handleCursors[h] }}
+          style={{ ...handlePositions[h], cursor: handleCursors[h], zIndex: 50, pointerEvents: 'auto' }}
           onMouseDown={e => handleResizeMouseDown(e, h)}
         />
       ))}
