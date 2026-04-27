@@ -94,9 +94,7 @@ export function DesignElementRenderer({
     if (element.type !== 'text' || !editableRef.current) return;
     if (document.activeElement === editableRef.current) return;
 
-    const nextHtml = isPlaceholder
-      ? ''
-      : (element.textHtml && element.textHtml.length > 0)
+    const nextHtml = !isPlaceholder && element.textHtml && element.textHtml.length > 0
         ? element.textHtml
         : escapeTextToHtml(element.text ?? '');
 
