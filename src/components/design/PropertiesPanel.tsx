@@ -19,20 +19,32 @@ interface PropertiesPanelProps {
   bgGradientDir?: number;
   onBgChange: (bg: any) => void;
   activeEditRef?: React.MutableRefObject<HTMLElement | null>;
+  activeTextRangeRef?: React.MutableRefObject<Range | null>;
 }
 
 export function PropertiesPanel({
   element, onUpdate, onDelete,
   bgColor, bgType, bgGradientFrom, bgGradientTo, bgGradientDir, onBgChange,
-  activeEditRef,
+  activeEditRef, activeTextRangeRef,
 }: PropertiesPanelProps) {
 
-  const hasActiveSelection = useCallback(() => {
+  const getEditableSelectionRange = useCallback(() => {
     const editEl = activeEditRef?.current;
-    if (!editEl) return false;
+    if (!editEl) return null;
     const sel = window.getSelection();
-    return !!(sel && sel.rangeCount > 0 && !sel.isCollapsed && editEl.contains(sel.anchorNode));
-  }, [activeEditRef]);
+    if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+      const range = sel.getRangeAt(0);
+      if (editEl.contains(range.startContainer) && editEl.contains(range.endContainer)) {
+        activeTextRangeRef && (activeTextRangeRef.current = range.cloneRange());
+        return range.cloneRange();
+      }
+    }
+    const savedRange = activeTextRangeRef?.current;
+    if (savedRange && editEl.contains(savedRange.startContainer) && editEl.contains(savedRange.endContainer)) {
+      return savedRange.cloneRange();
+    }
+    return null;
+  }, [activeEditRef, activeTextRangeRef]);
 
   const dispatchInputEvent = useCallback(() => {
     const editEl = activeEditRef?.current;
@@ -41,33 +53,52 @@ export function PropertiesPanel({
     }
   }, [activeEditRef]);
 
+  const applySpanToSelection = useCallback((styles: React.CSSProperties) => {
+    const editEl = activeEditRef?.current;
+    const range = getEditableSelectionRange();
+    if (!editEl || !range) return false;
+
+    editEl.focus({ preventScroll: true });
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+
+    const span = document.createElement('span');
+    Object.assign(span.style, styles);
+    const contents = range.extractContents();
+    span.appendChild(contents);
+    range.insertNode(span);
+
+    const after = document.createRange();
+    after.setStartAfter(span);
+    after.collapse(true);
+    sel?.removeAllRanges();
+    sel?.addRange(after);
+    activeTextRangeRef && (activeTextRangeRef.current = null);
+    dispatchInputEvent();
+    return true;
+  }, [activeEditRef, activeTextRangeRef, dispatchInputEvent, getEditableSelectionRange]);
+
   const handleColorChange = useCallback((color: string) => {
     if (!element) return;
 
-    if (hasActiveSelection()) {
-      document.execCommand('styleWithCSS', false, 'true');
-      document.execCommand('foreColor', false, color);
-      dispatchInputEvent();
+    if (applySpanToSelection({ color })) {
       return;
     }
 
     // Otherwise, change the whole element's text color
     onUpdate(element.id, { textStyle: { ...element.textStyle!, color } });
-  }, [element, onUpdate, hasActiveSelection, dispatchInputEvent]);
+  }, [element, onUpdate, applySpanToSelection]);
 
   const applyInlineStyle = useCallback((command: 'bold' | 'underline' | 'highlight') => {
-    if (!hasActiveSelection()) return;
-    document.execCommand('styleWithCSS', false, 'true');
     if (command === 'bold') {
-      document.execCommand('bold');
+      applySpanToSelection({ fontWeight: '700' });
     } else if (command === 'underline') {
-      document.execCommand('underline');
+      applySpanToSelection({ textDecoration: 'underline' });
     } else if (command === 'highlight') {
-      // backColor in CSS mode applies background to the inline span
-      document.execCommand('hiliteColor', false, '#FEF08A');
+      applySpanToSelection({ backgroundColor: '#FEF08A' });
     }
-    dispatchInputEvent();
-  }, [hasActiveSelection, dispatchInputEvent]);
+  }, [applySpanToSelection]);
 
   if (!element) {
     return (
