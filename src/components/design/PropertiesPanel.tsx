@@ -27,23 +27,47 @@ export function PropertiesPanel({
   activeEditRef,
 }: PropertiesPanelProps) {
 
+  const hasActiveSelection = useCallback(() => {
+    const editEl = activeEditRef?.current;
+    if (!editEl) return false;
+    const sel = window.getSelection();
+    return !!(sel && sel.rangeCount > 0 && !sel.isCollapsed && editEl.contains(sel.anchorNode));
+  }, [activeEditRef]);
+
+  const dispatchInputEvent = useCallback(() => {
+    const editEl = activeEditRef?.current;
+    if (editEl) {
+      editEl.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }, [activeEditRef]);
+
   const handleColorChange = useCallback((color: string) => {
     if (!element) return;
 
-    // If actively editing (contentEditable), apply color to selection only
-    const editEl = activeEditRef?.current;
-    if (editEl) {
-      const sel = window.getSelection();
-      if (sel && sel.rangeCount > 0 && !sel.isCollapsed && editEl.contains(sel.anchorNode)) {
-        // Apply color to selected text using execCommand
-        document.execCommand('foreColor', false, color);
-        return;
-      }
+    if (hasActiveSelection()) {
+      document.execCommand('styleWithCSS', false, 'true');
+      document.execCommand('foreColor', false, color);
+      dispatchInputEvent();
+      return;
     }
 
     // Otherwise, change the whole element's text color
     onUpdate(element.id, { textStyle: { ...element.textStyle!, color } });
-  }, [element, onUpdate, activeEditRef]);
+  }, [element, onUpdate, hasActiveSelection, dispatchInputEvent]);
+
+  const applyInlineStyle = useCallback((command: 'bold' | 'underline' | 'highlight') => {
+    if (!hasActiveSelection()) return;
+    document.execCommand('styleWithCSS', false, 'true');
+    if (command === 'bold') {
+      document.execCommand('bold');
+    } else if (command === 'underline') {
+      document.execCommand('underline');
+    } else if (command === 'highlight') {
+      // backColor in CSS mode applies background to the inline span
+      document.execCommand('hiliteColor', false, '#FEF08A');
+    }
+    dispatchInputEvent();
+  }, [hasActiveSelection, dispatchInputEvent]);
 
   if (!element) {
     return (
