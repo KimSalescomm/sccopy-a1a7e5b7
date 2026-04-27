@@ -21,6 +21,7 @@ interface DesignElementRendererProps {
   onTextChange: (id: string, text: string) => void;
   onFinishEditing: () => void;
   activeEditRef?: React.MutableRefObject<HTMLElement | null>;
+  activeTextRangeRef?: React.MutableRefObject<Range | null>;
   onDragMove?: (id: string, x: number, y: number) => void;
   onDragEnd?: () => void;
   onDragStart?: () => void;
@@ -43,16 +44,26 @@ function isPlaceholderText(element: DesignElement): boolean {
   return !element.text || element.text === element.placeholder;
 }
 
+function escapeTextToHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/\n/g, '<br>');
+}
+
 export function DesignElementRenderer({
   element, selected, scale, isExporting = false, onSelect, onUpdate,
   onDoubleClick, editingId, onTextChange, onFinishEditing, activeEditRef,
-  onDragMove, onDragEnd, onDragStart,
+  activeTextRangeRef, onDragMove, onDragEnd, onDragStart,
 }: DesignElementRendererProps) {
   const elRef = useRef<HTMLDivElement>(null);
   const editableRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number; started: boolean } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number; handle: string } | null>(null);
   const isEditing = editingId === element.id;
+  const isTextEditable = element.type === 'text' && !isExporting && !element.locked;
   const [showCorrectionPanel, setShowCorrectionPanel] = useState(false);
   const [showCopyTypeFlow, setShowCopyTypeFlow] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -67,29 +78,42 @@ export function DesignElementRenderer({
     }
   }, [selected]);
 
-  // Track active editable ref
-  useEffect(() => {
-    if (isEditing && editableRef.current && activeEditRef) {
-      activeEditRef.current = editableRef.current;
-    }
-    return () => {
-      if (activeEditRef && activeEditRef.current === editableRef.current) {
-        activeEditRef.current = null;
-      }
-    };
-  }, [isEditing, activeEditRef]);
+  const saveTextSelectionRange = useCallback(() => {
+    const editEl = editableRef.current;
+    if (!editEl || !activeTextRangeRef) return;
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    if (!editEl.contains(range.startContainer) || !editEl.contains(range.endContainer)) return;
+    activeEditRef && (activeEditRef.current = editEl);
+    activeTextRangeRef.current = range.cloneRange();
+  }, [activeEditRef, activeTextRangeRef]);
 
-  // Set initial content when entering edit mode
+  // Keep the real contenteditable DOM in sync while it is not focused.
+  useEffect(() => {
+    if (element.type !== 'text' || !editableRef.current) return;
+    if (document.activeElement === editableRef.current) return;
+
+    const nextHtml = isPlaceholder
+      ? ''
+      : (element.textHtml && element.textHtml.length > 0)
+        ? element.textHtml
+        : escapeTextToHtml(element.text ?? '');
+
+    if (editableRef.current.innerHTML !== nextHtml) {
+      editableRef.current.innerHTML = nextHtml;
+    }
+  }, [element.type, element.text, element.textHtml, isPlaceholder]);
+
+  // Double-click keeps the old "edit all/select all" behavior.
   useEffect(() => {
     if (!isEditing || !editableRef.current) return;
-
-    // If placeholder, show empty; otherwise prefer rich HTML, fall back to plain text
     if (isPlaceholder) {
       editableRef.current.innerHTML = '';
     } else if (element.textHtml && element.textHtml.length > 0) {
       editableRef.current.innerHTML = element.textHtml;
     } else {
-      editableRef.current.innerText = element.text ?? '';
+      editableRef.current.innerHTML = escapeTextToHtml(element.text ?? '');
     }
 
     editableRef.current.focus();
