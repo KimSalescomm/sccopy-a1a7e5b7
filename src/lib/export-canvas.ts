@@ -29,12 +29,11 @@ async function waitForAssets(root: HTMLElement) {
 
 // ─── clone & prepare ────────────────────────────────────────────────────────
 
-function normalizeExportRoot(root: HTMLElement, w: number, h: number) {
-  root.id = 'export-clone-root';
-  root.setAttribute('data-export-clone-root', 'true');
-  // 화면 안에 표시 (html2canvas가 hidden/off-screen DOM을 빈 화면으로 캡처하는 문제 회피)
-  // 사용자에게는 0.25배 축소 + pointer-events: none 으로 잠깐만 보임
-  root.style.position = 'fixed';
+function normalizeExportCanvas(root: HTMLElement, w: number, h: number) {
+  root.id = 'export-canvas';
+  root.setAttribute('data-export-canvas', 'true');
+  // 캡처 대상 자체에는 transform/scale을 절대 적용하지 않음 (1920x1080 원본 유지)
+  root.style.position = 'relative';
   root.style.left = '0';
   root.style.top = '0';
   root.style.width = `${w}px`;
@@ -44,15 +43,14 @@ function normalizeExportRoot(root: HTMLElement, w: number, h: number) {
   root.style.maxWidth = 'none';
   root.style.maxHeight = 'none';
   root.style.overflow = 'visible';
-  root.style.transform = 'scale(0.25)';
+  root.style.transform = 'none';
   root.style.transformOrigin = 'top left';
   root.style.zoom = '1';
   root.style.boxShadow = 'none';
   root.style.borderRadius = '0';
-  root.style.pointerEvents = 'none';
   root.style.opacity = '1';
-  root.style.zIndex = '999999';
   root.style.background = '#FAFAFA';
+  root.style.margin = '0';
 
   root.querySelectorAll('[data-editing-ui]').forEach(n => n.remove());
 
@@ -73,14 +71,35 @@ function normalizeExportRoot(root: HTMLElement, w: number, h: number) {
   });
 }
 
+function createPreviewWrapper(w: number, h: number) {
+  const wrapper = document.createElement('div');
+  wrapper.id = 'export-preview-wrapper';
+  wrapper.setAttribute('data-export-preview-wrapper', 'true');
+  // wrapper에만 미리보기 축소 적용 — 캡처 대상에는 영향 없음
+  wrapper.style.position = 'fixed';
+  wrapper.style.left = '0';
+  wrapper.style.top = '0';
+  wrapper.style.width = `${w}px`;
+  wrapper.style.height = `${h}px`;
+  wrapper.style.transform = 'scale(0.25)';
+  wrapper.style.transformOrigin = 'top left';
+  wrapper.style.pointerEvents = 'none';
+  wrapper.style.zIndex = '999999';
+  wrapper.style.overflow = 'visible';
+  wrapper.style.background = 'transparent';
+  return wrapper;
+}
+
 async function createExportClone(canvasEl: HTMLElement, w: number, h: number) {
+  const wrapper = createPreviewWrapper(w, h);
   const clone = canvasEl.cloneNode(true) as HTMLElement;
-  normalizeExportRoot(clone, w, h);
-  document.body.appendChild(clone);
+  normalizeExportCanvas(clone, w, h);
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
   await waitForAssets(clone);
   void clone.offsetHeight;
   await waitForNextPaint();
-  return clone;
+  return { wrapper, clone };
 }
 
 // ─── capture ────────────────────────────────────────────────────────────────
@@ -99,15 +118,18 @@ async function captureCanvas(
   canvasWidth: number,
   canvasHeight: number,
 ): Promise<HTMLCanvasElement> {
-  const exportRoot = await createExportClone(canvasEl, canvasWidth, canvasHeight);
+  const { wrapper, clone } = await createExportClone(canvasEl, canvasWidth, canvasHeight);
   const debug = isDebugExport();
 
   try {
-    const rect = exportRoot.getBoundingClientRect();
-    console.log('[Export] target selector', '#export-clone-root');
+    const rect = clone.getBoundingClientRect();
+    const computed = window.getComputedStyle(clone);
+    console.log('[Export] target selector', '#export-canvas');
     console.log('[Export] target width / height', canvasWidth, canvasHeight);
-    console.log('[Export] target scrollWidth / scrollHeight', exportRoot.scrollWidth, exportRoot.scrollHeight);
+    console.log('[Export] target offsetWidth / offsetHeight', clone.offsetWidth, clone.offsetHeight);
+    console.log('[Export] target scrollWidth / scrollHeight', clone.scrollWidth, clone.scrollHeight);
     console.log('[Export] target getBoundingClientRect()', rect.toJSON ? rect.toJSON() : rect);
+    console.log('[Export] target computed transform', computed.transform);
     console.log('[Export] debugExport mode', debug);
 
     const opts = {
@@ -128,18 +150,17 @@ async function captureCanvas(
 
     let captured: HTMLCanvasElement;
     try {
-      captured = await html2canvas(exportRoot, { ...opts, foreignObjectRendering: true });
+      captured = await html2canvas(clone, { ...opts, foreignObjectRendering: true });
     } catch {
-      captured = await html2canvas(exportRoot, { ...opts, foreignObjectRendering: false });
+      captured = await html2canvas(clone, { ...opts, foreignObjectRendering: false });
     }
     console.log('[Export] generated canvas width / height', captured.width, captured.height);
     return captured;
   } finally {
     if (debug) {
-      // 2초간 보여서 사용자가 export DOM 내용을 확인할 수 있게 함
-      setTimeout(() => exportRoot.remove(), 2000);
+      setTimeout(() => wrapper.remove(), 2000);
     } else {
-      exportRoot.remove();
+      wrapper.remove();
     }
   }
 }
