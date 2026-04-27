@@ -246,6 +246,7 @@ export function DesignElementRenderer({
 
     const handleMouseUp = () => {
       resizeRef.current = null;
+      setIsResizing(false);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
