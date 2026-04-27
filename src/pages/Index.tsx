@@ -566,11 +566,15 @@ const Index = () => {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
       const tag = target?.tagName;
+      // Only treat as a "form field" (and skip shortcuts) when the user is actually
+      // editing — i.e. typing into an input/textarea/select, or actively editing a
+      // text element (editingId is set). A contenteditable that just happens to have
+      // focus while no element is in edit mode should NOT swallow arrow keys etc.
       const isFormField =
         tag === 'INPUT' ||
         tag === 'TEXTAREA' ||
         tag === 'SELECT' ||
-        target?.isContentEditable === true;
+        (target?.isContentEditable === true && !!editingId);
 
       // Undo: Ctrl/Cmd+Z (works even while editing text — overrides native contenteditable undo)
       if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) {
