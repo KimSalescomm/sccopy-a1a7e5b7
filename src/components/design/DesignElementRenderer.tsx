@@ -130,7 +130,7 @@ export function DesignElementRenderer({
 
   // Keep contentEditable in sync when text changes externally (e.g. AI correction apply)
   useEffect(() => {
-    if (!isEditing || !editableRef.current) return;
+    if (!isTextEditable || !editableRef.current) return;
     if (isPlaceholder) return;
 
     const text = element.text ?? '';
@@ -149,7 +149,7 @@ export function DesignElementRenderer({
         sel.collapseToEnd();
       }
     }
-  }, [isEditing, element.text]);
+  }, [isTextEditable, element.text]);
 
   // Detect text overflow (content taller than the box) so we can highlight it during resize
   useEffect(() => {
@@ -298,8 +298,7 @@ export function DesignElementRenderer({
     if (!editableRef.current) return;
     const text = editableRef.current.innerText;
     const html = editableRef.current.innerHTML;
-    // If the rendered HTML is just plain text (no inline formatting), don't bother storing textHtml
-    const hasRichFormatting = /<(span|b|strong|i|em|u|mark|font)\b/i.test(html);
+    const hasRichFormatting = /<(span|b|strong|i|em|u|mark|font)\b/i.test(html) || /style="[^"]*(color|background|font-weight|text-decoration)/i.test(html);
 
     // Auto-expand: measure natural content height
     const el = editableRef.current;
@@ -320,15 +319,16 @@ export function DesignElementRenderer({
 
   // Handle finishing edit — restore placeholder if empty
   const handleFinishEditingWithPlaceholder = useCallback(() => {
+    saveTextSelectionRange();
     if (element.type === 'text' && element.placeholder) {
       const currentText = editableRef.current?.innerText?.trim() ?? '';
       if (!currentText) {
         // Restore placeholder
-        onUpdate(element.id, { text: element.placeholder });
+        onUpdate(element.id, { text: element.placeholder, textHtml: undefined });
       }
     }
     onFinishEditing();
-  }, [element.id, element.type, element.placeholder, onUpdate, onFinishEditing]);
+  }, [element.id, element.type, element.placeholder, onUpdate, onFinishEditing, saveTextSelectionRange]);
 
   const renderContent = () => {
     if (element.type === 'text') {
