@@ -117,6 +117,7 @@ const Index = () => {
   const [isExporting, setIsExporting] = useState(false);
   const canvasRef = useRef<CanvasHandle>(null);
   const activeEditRef = useRef<HTMLElement | null>(null);
+  const activeTextRangeRef = useRef<Range | null>(null);
 
   // Undo/Redo history
   const historyRef = useRef<Page[][]>([]);
@@ -673,6 +674,7 @@ const Index = () => {
           onScaleChange={setScale}
           onMarqueeSelect={handleMarqueeSelect}
           activeEditRef={activeEditRef}
+          activeTextRangeRef={activeTextRangeRef}
         />
         <PropertiesPanel
           element={selectedElement}
@@ -685,6 +687,7 @@ const Index = () => {
           bgGradientDir={currentPage.background.gradientDirection}
           onBgChange={handleBgChange}
           activeEditRef={activeEditRef}
+          activeTextRangeRef={activeTextRangeRef}
         />
       </div>
       {/* PPT 스타일 하단 상태바 — 줌 컨트롤 오른쪽 하단 배치 */}
