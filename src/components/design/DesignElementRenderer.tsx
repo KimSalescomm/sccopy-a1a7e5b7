@@ -342,6 +342,15 @@ export function DesignElementRenderer({
         );
       }
 
+      if (!isPlaceholder && element.textHtml && element.textHtml.length > 0) {
+        return (
+          <div
+            style={style}
+            className="pointer-events-none select-none"
+            dangerouslySetInnerHTML={{ __html: element.textHtml }}
+          />
+        );
+      }
       return (
         <div style={style} className="pointer-events-none select-none">
           {element.text}
