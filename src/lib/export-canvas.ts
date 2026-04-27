@@ -86,37 +86,20 @@ async function captureCanvas(
   canvasWidth: number,
   canvasHeight: number,
 ): Promise<HTMLCanvasElement> {
-  const exportId = `export-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  canvasEl.setAttribute('data-export-id', exportId);
-
-  type Snap = { el: HTMLElement; transform: string; overflow: string };
-  const chain: Snap[] = [];
-  let cur: HTMLElement | null = canvasEl;
-  while (cur) {
-    chain.push({ el: cur, transform: cur.style.transform, overflow: cur.style.overflow });
-    cur.style.transform = 'none';
-    cur.style.overflow = 'visible';
-    cur = cur.parentElement;
-  }
-
-  const restore = () => {
-    chain.forEach(s => {
-      s.el.style.transform = s.transform;
-      s.el.style.overflow = s.overflow;
-    });
-    canvasEl.removeAttribute('data-export-id');
-  };
+  const exportRoot = await createExportClone(canvasEl, canvasWidth, canvasHeight);
 
   try {
-    await waitForAssets(canvasEl);
-    void canvasEl.offsetHeight;
-    await waitForNextPaint();
+    const rect = exportRoot.getBoundingClientRect();
+    console.log('[Export] target selector', '#export-clone-root');
+    console.log('[Export] target width / height', canvasWidth, canvasHeight);
+    console.log('[Export] target scrollWidth / scrollHeight', exportRoot.scrollWidth, exportRoot.scrollHeight);
+    console.log('[Export] target getBoundingClientRect()', rect.toJSON ? rect.toJSON() : rect);
 
     const opts = {
       scale: 2,
       useCORS: true,
       allowTaint: true,
-      backgroundColor: null as string | null,
+      backgroundColor: '#FAFAFA',
       logging: false,
       width: canvasWidth,
       height: canvasHeight,
@@ -126,16 +109,18 @@ async function captureCanvas(
       scrollY: 0,
       x: 0,
       y: 0,
-      onclone: (doc: Document) => prepareClone(doc, exportId, canvasWidth, canvasHeight),
     };
 
+    let captured: HTMLCanvasElement;
     try {
-      return await html2canvas(canvasEl, { ...opts, foreignObjectRendering: true });
+      captured = await html2canvas(exportRoot, { ...opts, foreignObjectRendering: true });
     } catch {
-      return await html2canvas(canvasEl, { ...opts, foreignObjectRendering: false });
+      captured = await html2canvas(exportRoot, { ...opts, foreignObjectRendering: false });
     }
+    console.log('[Export] generated canvas width / height', captured.width, captured.height);
+    return captured;
   } finally {
-    restore();
+    exportRoot.remove();
   }
 }
 
