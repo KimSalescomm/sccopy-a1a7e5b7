@@ -55,6 +55,8 @@ export function DesignElementRenderer({
   const isEditing = editingId === element.id;
   const [showCorrectionPanel, setShowCorrectionPanel] = useState(false);
   const [showCopyTypeFlow, setShowCopyTypeFlow] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [textOverflow, setTextOverflow] = useState(false);
 
   const isPlaceholder = isPlaceholderText(element);
 
