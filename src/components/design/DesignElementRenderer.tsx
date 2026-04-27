@@ -353,50 +353,39 @@ export function DesignElementRenderer({
         margin: 0,
       };
 
-      if (isEditing) {
-        return (
-          <div
-            ref={editableRef}
-            contentEditable
-            suppressContentEditableWarning
-            onInput={handleInput}
-            onBlur={handleFinishEditingWithPlaceholder}
-            onPaste={e => {
-              e.preventDefault();
-              const plain = e.clipboardData.getData('text/plain');
-              const sel = window.getSelection();
-              if (sel && sel.rangeCount > 0) {
-                const range = sel.getRangeAt(0);
-                range.deleteContents();
-                range.insertNode(document.createTextNode(plain));
-                range.collapse(false);
-                sel.removeAllRanges();
-                sel.addRange(range);
-              }
-              handleInput();
-            }}
-            onKeyDown={e => {
-              if (e.key === 'Escape') handleFinishEditingWithPlaceholder();
-              e.stopPropagation();
-            }}
-            style={style}
-            className="cursor-text"
-          />
-        );
-      }
-
-      if (!isPlaceholder && element.textHtml && element.textHtml.length > 0) {
-        return (
-          <div
-            style={style}
-            className="pointer-events-none select-none"
-            dangerouslySetInnerHTML={{ __html: element.textHtml }}
-          />
-        );
-      }
       return (
-        <div style={style} className="pointer-events-none select-none">
-          {element.text}
+        <div
+          ref={editableRef}
+          contentEditable={isTextEditable}
+          suppressContentEditableWarning
+          onInput={handleInput}
+          onMouseUp={saveTextSelectionRange}
+          onKeyUp={saveTextSelectionRange}
+          onSelect={saveTextSelectionRange}
+          onBlur={handleFinishEditingWithPlaceholder}
+          onPaste={e => {
+            e.preventDefault();
+            const plain = e.clipboardData.getData('text/plain');
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount > 0) {
+              const range = sel.getRangeAt(0);
+              range.deleteContents();
+              range.insertNode(document.createTextNode(plain));
+              range.collapse(false);
+              sel.removeAllRanges();
+              sel.addRange(range);
+            }
+            handleInput();
+          }}
+          onKeyDown={e => {
+            if (e.key === 'Escape') handleFinishEditingWithPlaceholder();
+            e.stopPropagation();
+          }}
+          style={style}
+          className={isTextEditable ? 'cursor-text select-text' : 'pointer-events-none select-none'}
+          dangerouslySetInnerHTML={!isPlaceholder && element.textHtml ? { __html: element.textHtml } : undefined}
+        >
+          {!element.textHtml ? element.text : undefined}
         </div>
       );
     }
