@@ -21,6 +21,7 @@ interface DesignElementRendererProps {
   onTextChange: (id: string, text: string) => void;
   onFinishEditing: () => void;
   activeEditRef?: React.MutableRefObject<HTMLElement | null>;
+  activeTextRangeRef?: React.MutableRefObject<Range | null>;
   onDragMove?: (id: string, x: number, y: number) => void;
   onDragEnd?: () => void;
   onDragStart?: () => void;
@@ -43,16 +44,26 @@ function isPlaceholderText(element: DesignElement): boolean {
   return !element.text || element.text === element.placeholder;
 }
 
+function escapeTextToHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/\n/g, '<br>');
+}
+
 export function DesignElementRenderer({
   element, selected, scale, isExporting = false, onSelect, onUpdate,
   onDoubleClick, editingId, onTextChange, onFinishEditing, activeEditRef,
-  onDragMove, onDragEnd, onDragStart,
+  activeTextRangeRef, onDragMove, onDragEnd, onDragStart,
 }: DesignElementRendererProps) {
   const elRef = useRef<HTMLDivElement>(null);
   const editableRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number; started: boolean } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number; handle: string } | null>(null);
   const isEditing = editingId === element.id;
+  const isTextEditable = element.type === 'text' && !isExporting && !element.locked;
   const [showCorrectionPanel, setShowCorrectionPanel] = useState(false);
   const [showCopyTypeFlow, setShowCopyTypeFlow] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -67,29 +78,40 @@ export function DesignElementRenderer({
     }
   }, [selected]);
 
-  // Track active editable ref
-  useEffect(() => {
-    if (isEditing && editableRef.current && activeEditRef) {
-      activeEditRef.current = editableRef.current;
-    }
-    return () => {
-      if (activeEditRef && activeEditRef.current === editableRef.current) {
-        activeEditRef.current = null;
-      }
-    };
-  }, [isEditing, activeEditRef]);
+  const saveTextSelectionRange = useCallback(() => {
+    const editEl = editableRef.current;
+    if (!editEl || !activeTextRangeRef) return;
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    if (!editEl.contains(range.startContainer) || !editEl.contains(range.endContainer)) return;
+    activeEditRef && (activeEditRef.current = editEl);
+    activeTextRangeRef.current = range.cloneRange();
+  }, [activeEditRef, activeTextRangeRef]);
 
-  // Set initial content when entering edit mode
+  // Keep the real contenteditable DOM in sync while it is not focused.
+  useEffect(() => {
+    if (element.type !== 'text' || !editableRef.current) return;
+    if (document.activeElement === editableRef.current) return;
+
+    const nextHtml = !isPlaceholder && element.textHtml && element.textHtml.length > 0
+        ? element.textHtml
+        : escapeTextToHtml(element.text ?? '');
+
+    if (editableRef.current.innerHTML !== nextHtml) {
+      editableRef.current.innerHTML = nextHtml;
+    }
+  }, [element.type, element.text, element.textHtml, isPlaceholder]);
+
+  // Double-click keeps the old "edit all/select all" behavior.
   useEffect(() => {
     if (!isEditing || !editableRef.current) return;
-
-    // If placeholder, show empty; otherwise prefer rich HTML, fall back to plain text
     if (isPlaceholder) {
       editableRef.current.innerHTML = '';
     } else if (element.textHtml && element.textHtml.length > 0) {
       editableRef.current.innerHTML = element.textHtml;
     } else {
-      editableRef.current.innerText = element.text ?? '';
+      editableRef.current.innerHTML = escapeTextToHtml(element.text ?? '');
     }
 
     editableRef.current.focus();
@@ -106,7 +128,7 @@ export function DesignElementRenderer({
 
   // Keep contentEditable in sync when text changes externally (e.g. AI correction apply)
   useEffect(() => {
-    if (!isEditing || !editableRef.current) return;
+    if (!isTextEditable || !editableRef.current) return;
     if (isPlaceholder) return;
 
     const text = element.text ?? '';
@@ -125,7 +147,7 @@ export function DesignElementRenderer({
         sel.collapseToEnd();
       }
     }
-  }, [isEditing, element.text]);
+  }, [isTextEditable, element.text]);
 
   // Detect text overflow (content taller than the box) so we can highlight it during resize
   useEffect(() => {
@@ -274,8 +296,7 @@ export function DesignElementRenderer({
     if (!editableRef.current) return;
     const text = editableRef.current.innerText;
     const html = editableRef.current.innerHTML;
-    // If the rendered HTML is just plain text (no inline formatting), don't bother storing textHtml
-    const hasRichFormatting = /<(span|b|strong|i|em|u|mark|font)\b/i.test(html);
+    const hasRichFormatting = /<(span|b|strong|i|em|u|mark|font)\b/i.test(html) || /style="[^"]*(color|background|font-weight|text-decoration)/i.test(html);
 
     // Auto-expand: measure natural content height
     const el = editableRef.current;
@@ -296,15 +317,16 @@ export function DesignElementRenderer({
 
   // Handle finishing edit — restore placeholder if empty
   const handleFinishEditingWithPlaceholder = useCallback(() => {
+    saveTextSelectionRange();
     if (element.type === 'text' && element.placeholder) {
       const currentText = editableRef.current?.innerText?.trim() ?? '';
       if (!currentText) {
         // Restore placeholder
-        onUpdate(element.id, { text: element.placeholder });
+        onUpdate(element.id, { text: element.placeholder, textHtml: undefined });
       }
     }
     onFinishEditing();
-  }, [element.id, element.type, element.placeholder, onUpdate, onFinishEditing]);
+  }, [element.id, element.type, element.placeholder, onUpdate, onFinishEditing, saveTextSelectionRange]);
 
   const renderContent = () => {
     if (element.type === 'text') {
@@ -329,51 +351,37 @@ export function DesignElementRenderer({
         margin: 0,
       };
 
-      if (isEditing) {
-        return (
-          <div
-            ref={editableRef}
-            contentEditable
-            suppressContentEditableWarning
-            onInput={handleInput}
-            onBlur={handleFinishEditingWithPlaceholder}
-            onPaste={e => {
-              e.preventDefault();
-              const plain = e.clipboardData.getData('text/plain');
-              const sel = window.getSelection();
-              if (sel && sel.rangeCount > 0) {
-                const range = sel.getRangeAt(0);
-                range.deleteContents();
-                range.insertNode(document.createTextNode(plain));
-                range.collapse(false);
-                sel.removeAllRanges();
-                sel.addRange(range);
-              }
-              handleInput();
-            }}
-            onKeyDown={e => {
-              if (e.key === 'Escape') handleFinishEditingWithPlaceholder();
-              e.stopPropagation();
-            }}
-            style={style}
-            className="cursor-text"
-          />
-        );
-      }
-
-      if (!isPlaceholder && element.textHtml && element.textHtml.length > 0) {
-        return (
-          <div
-            style={style}
-            className="pointer-events-none select-none"
-            dangerouslySetInnerHTML={{ __html: element.textHtml }}
-          />
-        );
-      }
       return (
-        <div style={style} className="pointer-events-none select-none">
-          {element.text}
-        </div>
+        <div
+          ref={editableRef}
+          contentEditable={isTextEditable}
+          suppressContentEditableWarning
+          onInput={handleInput}
+          onMouseUp={saveTextSelectionRange}
+          onKeyUp={saveTextSelectionRange}
+          onSelect={saveTextSelectionRange}
+          onBlur={handleFinishEditingWithPlaceholder}
+          onPaste={e => {
+            e.preventDefault();
+            const plain = e.clipboardData.getData('text/plain');
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount > 0) {
+              const range = sel.getRangeAt(0);
+              range.deleteContents();
+              range.insertNode(document.createTextNode(plain));
+              range.collapse(false);
+              sel.removeAllRanges();
+              sel.addRange(range);
+            }
+            handleInput();
+          }}
+          onKeyDown={e => {
+            if (e.key === 'Escape') handleFinishEditingWithPlaceholder();
+            e.stopPropagation();
+          }}
+          style={style}
+          className={isTextEditable ? 'cursor-text select-text' : 'pointer-events-none select-none'}
+        />
       );
     }
 
@@ -488,18 +496,14 @@ export function DesignElementRenderer({
           ? '2px solid hsl(230, 65%, 55%)'
           : (textOverflow && !isExporting ? '1px dashed hsl(0, 80%, 55%)' : 'none'),
         outlineOffset: 1,
-        // Layering: text is always above shapes, images sit between, selected goes on top.
-        // Resizing a shape temporarily drops its z-index further so any text remains visible.
-        zIndex: selected && !isExporting
-          ? 100
-          : element.type === 'text'
-            ? 30
-            : element.type === 'image'
-              ? 20
-              : (isResizing ? 5 : 10),
-        // Slight transparency on the shape itself while resizing so the user can see
-        // any text/content behind/inside the box outline.
-        opacity: isResizing && element.type === 'shape' ? 0.6 : 1,
+        // Keep card/background shapes below text even when selected/resizing.
+        // Text stays visible while the box is resized; handles sit on top of the shape only.
+        zIndex: element.type === 'text'
+          ? (selected && !isExporting ? 120 : 40)
+          : element.type === 'image'
+            ? (selected && !isExporting ? 110 : 20)
+            : 10,
+        opacity: 1,
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={(e) => {
@@ -559,7 +563,7 @@ export function DesignElementRenderer({
           key={h}
           data-editing-ui
           className="absolute w-2 h-2 bg-primary rounded-sm border border-primary-foreground shadow-sm"
-          style={{ ...handlePositions[h], cursor: handleCursors[h] }}
+          style={{ ...handlePositions[h], cursor: handleCursors[h], zIndex: 50, pointerEvents: 'auto' }}
           onMouseDown={e => handleResizeMouseDown(e, h)}
         />
       ))}
