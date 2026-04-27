@@ -51,9 +51,14 @@ function prepareClone(clonedDoc: Document, exportId: string, w: number, h: numbe
   el.style.transform = 'none';
   el.style.transformOrigin = 'top left';
   el.style.boxShadow = 'none';
-  el.style.overflow = 'hidden';
+  // Use 'visible' so any element beyond the preset bounds is still rendered.
+  // Combined with explicit width/height matching the requested capture size,
+  // html2canvas will paint the entire content area, not just the viewport.
+  el.style.overflow = 'visible';
   el.style.width = `${w}px`;
   el.style.height = `${h}px`;
+  el.style.minWidth = `${w}px`;
+  el.style.minHeight = `${h}px`;
   el.style.maxWidth = 'none';
   el.style.maxHeight = 'none';
   el.style.borderRadius = '0';
