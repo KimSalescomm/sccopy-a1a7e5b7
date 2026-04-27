@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import type { DesignElement } from '@/types/design';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
