@@ -653,7 +653,7 @@ const Index = () => {
 
 
   return (
-    <div className="h-screen flex flex-col bg-background" onKeyDown={handleKeyDown} tabIndex={0}>
+    <div className="h-screen flex flex-col bg-background">
       <Toolbar
         onAddText={handleAddText}
         onAddShape={handleAddShape}
