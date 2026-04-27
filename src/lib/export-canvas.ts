@@ -29,54 +29,54 @@ async function waitForAssets(root: HTMLElement) {
 
 // ─── clone & prepare ────────────────────────────────────────────────────────
 
-function prepareClone(clonedDoc: Document, exportId: string, w: number, h: number) {
-  const el = clonedDoc.querySelector<HTMLElement>(`[data-export-id="${exportId}"]`);
-  if (!el) return;
+function normalizeExportRoot(root: HTMLElement, w: number, h: number) {
+  root.id = 'export-clone-root';
+  root.setAttribute('data-export-clone-root', 'true');
+  root.style.position = 'fixed';
+  root.style.left = '-99999px';
+  root.style.top = '0';
+  root.style.width = `${w}px`;
+  root.style.height = `${h}px`;
+  root.style.minWidth = `${w}px`;
+  root.style.minHeight = `${h}px`;
+  root.style.maxWidth = 'none';
+  root.style.maxHeight = 'none';
+  root.style.overflow = 'visible';
+  root.style.transform = 'none';
+  root.style.transformOrigin = 'top left';
+  root.style.zoom = '1';
+  root.style.boxShadow = 'none';
+  root.style.borderRadius = '0';
+  root.style.pointerEvents = 'none';
+  root.style.zIndex = '-1';
 
-  let parent: HTMLElement | null = el;
-  while (parent) {
-    parent.style.overflow = 'visible';
-    parent.style.transform = 'none';
-    parent.style.transformOrigin = 'top left';
-    parent.style.maxHeight = 'none';
-    parent.style.maxWidth = 'none';
-    parent = parent.parentElement as HTMLElement | null;
-  }
+  root.querySelectorAll('[data-editing-ui]').forEach(n => n.remove());
 
-  clonedDoc.documentElement.style.overflow = 'visible';
-  clonedDoc.body.style.overflow = 'visible';
-  clonedDoc.body.style.margin = '0';
-  clonedDoc.body.style.padding = '0';
-
-  el.style.transform = 'none';
-  el.style.transformOrigin = 'top left';
-  el.style.boxShadow = 'none';
-  // Use 'visible' so any element beyond the preset bounds is still rendered.
-  // Combined with explicit width/height matching the requested capture size,
-  // html2canvas will paint the entire content area, not just the viewport.
-  el.style.overflow = 'visible';
-  el.style.width = `${w}px`;
-  el.style.height = `${h}px`;
-  el.style.minWidth = `${w}px`;
-  el.style.minHeight = `${h}px`;
-  el.style.maxWidth = 'none';
-  el.style.maxHeight = 'none';
-  el.style.borderRadius = '0';
-
-  el.querySelectorAll('[data-editing-ui]').forEach(n => {
-    (n as HTMLElement).style.display = 'none';
+  root.querySelectorAll<HTMLElement>('*').forEach(n => {
+    n.style.animation = 'none';
+    n.style.transition = 'none';
   });
 
-  el.querySelectorAll<HTMLElement>('[data-design-element-id]').forEach(n => {
+  root.querySelectorAll<HTMLElement>('[data-design-element-id]').forEach(n => {
     n.style.outline = 'none';
     n.style.boxShadow = 'none';
     n.style.cursor = 'default';
   });
 
-  el.querySelectorAll<HTMLElement>('[data-design-element-type="text"] > div').forEach(n => {
-    n.style.overflow = 'visible';
+  root.querySelectorAll<HTMLElement>('[data-design-element-type="text"] > div').forEach(n => {
+    n.style.overflow = 'hidden';
     n.style.minHeight = '100%';
   });
+}
+
+async function createExportClone(canvasEl: HTMLElement, w: number, h: number) {
+  const clone = canvasEl.cloneNode(true) as HTMLElement;
+  normalizeExportRoot(clone, w, h);
+  document.body.appendChild(clone);
+  await waitForAssets(clone);
+  void clone.offsetHeight;
+  await waitForNextPaint();
+  return clone;
 }
 
 // ─── capture ────────────────────────────────────────────────────────────────
