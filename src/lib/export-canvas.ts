@@ -32,8 +32,10 @@ async function waitForAssets(root: HTMLElement) {
 function normalizeExportRoot(root: HTMLElement, w: number, h: number) {
   root.id = 'export-clone-root';
   root.setAttribute('data-export-clone-root', 'true');
+  // 화면 안에 표시 (html2canvas가 hidden/off-screen DOM을 빈 화면으로 캡처하는 문제 회피)
+  // 사용자에게는 0.25배 축소 + pointer-events: none 으로 잠깐만 보임
   root.style.position = 'fixed';
-  root.style.left = '-99999px';
+  root.style.left = '0';
   root.style.top = '0';
   root.style.width = `${w}px`;
   root.style.height = `${h}px`;
@@ -42,13 +44,15 @@ function normalizeExportRoot(root: HTMLElement, w: number, h: number) {
   root.style.maxWidth = 'none';
   root.style.maxHeight = 'none';
   root.style.overflow = 'visible';
-  root.style.transform = 'none';
+  root.style.transform = 'scale(0.25)';
   root.style.transformOrigin = 'top left';
   root.style.zoom = '1';
   root.style.boxShadow = 'none';
   root.style.borderRadius = '0';
   root.style.pointerEvents = 'none';
-  root.style.zIndex = '-1';
+  root.style.opacity = '1';
+  root.style.zIndex = '999999';
+  root.style.background = '#FAFAFA';
 
   root.querySelectorAll('[data-editing-ui]').forEach(n => n.remove());
 
@@ -81,12 +85,22 @@ async function createExportClone(canvasEl: HTMLElement, w: number, h: number) {
 
 // ─── capture ────────────────────────────────────────────────────────────────
 
+function isDebugExport() {
+  if (typeof window === 'undefined') return false;
+  try {
+    if (new URLSearchParams(window.location.search).get('debugExport') === 'true') return true;
+    if ((window as any).debugExport === true) return true;
+  } catch {}
+  return false;
+}
+
 async function captureCanvas(
   canvasEl: HTMLElement,
   canvasWidth: number,
   canvasHeight: number,
 ): Promise<HTMLCanvasElement> {
   const exportRoot = await createExportClone(canvasEl, canvasWidth, canvasHeight);
+  const debug = isDebugExport();
 
   try {
     const rect = exportRoot.getBoundingClientRect();
@@ -94,6 +108,7 @@ async function captureCanvas(
     console.log('[Export] target width / height', canvasWidth, canvasHeight);
     console.log('[Export] target scrollWidth / scrollHeight', exportRoot.scrollWidth, exportRoot.scrollHeight);
     console.log('[Export] target getBoundingClientRect()', rect.toJSON ? rect.toJSON() : rect);
+    console.log('[Export] debugExport mode', debug);
 
     const opts = {
       scale: 2,
@@ -120,7 +135,12 @@ async function captureCanvas(
     console.log('[Export] generated canvas width / height', captured.width, captured.height);
     return captured;
   } finally {
-    exportRoot.remove();
+    if (debug) {
+      // 2초간 보여서 사용자가 export DOM 내용을 확인할 수 있게 함
+      setTimeout(() => exportRoot.remove(), 2000);
+    } else {
+      exportRoot.remove();
+    }
   }
 }
 
