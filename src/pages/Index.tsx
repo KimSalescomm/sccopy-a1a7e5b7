@@ -213,6 +213,19 @@ const Index = () => {
     updatePage(currentPageIndex, page => {
       const oldEl = page.elements.find(e => e.id === id);
       const normalizedUpdates = normalizeImageUpdates(oldEl, updates);
+
+      // If plain text changed (e.g. AI correction) but textHtml wasn't explicitly provided,
+      // the existing rich HTML no longer matches the new text — drop it so the new plain
+      // text renders correctly.
+      if (
+        oldEl?.type === 'text' &&
+        'text' in normalizedUpdates &&
+        !('textHtml' in normalizedUpdates) &&
+        normalizedUpdates.text !== oldEl.text
+      ) {
+        (normalizedUpdates as Partial<DesignElement>).textHtml = undefined;
+      }
+
       let newElements = page.elements.map(e => e.id === id ? { ...e, ...normalizedUpdates } as DesignElement : e);
 
       if (
