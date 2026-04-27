@@ -561,73 +561,99 @@ const Index = () => {
     }
   }, [currentPage]);
 
-  // Keyboard shortcuts
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    // Undo: Ctrl+Z
-    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
-      e.preventDefault();
-      handleUndo();
-      return;
-    }
-    // Redo: Ctrl+Shift+Z or Ctrl+Y
-    if ((e.ctrlKey || e.metaKey) && (e.key === 'Z' || e.key === 'y') && (e.shiftKey || e.key === 'y')) {
-      e.preventDefault();
-      handleRedo();
-      return;
-    }
-    // Copy: Ctrl+C
-    if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !editingId) {
-      e.preventDefault();
-      handleCopy();
-      return;
-    }
-    // Paste: Ctrl+V
-    if ((e.ctrlKey || e.metaKey) && e.key === 'v' && !editingId) {
-      e.preventDefault();
-      handlePaste();
-      return;
-    }
-    // Duplicate: Ctrl+D
-    if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-      e.preventDefault();
-      handleDuplicate();
-      return;
-    }
-    // Group: Ctrl+G
-    if ((e.ctrlKey || e.metaKey) && e.key === 'g' && !e.shiftKey) {
-      e.preventDefault();
-      handleGroup();
-      return;
-    }
-    // Ungroup: Ctrl+Shift+G
-    if ((e.ctrlKey || e.metaKey) && e.key === 'G' && e.shiftKey) {
-      e.preventDefault();
-      handleUngroup();
-      return;
-    }
-    if (editingId) return;
+  // Keyboard shortcuts — attached to window so they work regardless of focus
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      const isFormField =
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        tag === 'SELECT' ||
+        target?.isContentEditable === true;
 
-    // Delete selected
-    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedIds.length > 0) {
-      selectedIds.forEach(id => handleDeleteElement(id));
-      return;
-    }
+      // Undo: Ctrl/Cmd+Z (works even while editing text — overrides native contenteditable undo)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleUndo();
+        return;
+      }
+      // Redo: Ctrl/Cmd+Shift+Z or Ctrl+Y
+      if ((e.ctrlKey || e.metaKey) && ((e.key === 'z' || e.key === 'Z') && e.shiftKey)) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleRedo();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        e.preventDefault();
+        e.stopPropagation();
+        handleRedo();
+        return;
+      }
 
-    // Arrow keys: move selected elements
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) && selectedIds.length > 0) {
-      e.preventDefault();
-      const step = e.shiftKey ? 10 : 1;
-      let dx = 0, dy = 0;
-      if (e.key === 'ArrowUp') dy = -step;
-      if (e.key === 'ArrowDown') dy = step;
-      if (e.key === 'ArrowLeft') dx = -step;
-      if (e.key === 'ArrowRight') dx = step;
-      handleMoveSelected(dx, dy);
-    }
+      // The remaining shortcuts should not interfere with typing in form fields
+      if (isFormField) return;
+
+      // Copy: Ctrl+C
+      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !editingId) {
+        e.preventDefault();
+        handleCopy();
+        return;
+      }
+      // Paste: Ctrl+V
+      if ((e.ctrlKey || e.metaKey) && e.key === 'v' && !editingId) {
+        e.preventDefault();
+        handlePaste();
+        return;
+      }
+      // Duplicate: Ctrl+D
+      if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+        e.preventDefault();
+        handleDuplicate();
+        return;
+      }
+      // Group: Ctrl+G
+      if ((e.ctrlKey || e.metaKey) && e.key === 'g' && !e.shiftKey) {
+        e.preventDefault();
+        handleGroup();
+        return;
+      }
+      // Ungroup: Ctrl+Shift+G
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'g' || e.key === 'G') && e.shiftKey) {
+        e.preventDefault();
+        handleUngroup();
+        return;
+      }
+      if (editingId) return;
+
+      // Delete selected
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedIds.length > 0) {
+        selectedIds.forEach(id => handleDeleteElement(id));
+        return;
+      }
+
+      // Arrow keys: move selected elements
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) && selectedIds.length > 0) {
+        e.preventDefault();
+        const step = e.shiftKey ? 10 : 1;
+        let dx = 0, dy = 0;
+        if (e.key === 'ArrowUp') dy = -step;
+        if (e.key === 'ArrowDown') dy = step;
+        if (e.key === 'ArrowLeft') dx = -step;
+        if (e.key === 'ArrowRight') dx = step;
+        handleMoveSelected(dx, dy);
+      }
+    };
+    // capture phase so we run before the contenteditable's native undo
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
   }, [editingId, selectedIds, handleDeleteElement, handleUndo, handleRedo, handleMoveSelected, handleCopy, handlePaste, handleDuplicate, handleGroup, handleUngroup]);
 
+
   return (
-    <div className="h-screen flex flex-col bg-background" onKeyDown={handleKeyDown} tabIndex={0}>
+    <div className="h-screen flex flex-col bg-background">
       <Toolbar
         onAddText={handleAddText}
         onAddShape={handleAddShape}

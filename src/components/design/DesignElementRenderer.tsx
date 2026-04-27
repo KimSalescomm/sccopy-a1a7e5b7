@@ -202,10 +202,18 @@ export function DesignElementRenderer({
     if (element.locked) return;
     if (isEditing) return;
 
-    // For text elements, only allow drag from border area
-    if (element.type === 'text' && elRef.current && !isOnBorder(e, elRef.current)) {
-      // Click inside text area — don't start drag, will trigger edit on double-click
-      return;
+    // For text elements: never start drag when the mousedown originated inside the
+    // contenteditable area — that's the user trying to place a caret or drag-select
+    // text. Drag only initiates from the border zone OUTSIDE the editable text.
+    if (element.type === 'text') {
+      const editEl = editableRef.current;
+      const target = e.target as Node | null;
+      if (editEl && target && editEl.contains(target)) {
+        return;
+      }
+      if (elRef.current && !isOnBorder(e, elRef.current)) {
+        return;
+      }
     }
 
     dragRef.current = {
