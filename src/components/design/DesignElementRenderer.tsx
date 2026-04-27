@@ -254,6 +254,9 @@ export function DesignElementRenderer({
   const handleInput = useCallback(() => {
     if (!editableRef.current) return;
     const text = editableRef.current.innerText;
+    const html = editableRef.current.innerHTML;
+    // If the rendered HTML is just plain text (no inline formatting), don't bother storing textHtml
+    const hasRichFormatting = /<(span|b|strong|i|em|u|mark|font)\b/i.test(html);
 
     // Auto-expand: measure natural content height
     const el = editableRef.current;
@@ -262,7 +265,10 @@ export function DesignElementRenderer({
     const naturalHeight = Math.max(24, el.scrollHeight);
     el.style.height = prevH;
 
-    const updates: Partial<DesignElement> = { text };
+    const updates: Partial<DesignElement> = {
+      text,
+      textHtml: hasRichFormatting ? html : undefined,
+    };
     if (Math.abs(naturalHeight - element.size.height) >= 1) {
       updates.size = { ...element.size, height: naturalHeight };
     }
