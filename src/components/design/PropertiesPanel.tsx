@@ -263,13 +263,17 @@ export function PropertiesPanel({
                   type="color"
                   value={element.textStyle.color}
                   onChange={e => handleColorChange(e.target.value)}
-                  onMouseDown={e => e.stopPropagation()}
+                  onMouseDown={e => { e.stopPropagation(); beginColorSession(); }}
+                  onFocus={beginColorSession}
+                  onBlur={endColorSession}
                   className="w-8 h-7 rounded cursor-pointer border"
                 />
                 <Input
                   value={element.textStyle.color}
                   onChange={e => handleColorChange(e.target.value)}
-                  onMouseDown={e => e.stopPropagation()}
+                  onMouseDown={e => { e.stopPropagation(); beginColorSession(); }}
+                  onFocus={beginColorSession}
+                  onBlur={endColorSession}
                   className="h-7 text-xs flex-1"
                 />
               </div>
