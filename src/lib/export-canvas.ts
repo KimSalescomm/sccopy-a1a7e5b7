@@ -85,12 +85,22 @@ async function createExportClone(canvasEl: HTMLElement, w: number, h: number) {
 
 // ─── capture ────────────────────────────────────────────────────────────────
 
+function isDebugExport() {
+  if (typeof window === 'undefined') return false;
+  try {
+    if (new URLSearchParams(window.location.search).get('debugExport') === 'true') return true;
+    if ((window as any).debugExport === true) return true;
+  } catch {}
+  return false;
+}
+
 async function captureCanvas(
   canvasEl: HTMLElement,
   canvasWidth: number,
   canvasHeight: number,
 ): Promise<HTMLCanvasElement> {
   const exportRoot = await createExportClone(canvasEl, canvasWidth, canvasHeight);
+  const debug = isDebugExport();
 
   try {
     const rect = exportRoot.getBoundingClientRect();
@@ -98,6 +108,7 @@ async function captureCanvas(
     console.log('[Export] target width / height', canvasWidth, canvasHeight);
     console.log('[Export] target scrollWidth / scrollHeight', exportRoot.scrollWidth, exportRoot.scrollHeight);
     console.log('[Export] target getBoundingClientRect()', rect.toJSON ? rect.toJSON() : rect);
+    console.log('[Export] debugExport mode', debug);
 
     const opts = {
       scale: 2,
@@ -124,21 +135,13 @@ async function captureCanvas(
     console.log('[Export] generated canvas width / height', captured.width, captured.height);
     return captured;
   } finally {
-    exportRoot.remove();
+    if (debug) {
+      // 2초간 보여서 사용자가 export DOM 내용을 확인할 수 있게 함
+      setTimeout(() => exportRoot.remove(), 2000);
+    } else {
+      exportRoot.remove();
+    }
   }
-}
-
-// ─── download helper ─────────────────────────────────────────────────────────
-
-function downloadBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
 // ─── public API ──────────────────────────────────────────────────────────────
