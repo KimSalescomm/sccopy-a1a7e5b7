@@ -483,9 +483,23 @@ export function DesignElementRenderer({
         width: element.size.width,
         height: element.size.height,
         cursor: getCursor(),
-        outline: selected && !isExporting ? '2px solid hsl(230, 65%, 55%)' : 'none',
+        // Overflowing text gets a red dashed outline so the user can see it doesn't fit
+        outline: selected && !isExporting
+          ? '2px solid hsl(230, 65%, 55%)'
+          : (textOverflow && !isExporting ? '1px dashed hsl(0, 80%, 55%)' : 'none'),
         outlineOffset: 1,
-        zIndex: selected && !isExporting ? 100 : 'auto',
+        // Layering: text is always above shapes, images sit between, selected goes on top.
+        // Resizing a shape temporarily drops its z-index further so any text remains visible.
+        zIndex: selected && !isExporting
+          ? 100
+          : element.type === 'text'
+            ? 30
+            : element.type === 'image'
+              ? 20
+              : (isResizing ? 5 : 10),
+        // Slight transparency on the shape itself while resizing so the user can see
+        // any text/content behind/inside the box outline.
+        opacity: isResizing && element.type === 'shape' ? 0.6 : 1,
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={(e) => {
