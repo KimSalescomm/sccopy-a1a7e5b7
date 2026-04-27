@@ -37,6 +37,8 @@ export interface DesignElement {
   groupId?: string;
   // Text
   text?: string;
+  /** Optional rich-text HTML for partial formatting (color/bold/underline/highlight on selections). When present, takes precedence in rendering. */
+  textHtml?: string;
   placeholder?: string;
   textStyle?: TextStyle;
   // Image

@@ -55,6 +55,8 @@ export function DesignElementRenderer({
   const isEditing = editingId === element.id;
   const [showCorrectionPanel, setShowCorrectionPanel] = useState(false);
   const [showCopyTypeFlow, setShowCopyTypeFlow] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [textOverflow, setTextOverflow] = useState(false);
 
   const isPlaceholder = isPlaceholderText(element);
 
@@ -81,16 +83,21 @@ export function DesignElementRenderer({
   useEffect(() => {
     if (!isEditing || !editableRef.current) return;
 
-    // If placeholder, show empty or select-all the placeholder text
-    const text = isPlaceholder ? '' : (element.text ?? '');
-    editableRef.current.innerText = text;
+    // If placeholder, show empty; otherwise prefer rich HTML, fall back to plain text
+    if (isPlaceholder) {
+      editableRef.current.innerHTML = '';
+    } else if (element.textHtml && element.textHtml.length > 0) {
+      editableRef.current.innerHTML = element.textHtml;
+    } else {
+      editableRef.current.innerText = element.text ?? '';
+    }
 
     editableRef.current.focus();
     const sel = window.getSelection();
     if (sel) {
       sel.selectAllChildren(editableRef.current);
-      if (text) {
-        // Select all so user can type to replace
+      if (editableRef.current.innerText) {
+        // keep selection (user can type to replace)
       } else {
         sel.collapseToEnd();
       }
@@ -100,9 +107,12 @@ export function DesignElementRenderer({
   // Keep contentEditable in sync when text changes externally (e.g. AI correction apply)
   useEffect(() => {
     if (!isEditing || !editableRef.current) return;
+    if (isPlaceholder) return;
 
     const text = element.text ?? '';
-    if (isPlaceholder) return; // don't sync placeholder back
+    // If external plain text differs from current contentEditable plain text,
+    // overwrite (AI correction case). This intentionally drops partial formatting
+    // when the underlying text has been replaced.
     if (editableRef.current.innerText === text) return;
 
     const wasFocused = document.activeElement === editableRef.current;
@@ -116,6 +126,21 @@ export function DesignElementRenderer({
       }
     }
   }, [isEditing, element.text]);
+
+  // Detect text overflow (content taller than the box) so we can highlight it during resize
+  useEffect(() => {
+    if (element.type !== 'text') {
+      if (textOverflow) setTextOverflow(false);
+      return;
+    }
+    const node = elRef.current;
+    if (!node) return;
+    // Find the inner text container (the first child div in renderContent)
+    const inner = node.firstElementChild as HTMLElement | null;
+    if (!inner) return;
+    const overflow = inner.scrollHeight > element.size.height + 1 || inner.scrollWidth > element.size.width + 1;
+    if (overflow !== textOverflow) setTextOverflow(overflow);
+  }, [element.type, element.text, element.textHtml, element.size.width, element.size.height, element.textStyle, isEditing, textOverflow]);
 
   // Clipboard-only image paste (보안 환경: 파일 업로드 불가)
   const handleClipboardPaste = useCallback(async () => {
@@ -203,6 +228,7 @@ export function DesignElementRenderer({
   const handleResizeMouseDown = useCallback((e: React.MouseEvent, handle: string) => {
     e.stopPropagation();
     e.preventDefault();
+    setIsResizing(true);
     resizeRef.current = {
       startX: e.clientX, startY: e.clientY,
       origW: element.size.width, origH: element.size.height,
@@ -235,6 +261,7 @@ export function DesignElementRenderer({
 
     const handleMouseUp = () => {
       resizeRef.current = null;
+      setIsResizing(false);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
@@ -246,6 +273,9 @@ export function DesignElementRenderer({
   const handleInput = useCallback(() => {
     if (!editableRef.current) return;
     const text = editableRef.current.innerText;
+    const html = editableRef.current.innerHTML;
+    // If the rendered HTML is just plain text (no inline formatting), don't bother storing textHtml
+    const hasRichFormatting = /<(span|b|strong|i|em|u|mark|font)\b/i.test(html);
 
     // Auto-expand: measure natural content height
     const el = editableRef.current;
@@ -254,7 +284,10 @@ export function DesignElementRenderer({
     const naturalHeight = Math.max(24, el.scrollHeight);
     el.style.height = prevH;
 
-    const updates: Partial<DesignElement> = { text };
+    const updates: Partial<DesignElement> = {
+      text,
+      textHtml: hasRichFormatting ? html : undefined,
+    };
     if (Math.abs(naturalHeight - element.size.height) >= 1) {
       updates.size = { ...element.size, height: naturalHeight };
     }
@@ -328,6 +361,15 @@ export function DesignElementRenderer({
         );
       }
 
+      if (!isPlaceholder && element.textHtml && element.textHtml.length > 0) {
+        return (
+          <div
+            style={style}
+            className="pointer-events-none select-none"
+            dangerouslySetInnerHTML={{ __html: element.textHtml }}
+          />
+        );
+      }
       return (
         <div style={style} className="pointer-events-none select-none">
           {element.text}
@@ -441,9 +483,23 @@ export function DesignElementRenderer({
         width: element.size.width,
         height: element.size.height,
         cursor: getCursor(),
-        outline: selected && !isExporting ? '2px solid hsl(230, 65%, 55%)' : 'none',
+        // Overflowing text gets a red dashed outline so the user can see it doesn't fit
+        outline: selected && !isExporting
+          ? '2px solid hsl(230, 65%, 55%)'
+          : (textOverflow && !isExporting ? '1px dashed hsl(0, 80%, 55%)' : 'none'),
         outlineOffset: 1,
-        zIndex: selected && !isExporting ? 100 : 'auto',
+        // Layering: text is always above shapes, images sit between, selected goes on top.
+        // Resizing a shape temporarily drops its z-index further so any text remains visible.
+        zIndex: selected && !isExporting
+          ? 100
+          : element.type === 'text'
+            ? 30
+            : element.type === 'image'
+              ? 20
+              : (isResizing ? 5 : 10),
+        // Slight transparency on the shape itself while resizing so the user can see
+        // any text/content behind/inside the box outline.
+        opacity: isResizing && element.type === 'shape' ? 0.6 : 1,
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={(e) => {

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { AlignLeft, AlignCenter, AlignRight, Trash2, Lock, Unlock } from 'lucide-react';
+import { AlignLeft, AlignCenter, AlignRight, Trash2, Lock, Unlock, Bold, Underline, Highlighter } from 'lucide-react';
 
 interface PropertiesPanelProps {
   element: DesignElement | null;
@@ -27,23 +27,47 @@ export function PropertiesPanel({
   activeEditRef,
 }: PropertiesPanelProps) {
 
+  const hasActiveSelection = useCallback(() => {
+    const editEl = activeEditRef?.current;
+    if (!editEl) return false;
+    const sel = window.getSelection();
+    return !!(sel && sel.rangeCount > 0 && !sel.isCollapsed && editEl.contains(sel.anchorNode));
+  }, [activeEditRef]);
+
+  const dispatchInputEvent = useCallback(() => {
+    const editEl = activeEditRef?.current;
+    if (editEl) {
+      editEl.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }, [activeEditRef]);
+
   const handleColorChange = useCallback((color: string) => {
     if (!element) return;
 
-    // If actively editing (contentEditable), apply color to selection only
-    const editEl = activeEditRef?.current;
-    if (editEl) {
-      const sel = window.getSelection();
-      if (sel && sel.rangeCount > 0 && !sel.isCollapsed && editEl.contains(sel.anchorNode)) {
-        // Apply color to selected text using execCommand
-        document.execCommand('foreColor', false, color);
-        return;
-      }
+    if (hasActiveSelection()) {
+      document.execCommand('styleWithCSS', false, 'true');
+      document.execCommand('foreColor', false, color);
+      dispatchInputEvent();
+      return;
     }
 
     // Otherwise, change the whole element's text color
     onUpdate(element.id, { textStyle: { ...element.textStyle!, color } });
-  }, [element, onUpdate, activeEditRef]);
+  }, [element, onUpdate, hasActiveSelection, dispatchInputEvent]);
+
+  const applyInlineStyle = useCallback((command: 'bold' | 'underline' | 'highlight') => {
+    if (!hasActiveSelection()) return;
+    document.execCommand('styleWithCSS', false, 'true');
+    if (command === 'bold') {
+      document.execCommand('bold');
+    } else if (command === 'underline') {
+      document.execCommand('underline');
+    } else if (command === 'highlight') {
+      // backColor in CSS mode applies background to the inline span
+      document.execCommand('hiliteColor', false, '#FEF08A');
+    }
+    dispatchInputEvent();
+  }, [hasActiveSelection, dispatchInputEvent]);
 
   if (!element) {
     return (
@@ -184,6 +208,42 @@ export function PropertiesPanel({
                   onMouseDown={e => e.stopPropagation()}
                   className="h-7 text-xs flex-1"
                 />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">부분 서식</Label>
+              <p className="text-[10px] text-muted-foreground">텍스트를 드래그한 뒤 클릭하세요</p>
+              <div className="flex gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  title="굵게 (선택 영역)"
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => applyInlineStyle('bold')}
+                >
+                  <Bold className="w-3 h-3" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  title="밑줄 (선택 영역)"
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => applyInlineStyle('underline')}
+                >
+                  <Underline className="w-3 h-3" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  title="형광펜 (선택 영역)"
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => applyInlineStyle('highlight')}
+                >
+                  <Highlighter className="w-3 h-3" />
+                </Button>
               </div>
             </div>
             <div className="space-y-1">
