@@ -26,6 +26,7 @@ interface CanvasProps {
   onFinishEditing: () => void;
   onScaleChange?: (scale: number) => void;
   activeEditRef?: React.MutableRefObject<HTMLElement | null>;
+  activeTextRangeRef?: React.MutableRefObject<Range | null>;
   onMarqueeSelect?: (ids: string[], additive: boolean) => void;
 }
 
@@ -41,7 +42,7 @@ interface MarqueeState {
 export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
   page, selectedIds, editingId, canvasPreset, isExporting = false,
   onSelectElement, onUpdateElement, onMoveSelected, onDoubleClickElement,
-  onTextChange, onFinishEditing, onScaleChange, activeEditRef, onMarqueeSelect,
+  onTextChange, onFinishEditing, onScaleChange, activeEditRef, activeTextRangeRef, onMarqueeSelect,
 }, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasContentRef = useRef<HTMLDivElement>(null);
@@ -301,6 +302,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
               onTextChange={onTextChange}
               onFinishEditing={onFinishEditing}
               activeEditRef={activeEditRef}
+              activeTextRangeRef={activeTextRangeRef}
               isExporting={isExporting}
               onDragMove={handleElementDrag}
               onDragEnd={handleDragEnd}
