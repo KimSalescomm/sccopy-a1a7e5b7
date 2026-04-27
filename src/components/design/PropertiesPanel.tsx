@@ -28,15 +28,23 @@ export function PropertiesPanel({
   activeEditRef, activeTextRangeRef,
 }: PropertiesPanelProps) {
 
-  const getEditableSelectionRange = useCallback(() => {
+  // Tracks an active "color picker session" — when the user opens the native
+  // color picker, focus leaves the canvas, the contenteditable selection
+  // collapses, and the input fires onChange repeatedly as the user drags
+  // through colors. We snapshot the editable range at session start and reuse
+  // it for every change in that session so partial-text styling is preserved.
+  const colorSessionRangeRef = useRef<Range | null>(null);
+
+  const captureCurrentEditableRange = useCallback((): Range | null => {
     const editEl = activeEditRef?.current;
     if (!editEl) return null;
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
       const range = sel.getRangeAt(0);
       if (editEl.contains(range.startContainer) && editEl.contains(range.endContainer)) {
-        activeTextRangeRef && (activeTextRangeRef.current = range.cloneRange());
-        return range.cloneRange();
+        const cloned = range.cloneRange();
+        activeTextRangeRef && (activeTextRangeRef.current = cloned.cloneRange());
+        return cloned;
       }
     }
     const savedRange = activeTextRangeRef?.current;
@@ -53,15 +61,11 @@ export function PropertiesPanel({
     }
   }, [activeEditRef]);
 
-  const applySpanToSelection = useCallback((styles: React.CSSProperties) => {
+  const applySpanWithRange = useCallback((range: Range, styles: React.CSSProperties): boolean => {
     const editEl = activeEditRef?.current;
-    const range = getEditableSelectionRange();
-    if (!editEl || !range) return false;
-
-    editEl.focus({ preventScroll: true });
-    const sel = window.getSelection();
-    sel?.removeAllRanges();
-    sel?.addRange(range);
+    if (!editEl) return false;
+    if (!editEl.contains(range.startContainer) || !editEl.contains(range.endContainer)) return false;
+    if (range.collapsed) return false;
 
     const span = document.createElement('span');
     Object.assign(span.style, styles);
@@ -69,26 +73,55 @@ export function PropertiesPanel({
     span.appendChild(contents);
     range.insertNode(span);
 
-    const after = document.createRange();
-    after.setStartAfter(span);
-    after.collapse(true);
-    sel?.removeAllRanges();
-    sel?.addRange(after);
-    activeTextRangeRef && (activeTextRangeRef.current = null);
+    // Update the saved range to wrap the freshly-inserted span so subsequent
+    // applies (e.g. dragging through the color picker) keep targeting the
+    // same visual selection.
+    const newRange = document.createRange();
+    newRange.selectNodeContents(span);
+    if (activeTextRangeRef) activeTextRangeRef.current = newRange.cloneRange();
+
     dispatchInputEvent();
     return true;
-  }, [activeEditRef, activeTextRangeRef, dispatchInputEvent, getEditableSelectionRange]);
+  }, [activeEditRef, activeTextRangeRef, dispatchInputEvent]);
+
+  const applySpanToSelection = useCallback((styles: React.CSSProperties) => {
+    const range = captureCurrentEditableRange();
+    if (!range) return false;
+    return applySpanWithRange(range, styles);
+  }, [captureCurrentEditableRange, applySpanWithRange]);
+
+  // --- Color picker session ---
+  const beginColorSession = useCallback(() => {
+    // Capture the editable selection BEFORE the native color picker steals focus.
+    const range = captureCurrentEditableRange();
+    colorSessionRangeRef.current = range;
+  }, [captureCurrentEditableRange]);
+
+  const endColorSession = useCallback(() => {
+    colorSessionRangeRef.current = null;
+  }, []);
 
   const handleColorChange = useCallback((color: string) => {
     if (!element) return;
 
-    if (applySpanToSelection({ color })) {
-      return;
+    // If a color-picker session is active and was started over a real selection,
+    // keep applying to that selection (and update the stored range to the new span).
+    const sessionRange = colorSessionRangeRef.current;
+    if (sessionRange) {
+      const ok = applySpanWithRange(sessionRange.cloneRange(), { color });
+      if (ok) {
+        // Refresh session range to point at the just-styled content
+        const refreshed = activeTextRangeRef?.current;
+        if (refreshed) colorSessionRangeRef.current = refreshed.cloneRange();
+        return;
+      }
+      // Range became invalid — fall through to whole-element update and end session.
+      colorSessionRangeRef.current = null;
     }
 
-    // Otherwise, change the whole element's text color
+    // No active selection session: apply to whole element
     onUpdate(element.id, { textStyle: { ...element.textStyle!, color } });
-  }, [element, onUpdate, applySpanToSelection]);
+  }, [element, onUpdate, applySpanWithRange, activeTextRangeRef]);
 
   const applyInlineStyle = useCallback((command: 'bold' | 'underline' | 'highlight') => {
     if (command === 'bold') {
