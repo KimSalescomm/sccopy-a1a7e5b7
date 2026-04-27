@@ -81,16 +81,21 @@ export function DesignElementRenderer({
   useEffect(() => {
     if (!isEditing || !editableRef.current) return;
 
-    // If placeholder, show empty or select-all the placeholder text
-    const text = isPlaceholder ? '' : (element.text ?? '');
-    editableRef.current.innerText = text;
+    // If placeholder, show empty; otherwise prefer rich HTML, fall back to plain text
+    if (isPlaceholder) {
+      editableRef.current.innerHTML = '';
+    } else if (element.textHtml && element.textHtml.length > 0) {
+      editableRef.current.innerHTML = element.textHtml;
+    } else {
+      editableRef.current.innerText = element.text ?? '';
+    }
 
     editableRef.current.focus();
     const sel = window.getSelection();
     if (sel) {
       sel.selectAllChildren(editableRef.current);
-      if (text) {
-        // Select all so user can type to replace
+      if (editableRef.current.innerText) {
+        // keep selection (user can type to replace)
       } else {
         sel.collapseToEnd();
       }
@@ -100,9 +105,12 @@ export function DesignElementRenderer({
   // Keep contentEditable in sync when text changes externally (e.g. AI correction apply)
   useEffect(() => {
     if (!isEditing || !editableRef.current) return;
+    if (isPlaceholder) return;
 
     const text = element.text ?? '';
-    if (isPlaceholder) return; // don't sync placeholder back
+    // If external plain text differs from current contentEditable plain text,
+    // overwrite (AI correction case). This intentionally drops partial formatting
+    // when the underlying text has been replaced.
     if (editableRef.current.innerText === text) return;
 
     const wasFocused = document.activeElement === editableRef.current;
