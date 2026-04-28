@@ -29,7 +29,7 @@ export function PropertiesPanel({
   bgColor, bgType, bgGradientFrom, bgGradientTo, bgGradientDir, onBgChange,
   activeEditRef, activeTextRangeRef, width = 300,
 }: PropertiesPanelProps) {
-
+  const effectiveWidth = isPublishedHost() ? 320 : width;
   // Tracks an active "color picker session" — when the user opens the native
   // color picker, focus leaves the canvas, the contenteditable selection
   // collapses, and the input fires onChange repeatedly as the user drags
