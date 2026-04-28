@@ -282,11 +282,12 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-auto bg-muted/30 relative"
+      className="flex-1 overflow-auto relative"
+      style={{ backgroundColor: '#f5f6f8' }}
       onClick={() => { onSelectElement(null); onFinishEditing(); }}
       onPaste={handlePaste}
     >
-      <div className="min-w-max min-h-full flex items-center justify-center p-6">
+      <div className="min-w-max min-h-full flex items-start justify-center p-6">
         <div
           ref={canvasContentRef}
           data-canvas-content
@@ -295,7 +296,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
             width: canvasPreset.width,
             height: canvasPreset.height,
             transform: `scale(${scale})`,
-            transformOrigin: 'center center',
+            transformOrigin: 'top center',
             ...bgStyle,
           }}
           onClick={e => e.stopPropagation()}
