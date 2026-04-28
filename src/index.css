@@ -109,6 +109,15 @@
     @apply border-border;
   }
 
+  /* 개발/배포 환경에서 UI 크기 일관성 보장 — 어떤 전역 scale/zoom도 금지 */
+  html {
+    font-size: 16px;
+  }
+  html, body, #root {
+    transform: none !important;
+    zoom: 1 !important;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;

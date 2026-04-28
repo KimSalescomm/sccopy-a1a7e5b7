@@ -20,12 +20,13 @@ interface PropertiesPanelProps {
   onBgChange: (bg: any) => void;
   activeEditRef?: React.MutableRefObject<HTMLElement | null>;
   activeTextRangeRef?: React.MutableRefObject<Range | null>;
+  width?: number;
 }
 
 export function PropertiesPanel({
   element, onUpdate, onDelete,
   bgColor, bgType, bgGradientFrom, bgGradientTo, bgGradientDir, onBgChange,
-  activeEditRef, activeTextRangeRef,
+  activeEditRef, activeTextRangeRef, width = 300,
 }: PropertiesPanelProps) {
 
   // Tracks an active "color picker session" — when the user opens the native
@@ -135,7 +136,7 @@ export function PropertiesPanel({
 
   if (!element) {
     return (
-      <div className="w-[300px] border-l bg-card p-4 space-y-4 overflow-y-auto">
+      <div className="border-l bg-card p-4 space-y-4 overflow-y-auto flex-shrink-0" style={{ width }}>
         <h3 className="text-base font-semibold text-muted-foreground uppercase tracking-wider">배경</h3>
         <div className="space-y-3">
           <div className="space-y-1">
@@ -185,7 +186,7 @@ export function PropertiesPanel({
   }
 
   return (
-    <div className="w-[300px] border-l bg-card overflow-y-auto">
+    <div className="border-l bg-card overflow-y-auto flex-shrink-0" style={{ width }}>
       <div className="p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">

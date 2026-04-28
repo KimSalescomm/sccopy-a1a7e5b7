@@ -256,28 +256,7 @@ export function Toolbar({
           )}
         </span>
 
-        {/* 줌 컨트롤 (Fit / 50 / 75 / 100%) */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className="flex items-center gap-1.5 px-2.5 h-10 rounded-md text-[14px] font-medium text-foreground hover:bg-accent transition-colors select-none border border-border/60"
-              title="줌"
-            >
-              <Maximize2 className="w-4 h-4 opacity-70" />
-              <span className="leading-none min-w-[44px] text-center">{Math.round(scale * 100)}%</span>
-              <ChevronDown className="w-3.5 h-3.5 opacity-60" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onSetZoom?.('fit')} className="text-sm">
-              <Maximize2 className="w-4 h-4 mr-2" /> Fit (화면 맞춤)
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onSetZoom?.(0.5)} className="text-sm">50%</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onSetZoom?.(0.75)} className="text-sm">75%</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onSetZoom?.(1)} className="text-sm">100%</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* 줌 컨트롤은 화면 우측 하단 슬라이더로 이동 */}
 
         {/* 슬라이드 크기 */}
         <DropdownMenu>

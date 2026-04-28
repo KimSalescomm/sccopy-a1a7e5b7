@@ -54,14 +54,14 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
   const [marquee, setMarquee] = useState<MarqueeState | null>(null);
 
   const getFitScale = useCallback(() => {
-    if (!containerRef.current) return 0.7;
+    if (!containerRef.current) return 0.65;
     const rect = containerRef.current.getBoundingClientRect();
     const padding = 48;
     const sx = (rect.width - padding) / canvasPreset.width;
     const sy = (rect.height - padding) / canvasPreset.height;
     const raw = Math.min(sx, sy);
-    // 화면 표시용 fit scale: 0.7 ~ 1.0 로 제한
-    return Math.max(0.7, Math.min(raw, 1));
+    // 화면 표시용 fit scale: 0.5 ~ 1.0
+    return Math.max(0.5, Math.min(raw, 1));
   }, [canvasPreset]);
 
   const updateScale = useCallback(() => {
@@ -82,7 +82,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
     zoomIn() {
       setIsManualZoom(true);
       setScale(prev => {
-        const next = Math.min(prev + 0.1, 2);
+        const next = Math.min(prev + 0.05, 1);
         onScaleChange?.(next);
         return next;
       });
@@ -90,7 +90,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
     zoomOut() {
       setIsManualZoom(true);
       setScale(prev => {
-        const next = Math.max(prev - 0.1, 0.1);
+        const next = Math.max(prev - 0.05, 0.5);
         onScaleChange?.(next);
         return next;
       });
@@ -109,8 +109,9 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
         onScaleChange?.(s);
       } else {
         setIsManualZoom(true);
-        setScale(value);
-        onScaleChange?.(value);
+        const clamped = Math.min(1, Math.max(0.5, value));
+        setScale(clamped);
+        onScaleChange?.(clamped);
       }
     },
     getScale() {
@@ -281,75 +282,85 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-auto bg-muted/30 relative"
+      className="flex-1 overflow-auto relative"
+      style={{ backgroundColor: '#f5f6f8' }}
       onClick={() => { onSelectElement(null); onFinishEditing(); }}
       onPaste={handlePaste}
     >
-      <div className="min-w-max min-h-full flex items-center justify-center p-6">
+      <div className="min-w-max min-h-full flex items-start justify-center p-6">
+        {/* Sizer takes the scaled dimensions so layout/scrollbars are correct */}
         <div
-          ref={canvasContentRef}
-          data-canvas-content
-          className="relative shadow-2xl flex-shrink-0"
           style={{
-            width: canvasPreset.width,
-            height: canvasPreset.height,
-            transform: `scale(${scale})`,
-            transformOrigin: 'center center',
-            ...bgStyle,
+            width: canvasPreset.width * scale,
+            height: canvasPreset.height * scale,
+            flexShrink: 0,
           }}
-          onClick={e => e.stopPropagation()}
-          onMouseDown={handleCanvasMouseDown}
         >
-          {page.elements.map(el => (
-            <DesignElementRenderer
-              key={el.id}
-              element={el}
-              selected={selectedIds.includes(el.id)}
-              scale={scale}
-              onSelect={(id) => {
-                const lastEvent = window.event as KeyboardEvent | MouseEvent | null;
-                const additive = lastEvent && 'shiftKey' in lastEvent ? lastEvent.shiftKey : false;
-                onSelectElement(id, additive);
-              }}
-              onUpdate={onUpdateElement}
-              onDoubleClick={onDoubleClickElement}
-              editingId={editingId}
-              onTextChange={onTextChange}
-              onFinishEditing={onFinishEditing}
-              activeEditRef={activeEditRef}
-              activeTextRangeRef={activeTextRangeRef}
-              isExporting={isExporting}
-              onDragMove={handleElementDrag}
-              onDragEnd={handleDragEnd}
-              onDragStart={handleDragStart}
-            />
-          ))}
+          <div
+            ref={canvasContentRef}
+            data-canvas-content
+            className="relative shadow-2xl"
+            style={{
+              width: canvasPreset.width,
+              height: canvasPreset.height,
+              transform: `scale(${scale})`,
+              transformOrigin: 'top left',
+              ...bgStyle,
+            }}
+            onClick={e => e.stopPropagation()}
+            onMouseDown={handleCanvasMouseDown}
+          >
+            {page.elements.map(el => (
+              <DesignElementRenderer
+                key={el.id}
+                element={el}
+                selected={selectedIds.includes(el.id)}
+                scale={scale}
+                onSelect={(id) => {
+                  const lastEvent = window.event as KeyboardEvent | MouseEvent | null;
+                  const additive = lastEvent && 'shiftKey' in lastEvent ? lastEvent.shiftKey : false;
+                  onSelectElement(id, additive);
+                }}
+                onUpdate={onUpdateElement}
+                onDoubleClick={onDoubleClickElement}
+                editingId={editingId}
+                onTextChange={onTextChange}
+                onFinishEditing={onFinishEditing}
+                activeEditRef={activeEditRef}
+                activeTextRangeRef={activeTextRangeRef}
+                isExporting={isExporting}
+                onDragMove={handleElementDrag}
+                onDragEnd={handleDragEnd}
+                onDragStart={handleDragStart}
+              />
+            ))}
 
-          {/* Marquee selection overlay */}
-          {!isExporting && marqueeRect && marqueeRect.width > 2 && marqueeRect.height > 2 && (
-            <div
-              data-editing-ui
-              className="absolute pointer-events-none"
-              style={{
-                left: marqueeRect.left,
-                top: marqueeRect.top,
-                width: marqueeRect.width,
-                height: marqueeRect.height,
-                border: '1px dashed hsl(230, 65%, 55%)',
-                backgroundColor: 'hsla(230, 65%, 55%, 0.08)',
-                zIndex: 9999,
-              }}
-            />
-          )}
+            {/* Marquee selection overlay */}
+            {!isExporting && marqueeRect && marqueeRect.width > 2 && marqueeRect.height > 2 && (
+              <div
+                data-editing-ui
+                className="absolute pointer-events-none"
+                style={{
+                  left: marqueeRect.left,
+                  top: marqueeRect.top,
+                  width: marqueeRect.width,
+                  height: marqueeRect.height,
+                  border: '1px dashed hsl(230, 65%, 55%)',
+                  backgroundColor: 'hsla(230, 65%, 55%, 0.08)',
+                  zIndex: 9999,
+                }}
+              />
+            )}
 
-          {!isExporting && (
-            <AlignmentGuidesOverlay
-              guides={guides}
-              spacingLabels={spacingLabels}
-              canvasWidth={canvasPreset.width}
-              canvasHeight={canvasPreset.height}
-            />
-          )}
+            {!isExporting && (
+              <AlignmentGuidesOverlay
+                guides={guides}
+                spacingLabels={spacingLabels}
+                canvasWidth={canvasPreset.width}
+                canvasHeight={canvasPreset.height}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>
