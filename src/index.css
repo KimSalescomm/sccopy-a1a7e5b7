@@ -109,9 +109,12 @@
     @apply border-border;
   }
 
-  /* 개발/배포 환경에서 UI 크기 일관성 보장 — 전역 scale/zoom 금지.
-     viewport 기반 자동 확대(clamp)는 Preview만 더 커지게 만들어
-     Published와의 차이를 키웠으므로 제거하고 16px 고정으로 되돌린다. */
+  /* Editor UI scale: Published 기준으로 가독성을 맞추기 위한 배율.
+     export canvas에는 절대 적용되지 않는다 (별도 CSS rule 참조). */
+  :root {
+    --editor-ui-scale: 1.2;
+  }
+
   html {
     font-size: 16px !important;
   }
