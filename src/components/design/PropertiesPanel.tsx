@@ -136,8 +136,8 @@ export function PropertiesPanel({
 
   if (!element) {
     return (
-      <div className="border-l bg-card p-4 space-y-4 overflow-y-auto flex-shrink-0" style={{ width }}>
-        <h3 className="text-base font-semibold text-muted-foreground uppercase tracking-wider">배경</h3>
+      <div data-right-panel className="editor-right-panel side-panel border-l bg-card p-4 space-y-4 overflow-y-auto flex-shrink-0" style={{ width }}>
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">배경</h3>
         <div className="space-y-3">
           <div className="space-y-1">
             <Label className="text-base font-medium">유형</Label>
@@ -186,11 +186,11 @@ export function PropertiesPanel({
   }
 
   return (
-    <div className="border-l bg-card overflow-y-auto flex-shrink-0" style={{ width }}>
+    <div data-right-panel className="editor-right-panel side-panel border-l bg-card overflow-y-auto flex-shrink-0" style={{ width }}>
       <div className="p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-semibold text-muted-foreground uppercase tracking-wider">
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
             {element.type === 'text' ? '텍스트' : element.type === 'shape' ? '도형' : '이미지'}
           </h3>
           <div className="flex gap-1">
