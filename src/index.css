@@ -170,8 +170,13 @@
     background-color: hsl(var(--muted));
   }
 
-  .canvas-stage {
+  .canvas-stage:not([data-export-canvas]) {
     transform: scale(var(--canvas-zoom)) !important;
+    zoom: 1 !important;
+  }
+
+  [data-export-canvas] {
+    transform: none !important;
     zoom: 1 !important;
   }
 }
