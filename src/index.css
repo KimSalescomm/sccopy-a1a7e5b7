@@ -110,10 +110,10 @@
   }
 
   /* 개발/배포 환경에서 UI 크기 일관성 보장 — 전역 scale/zoom 금지.
-     단, 큰 모니터(>1440px)에서는 root font-size를 점진적으로 확대해
-     UI가 자연스럽게 함께 커지도록 한다. (1440 → 16px, 1920 → 18px, 2560 → 20px) */
+     viewport 기반 자동 확대(clamp)는 Preview만 더 커지게 만들어
+     Published와의 차이를 키웠으므로 제거하고 16px 고정으로 되돌린다. */
   html {
-    font-size: clamp(16px, 0.85rem + 0.32vw, 20px) !important;
+    font-size: 16px !important;
   }
   html, body, #root, .app-shell, .editor-layout {
     transform: none !important;
