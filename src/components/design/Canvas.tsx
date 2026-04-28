@@ -47,21 +47,21 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
 }, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasContentRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.5);
-  const [isManualZoom, setIsManualZoom] = useState(false);
+  const [scale, setScale] = useState(0.9);
+  const [isManualZoom, setIsManualZoom] = useState(true);
   const [guides, setGuides] = useState<GuideLine[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [marquee, setMarquee] = useState<MarqueeState | null>(null);
 
   const getFitScale = useCallback(() => {
-    if (!containerRef.current) return 0.65;
+    if (!containerRef.current) return 0.9;
     const rect = containerRef.current.getBoundingClientRect();
     const padding = 48;
     const sx = (rect.width - padding) / canvasPreset.width;
     const sy = (rect.height - padding) / canvasPreset.height;
     const raw = Math.min(sx, sy);
-    // 화면 표시용 fit scale: 0.5 ~ 1.0
-    return Math.max(0.5, Math.min(raw, 1));
+    // 화면 표시용 fit scale: 0.5 ~ 1.2
+    return Math.max(0.5, Math.min(raw, 1.2));
   }, [canvasPreset]);
 
   const updateScale = useCallback(() => {
@@ -72,17 +72,19 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
   }, [getFitScale, isManualZoom, onScaleChange]);
 
   useEffect(() => {
-    updateScale();
+    // 기본 진입값은 0.9 (수동 모드 유지). resize 시에도 isManualZoom=true이면 자동 fit 안 함.
+    onScaleChange?.(scale);
     const observer = new ResizeObserver(updateScale);
     if (containerRef.current) observer.observe(containerRef.current);
     return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateScale]);
 
   useImperativeHandle(ref, () => ({
     zoomIn() {
       setIsManualZoom(true);
       setScale(prev => {
-        const next = Math.min(prev + 0.05, 1);
+        const next = Math.min(prev + 0.05, 1.2);
         onScaleChange?.(next);
         return next;
       });
@@ -109,7 +111,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
         onScaleChange?.(s);
       } else {
         setIsManualZoom(true);
-        const clamped = Math.min(1, Math.max(0.5, value));
+        const clamped = Math.min(1.2, Math.max(0.5, value));
         setScale(clamped);
         onScaleChange?.(clamped);
       }

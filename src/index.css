@@ -109,9 +109,12 @@
     @apply border-border;
   }
 
-  /* 개발/배포 환경에서 UI 크기 일관성 보장 — 전역 scale/zoom 금지.
-     viewport 기반 자동 확대(clamp)는 Preview만 더 커지게 만들어
-     Published와의 차이를 키웠으므로 제거하고 16px 고정으로 되돌린다. */
+  /* Editor UI scale: Published 기준으로 가독성을 맞추기 위한 배율.
+     export canvas에는 절대 적용되지 않는다 (별도 CSS rule 참조). */
+  :root {
+    --editor-ui-scale: 1.2;
+  }
+
   html {
     font-size: 16px !important;
   }
@@ -158,33 +161,34 @@
     font-size: 1rem !important;
   }
 
-  /* Toolbar: 고정 크기 (Preview/Published 동일하게 유지) */
+  /* Toolbar: editor-ui-scale 적용 (export canvas와 무관) */
   .editor-toolbar {
-    height: 64px !important;
-    min-height: 64px !important;
-    font-size: 15px !important;
+    height: calc(64px * var(--editor-ui-scale)) !important;
+    min-height: calc(64px * var(--editor-ui-scale)) !important;
+    font-size: calc(15px * var(--editor-ui-scale)) !important;
     line-height: 1 !important;
   }
 
   .editor-toolbar button {
-    min-height: 44px;
-    font-size: 15px;
+    min-height: calc(44px * var(--editor-ui-scale));
+    min-width: calc(44px * var(--editor-ui-scale));
+    font-size: calc(15px * var(--editor-ui-scale));
   }
 
   .editor-toolbar svg {
-    width: 22px;
-    height: 22px;
+    width: calc(22px * var(--editor-ui-scale));
+    height: calc(22px * var(--editor-ui-scale));
   }
 
   .editor-left-panel,
   .editor-right-panel {
-    font-size: 14px !important;
+    font-size: calc(14px * var(--editor-ui-scale)) !important;
   }
 
   .zoom-control {
-    font-size: 14px !important;
-    min-height: 42px !important;
-    max-height: 42px !important;
+    font-size: calc(14px * var(--editor-ui-scale)) !important;
+    min-height: calc(42px * var(--editor-ui-scale)) !important;
+    max-height: calc(42px * var(--editor-ui-scale)) !important;
   }
 
   .canvas-wrapper {
