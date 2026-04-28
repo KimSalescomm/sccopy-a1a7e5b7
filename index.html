@@ -25,6 +25,25 @@
 </head>
 
   <body>
+    <script>
+      // Mark Published vs Preview environment so CSS can scale the editor UI
+      // only on the Published site. Preview/dev should not get the extra scale.
+      (function () {
+        try {
+          var h = window.location.hostname || '';
+          var isPreview =
+            h.indexOf('id-preview--') === 0 ||
+            h.endsWith('.lovableproject.com') ||
+            h.endsWith('.lovable.dev') ||
+            h === 'localhost' ||
+            h === '127.0.0.1';
+          document.documentElement.setAttribute(
+            'data-env',
+            isPreview ? 'preview' : 'published'
+          );
+        } catch (e) {}
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
