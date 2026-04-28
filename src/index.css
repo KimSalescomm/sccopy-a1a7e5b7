@@ -158,27 +158,27 @@
     font-size: 1rem !important;
   }
 
-  /* Toolbar: rem 기반으로 화면 폭에 따라 함께 확장 */
+  /* Toolbar: 고정 크기 (Preview/Published 동일하게 유지) */
   .editor-toolbar {
-    height: clamp(64px, 4rem + 0.5vw, 80px) !important;
-    min-height: clamp(64px, 4rem + 0.5vw, 80px) !important;
-    font-size: clamp(15px, 0.95rem, 18px) !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    font-size: 15px !important;
     line-height: 1 !important;
   }
 
   .editor-toolbar button {
-    min-height: clamp(44px, 2.75rem, 52px);
-    font-size: clamp(15px, 0.95rem, 18px);
+    min-height: 44px;
+    font-size: 15px;
   }
 
   .editor-toolbar svg {
-    width: clamp(22px, 1.4rem, 28px);
-    height: clamp(22px, 1.4rem, 28px);
+    width: 22px;
+    height: 22px;
   }
 
   .editor-left-panel,
   .editor-right-panel {
-    font-size: clamp(14px, 0.9rem, 17px) !important;
+    font-size: 14px !important;
   }
 
   .zoom-control {
