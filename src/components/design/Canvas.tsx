@@ -54,14 +54,14 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
   const [marquee, setMarquee] = useState<MarqueeState | null>(null);
 
   const getFitScale = useCallback(() => {
-    if (!containerRef.current) return 0.7;
+    if (!containerRef.current) return 0.65;
     const rect = containerRef.current.getBoundingClientRect();
     const padding = 48;
     const sx = (rect.width - padding) / canvasPreset.width;
     const sy = (rect.height - padding) / canvasPreset.height;
     const raw = Math.min(sx, sy);
-    // 화면 표시용 fit scale: 0.7 ~ 1.0 로 제한
-    return Math.max(0.7, Math.min(raw, 1));
+    // 화면 표시용 fit scale: 0.5 ~ 1.0
+    return Math.max(0.5, Math.min(raw, 1));
   }, [canvasPreset]);
 
   const updateScale = useCallback(() => {
