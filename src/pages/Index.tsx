@@ -232,6 +232,59 @@ const Index = () => {
     }
   }, []);
 
+  // === Preview vs Published 진단 로그 ===
+  useEffect(() => {
+    const log = () => {
+      const pick = (sel: string) => {
+        const el = document.querySelector(sel) as HTMLElement | null;
+        if (!el) return { selector: sel, found: false };
+        const cs = getComputedStyle(el);
+        const r = el.getBoundingClientRect();
+        return {
+          selector: sel,
+          found: true,
+          rect: { w: Math.round(r.width), h: Math.round(r.height), top: Math.round(r.top), left: Math.round(r.left) },
+          fontSize: cs.fontSize,
+          height: cs.height,
+          transform: cs.transform,
+          zoom: (cs as any).zoom,
+          padding: cs.padding,
+          alignItems: cs.alignItems,
+          justifyContent: cs.justifyContent,
+        };
+      };
+      const meta = document.querySelector('meta[name="viewport"]') as HTMLMetaElement | null;
+      const cssLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map(l => (l as HTMLLinkElement).href);
+      // eslint-disable-next-line no-console
+      console.log('[ENV-DIAG]', {
+        href: location.href,
+        host: location.host,
+        innerWidth: window.innerWidth,
+        innerHeight: window.innerHeight,
+        devicePixelRatio: window.devicePixelRatio,
+        visualViewportScale: window.visualViewport?.scale,
+        viewportMeta: meta?.content,
+        inIframe: window.self !== window.top,
+        htmlFontSize: getComputedStyle(document.documentElement).fontSize,
+        bodyFontSize: getComputedStyle(document.body).fontSize,
+        bodyZoom: (getComputedStyle(document.body) as any).zoom,
+        bodyTransform: getComputedStyle(document.body).transform,
+        cssLinks,
+        elements: [
+          pick('html'), pick('body'), pick('#root'),
+          pick('.editor-app'), pick('.editor-layout'),
+          pick('.editor-toolbar'),
+          pick('.editor-left-panel'), pick('.editor-right-panel'),
+          pick('.canvas-area'), pick('.canvas-wrapper'), pick('.canvas-stage'),
+          pick('.zoom-control'),
+        ],
+      });
+    };
+    log();
+    const t = setTimeout(log, 1000);
+    return () => clearTimeout(t);
+  }, []);
+
   const handleRestore = useCallback(async () => {
     const data = await loadSavedData();
     if (data) {
