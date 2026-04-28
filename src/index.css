@@ -161,33 +161,34 @@
     font-size: 1rem !important;
   }
 
-  /* Toolbar: 고정 크기 (Preview/Published 동일하게 유지) */
+  /* Toolbar: editor-ui-scale 적용 (export canvas와 무관) */
   .editor-toolbar {
-    height: 64px !important;
-    min-height: 64px !important;
-    font-size: 15px !important;
+    height: calc(64px * var(--editor-ui-scale)) !important;
+    min-height: calc(64px * var(--editor-ui-scale)) !important;
+    font-size: calc(15px * var(--editor-ui-scale)) !important;
     line-height: 1 !important;
   }
 
   .editor-toolbar button {
-    min-height: 44px;
-    font-size: 15px;
+    min-height: calc(44px * var(--editor-ui-scale));
+    min-width: calc(44px * var(--editor-ui-scale));
+    font-size: calc(15px * var(--editor-ui-scale));
   }
 
   .editor-toolbar svg {
-    width: 22px;
-    height: 22px;
+    width: calc(22px * var(--editor-ui-scale));
+    height: calc(22px * var(--editor-ui-scale));
   }
 
   .editor-left-panel,
   .editor-right-panel {
-    font-size: 14px !important;
+    font-size: calc(14px * var(--editor-ui-scale)) !important;
   }
 
   .zoom-control {
-    font-size: 14px !important;
-    min-height: 42px !important;
-    max-height: 42px !important;
+    font-size: calc(14px * var(--editor-ui-scale)) !important;
+    min-height: calc(42px * var(--editor-ui-scale)) !important;
+    max-height: calc(42px * var(--editor-ui-scale)) !important;
   }
 
   .canvas-wrapper {
