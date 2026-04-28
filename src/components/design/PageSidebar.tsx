@@ -14,11 +14,11 @@ interface PageSidebarProps {
 
 export function PageSidebar({ pages, currentIndex, onSelectPage, onAddPage, onDeletePage }: PageSidebarProps) {
   return (
-    <div className="w-[200px] border-r bg-card flex flex-col">
-      <div className="p-3 border-b">
-        <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">페이지</span>
+    <div className="w-[240px] border-r bg-card flex flex-col">
+      <div className="px-4 py-3.5 border-b">
+        <span className="text-base font-semibold text-muted-foreground uppercase tracking-wider">페이지</span>
       </div>
-      <div className="flex-1 overflow-y-auto p-2 space-y-2">
+      <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
         {pages.map((page, i) => {
           const bgStyle: React.CSSProperties = page.background.type === 'gradient'
             ? { background: `linear-gradient(${page.background.gradientDirection ?? 180}deg, ${page.background.gradientFrom}, ${page.background.gradientTo})` }
@@ -82,16 +82,16 @@ export function PageSidebar({ pages, currentIndex, onSelectPage, onAddPage, onDe
                   })}
                 </div>
               </div>
-              <div className="px-2 py-1 bg-card text-center">
-                <span className="text-xs text-muted-foreground">{i + 1}</span>
+              <div className="px-2 py-1.5 bg-card text-center">
+                <span className="text-sm text-muted-foreground font-medium">{i + 1}</span>
               </div>
             </div>
           );
         })}
       </div>
-      <div className="p-2 border-t">
-        <Button variant="ghost" size="sm" className="w-full text-sm" onClick={onAddPage}>
-          <Plus className="w-4 h-4 mr-1" />
+      <div className="p-3 border-t">
+        <Button variant="ghost" className="w-full text-sm h-10" onClick={onAddPage}>
+          <Plus className="w-5 h-5 mr-1.5" />
           페이지 추가
         </Button>
       </div>
