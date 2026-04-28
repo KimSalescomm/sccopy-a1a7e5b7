@@ -14,9 +14,9 @@ interface PageSidebarProps {
 
 export function PageSidebar({ pages, currentIndex, onSelectPage, onAddPage, onDeletePage }: PageSidebarProps) {
   return (
-    <div className="w-[160px] border-r bg-card flex flex-col">
+    <div className="w-[200px] border-r bg-card flex flex-col">
       <div className="p-3 border-b">
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">페이지</span>
+        <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">페이지</span>
       </div>
       <div className="flex-1 overflow-y-auto p-2 space-y-2">
         {pages.map((page, i) => {
@@ -83,15 +83,15 @@ export function PageSidebar({ pages, currentIndex, onSelectPage, onAddPage, onDe
                 </div>
               </div>
               <div className="px-2 py-1 bg-card text-center">
-                <span className="text-[10px] text-muted-foreground">{i + 1}</span>
+                <span className="text-xs text-muted-foreground">{i + 1}</span>
               </div>
             </div>
           );
         })}
       </div>
       <div className="p-2 border-t">
-        <Button variant="ghost" size="sm" className="w-full text-xs" onClick={onAddPage}>
-          <Plus className="w-3 h-3 mr-1" />
+        <Button variant="ghost" size="sm" className="w-full text-sm" onClick={onAddPage}>
+          <Plus className="w-4 h-4 mr-1" />
           페이지 추가
         </Button>
       </div>
