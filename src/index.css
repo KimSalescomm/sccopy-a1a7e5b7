@@ -109,9 +109,13 @@
     @apply border-border;
   }
 
-  /* Editor UI scale: Published 기준으로 가독성을 맞추기 위한 배율.
-     export canvas에는 절대 적용되지 않는다 (별도 CSS rule 참조). */
+  /* Editor UI scale: Published 사이트에서만 UI를 1.2배 확대해 가독성을 맞춘다.
+     Preview/dev는 1.0 그대로 유지하고, export canvas에는 절대 적용되지 않는다
+     (별도 CSS rule 참조). data-env는 index.html의 inline script가 부여한다. */
   :root {
+    --editor-ui-scale: 1;
+  }
+  html[data-env="published"] {
     --editor-ui-scale: 1.2;
   }
 
