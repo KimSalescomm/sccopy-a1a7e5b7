@@ -8,6 +8,7 @@ export interface CanvasHandle {
   zoomIn: () => void;
   zoomOut: () => void;
   fitToScreen: () => void;
+  setZoom: (value: 'fit' | number) => void;
   getScale: () => number;
   getCanvasElement: () => HTMLElement | null;
 }
@@ -53,12 +54,14 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
   const [marquee, setMarquee] = useState<MarqueeState | null>(null);
 
   const getFitScale = useCallback(() => {
-    if (!containerRef.current) return 0.5;
+    if (!containerRef.current) return 0.7;
     const rect = containerRef.current.getBoundingClientRect();
     const padding = 48;
     const sx = (rect.width - padding) / canvasPreset.width;
     const sy = (rect.height - padding) / canvasPreset.height;
-    return Math.min(sx, sy, 1);
+    const raw = Math.min(sx, sy);
+    // 화면 표시용 fit scale: 0.7 ~ 1.0 로 제한
+    return Math.max(0.7, Math.min(raw, 1));
   }, [canvasPreset]);
 
   const updateScale = useCallback(() => {
@@ -97,6 +100,18 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
       const s = getFitScale();
       setScale(s);
       onScaleChange?.(s);
+    },
+    setZoom(value: 'fit' | number) {
+      if (value === 'fit') {
+        setIsManualZoom(false);
+        const s = getFitScale();
+        setScale(s);
+        onScaleChange?.(s);
+      } else {
+        setIsManualZoom(true);
+        setScale(value);
+        onScaleChange?.(value);
+      }
     },
     getScale() {
       return scale;

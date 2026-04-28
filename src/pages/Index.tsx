@@ -682,6 +682,7 @@ const Index = () => {
         onGroup={handleGroup}
         onUngroup={handleUngroup}
         hasGroupInSelection={selectedIds.some(id => currentPage.elements.find(e => e.id === id)?.groupId)}
+        onSetZoom={(v) => canvasRef.current?.setZoom(v)}
       />
       <div className="flex-1 flex overflow-hidden">
         <PageSidebar
