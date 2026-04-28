@@ -90,6 +90,47 @@ function waitForExportRender() {
   });
 }
 
+function logEditorUiDebug() {
+  const selectors: Record<string, string> = {
+    html: 'html',
+    body: 'body',
+    root: '#root',
+    appShell: '.app-shell',
+    editorLayout: '.editor-layout',
+    toolbar: '.editor-toolbar',
+    leftPanel: '.editor-left-panel',
+    rightPanel: '.editor-right-panel',
+    zoomControl: '.zoom-control',
+    canvasWrapper: '.canvas-wrapper',
+    canvasStage: '.canvas-stage',
+  };
+
+  const elements = Object.fromEntries(Object.entries(selectors).map(([name, selector]) => {
+    const el = document.querySelector<HTMLElement>(selector);
+    if (!el) return [name, { selector, found: false }];
+    const styles = window.getComputedStyle(el) as CSSStyleDeclaration & { zoom?: string };
+    const rect = el.getBoundingClientRect();
+    return [name, {
+      selector,
+      found: true,
+      fontSize: styles.fontSize,
+      zoom: styles.zoom || 'normal',
+      transform: styles.transform,
+      width: styles.width,
+      height: styles.height,
+      rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+    }];
+  }));
+
+  console.log('[UI DEBUG]', {
+    devicePixelRatio: window.devicePixelRatio,
+    windowInnerWidth: window.innerWidth,
+    windowInnerHeight: window.innerHeight,
+    viewportScale: window.visualViewport?.scale ?? null,
+    elements,
+  });
+}
+
 function isDataImage(value: unknown): value is string {
   return typeof value === 'string' && value.startsWith('data:image/');
 }
@@ -127,6 +168,10 @@ const Index = () => {
   });
   useEffect(() => { localStorage.setItem('ui:leftPanelWidth', String(leftPanelWidth)); }, [leftPanelWidth]);
   useEffect(() => { localStorage.setItem('ui:rightPanelWidth', String(rightPanelWidth)); }, [rightPanelWidth]);
+  useEffect(() => {
+    const id = window.setTimeout(logEditorUiDebug, 250);
+    return () => window.clearTimeout(id);
+  }, [leftPanelWidth, rightPanelWidth, scale]);
   const canvasRef = useRef<CanvasHandle>(null);
   const activeEditRef = useRef<HTMLElement | null>(null);
   const activeTextRangeRef = useRef<Range | null>(null);
@@ -672,7 +717,7 @@ const Index = () => {
 
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <div className="app-shell editor-app h-screen flex flex-col bg-background" data-app-shell>
       <Toolbar
         onAddText={handleAddText}
         onAddShape={handleAddShape}
@@ -696,7 +741,7 @@ const Index = () => {
         hasGroupInSelection={selectedIds.some(id => currentPage.elements.find(e => e.id === id)?.groupId)}
         onSetZoom={(v) => canvasRef.current?.setZoom(v)}
       />
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="editor-layout flex-1 flex overflow-hidden relative" data-editor-layout>
         <PageSidebar
           pages={pages}
           currentIndex={currentPageIndex}
