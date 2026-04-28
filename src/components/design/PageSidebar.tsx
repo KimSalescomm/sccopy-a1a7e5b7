@@ -10,11 +10,12 @@ interface PageSidebarProps {
   onSelectPage: (index: number) => void;
   onAddPage: () => void;
   onDeletePage: (index: number) => void;
+  width?: number;
 }
 
-export function PageSidebar({ pages, currentIndex, onSelectPage, onAddPage, onDeletePage }: PageSidebarProps) {
+export function PageSidebar({ pages, currentIndex, onSelectPage, onAddPage, onDeletePage, width = 240 }: PageSidebarProps) {
   return (
-    <div className="w-[240px] border-r bg-card flex flex-col">
+    <div className="border-r bg-card flex flex-col flex-shrink-0" style={{ width }}>
       <div className="px-4 py-3.5 border-b">
         <span className="text-base font-semibold text-muted-foreground uppercase tracking-wider">페이지</span>
       </div>
