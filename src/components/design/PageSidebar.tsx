@@ -3,6 +3,7 @@ import type { Page } from '@/types/design';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '@/types/design';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { isPublishedHost } from '@/lib/env';
 
 interface PageSidebarProps {
   pages: Page[];
@@ -14,8 +15,9 @@ interface PageSidebarProps {
 }
 
 export function PageSidebar({ pages, currentIndex, onSelectPage, onAddPage, onDeletePage, width = 220 }: PageSidebarProps) {
+  const effectiveWidth = isPublishedHost() ? 240 : width;
   return (
-    <div data-left-panel className="editor-left-panel side-panel border-r bg-card flex flex-col flex-shrink-0" style={{ width }}>
+    <div data-left-panel className="editor-left-panel side-panel border-r bg-card flex flex-col flex-shrink-0" style={{ width: effectiveWidth }}>
       <div className="px-4 py-3.5 border-b">
         <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">페이지</span>
       </div>

@@ -7,6 +7,7 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { AlignLeft, AlignCenter, AlignRight, Trash2, Lock, Unlock, Bold, Underline, Highlighter } from 'lucide-react';
+import { isPublishedHost } from '@/lib/env';
 
 interface PropertiesPanelProps {
   element: DesignElement | null;
@@ -28,7 +29,7 @@ export function PropertiesPanel({
   bgColor, bgType, bgGradientFrom, bgGradientTo, bgGradientDir, onBgChange,
   activeEditRef, activeTextRangeRef, width = 300,
 }: PropertiesPanelProps) {
-
+  const effectiveWidth = isPublishedHost() ? 320 : width;
   // Tracks an active "color picker session" — when the user opens the native
   // color picker, focus leaves the canvas, the contenteditable selection
   // collapses, and the input fires onChange repeatedly as the user drags
@@ -136,7 +137,7 @@ export function PropertiesPanel({
 
   if (!element) {
     return (
-      <div data-right-panel className="editor-right-panel side-panel border-l bg-card p-4 space-y-4 overflow-y-auto flex-shrink-0" style={{ width }}>
+      <div data-right-panel className="editor-right-panel side-panel border-l bg-card p-4 space-y-4 overflow-y-auto flex-shrink-0" style={{ width: effectiveWidth }}>
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">배경</h3>
         <div className="space-y-3">
           <div className="space-y-1">
@@ -186,7 +187,7 @@ export function PropertiesPanel({
   }
 
   return (
-    <div data-right-panel className="editor-right-panel side-panel border-l bg-card overflow-y-auto flex-shrink-0" style={{ width }}>
+    <div data-right-panel className="editor-right-panel side-panel border-l bg-card overflow-y-auto flex-shrink-0" style={{ width: effectiveWidth }}>
       <div className="p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
