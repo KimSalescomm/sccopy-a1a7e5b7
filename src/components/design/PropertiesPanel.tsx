@@ -20,12 +20,13 @@ interface PropertiesPanelProps {
   onBgChange: (bg: any) => void;
   activeEditRef?: React.MutableRefObject<HTMLElement | null>;
   activeTextRangeRef?: React.MutableRefObject<Range | null>;
+  width?: number;
 }
 
 export function PropertiesPanel({
   element, onUpdate, onDelete,
   bgColor, bgType, bgGradientFrom, bgGradientTo, bgGradientDir, onBgChange,
-  activeEditRef, activeTextRangeRef,
+  activeEditRef, activeTextRangeRef, width = 300,
 }: PropertiesPanelProps) {
 
   // Tracks an active "color picker session" — when the user opens the native
