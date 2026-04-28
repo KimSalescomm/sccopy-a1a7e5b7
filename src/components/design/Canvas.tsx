@@ -287,7 +287,10 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
       onClick={() => { onSelectElement(null); onFinishEditing(); }}
       onPaste={handlePaste}
     >
-      <div className="min-w-max min-h-full flex items-start justify-center p-6">
+      <div
+        className="canvas-area min-w-max min-h-full flex items-start justify-center"
+        style={{ padding: '48px 32px 96px' }}
+      >
         {/* Sizer takes the scaled dimensions so layout/scrollbars are correct */}
         <div
           style={{
