@@ -231,49 +231,49 @@ export function Toolbar({
             <RibbonSection label="정렬">
               <Tooltip><TooltipTrigger asChild>
                 <button onClick={() => onAlign('left')} className="flex items-center justify-center w-9 h-9 rounded hover:bg-accent transition-colors">
-                  <AlignLeft className="w-4 h-4" />
+                  <AlignLeft className="w-5 h-5" />
                 </button>
               </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">좌측 정렬</p></TooltipContent></Tooltip>
 
               <Tooltip><TooltipTrigger asChild>
                 <button onClick={() => onAlign('centerH')} className="flex items-center justify-center w-9 h-9 rounded hover:bg-accent transition-colors">
-                  <AlignCenter className="w-4 h-4" />
+                  <AlignCenter className="w-5 h-5" />
                 </button>
               </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">가운데 정렬 (가로)</p></TooltipContent></Tooltip>
 
               <Tooltip><TooltipTrigger asChild>
                 <button onClick={() => onAlign('right')} className="flex items-center justify-center w-9 h-9 rounded hover:bg-accent transition-colors">
-                  <AlignRight className="w-4 h-4" />
+                  <AlignRight className="w-5 h-5" />
                 </button>
               </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">우측 정렬</p></TooltipContent></Tooltip>
 
               <Tooltip><TooltipTrigger asChild>
                 <button onClick={() => onAlign('top')} className="flex items-center justify-center w-9 h-9 rounded hover:bg-accent transition-colors">
-                  <AlignStartVertical className="w-4 h-4" />
+                  <AlignStartVertical className="w-5 h-5" />
                 </button>
               </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">상단 정렬</p></TooltipContent></Tooltip>
 
               <Tooltip><TooltipTrigger asChild>
                 <button onClick={() => onAlign('centerV')} className="flex items-center justify-center w-9 h-9 rounded hover:bg-accent transition-colors">
-                  <AlignCenterVertical className="w-4 h-4" />
+                  <AlignCenterVertical className="w-5 h-5" />
                 </button>
               </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">중앙 정렬 (세로)</p></TooltipContent></Tooltip>
 
               <Tooltip><TooltipTrigger asChild>
                 <button onClick={() => onAlign('bottom')} className="flex items-center justify-center w-9 h-9 rounded hover:bg-accent transition-colors">
-                  <AlignEndVertical className="w-4 h-4" />
+                  <AlignEndVertical className="w-5 h-5" />
                 </button>
               </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">하단 정렬</p></TooltipContent></Tooltip>
 
               <Tooltip><TooltipTrigger asChild>
                 <button onClick={() => onAlign('distributeH')} className="flex items-center justify-center w-9 h-9 rounded hover:bg-accent transition-colors">
-                  <GripHorizontal className="w-4 h-4" />
+                  <GripHorizontal className="w-5 h-5" />
                 </button>
               </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">가로 간격 균등</p></TooltipContent></Tooltip>
 
               <Tooltip><TooltipTrigger asChild>
                 <button onClick={() => onAlign('distributeV')} className="flex items-center justify-center w-9 h-9 rounded hover:bg-accent transition-colors">
-                  <GripVertical className="w-4 h-4" />
+                  <GripVertical className="w-5 h-5" />
                 </button>
               </TooltipTrigger><TooltipContent side="bottom"><p className="text-xs">세로 간격 균등</p></TooltipContent></Tooltip>
             </RibbonSection>
@@ -286,7 +286,7 @@ export function Toolbar({
               ) : (
                 <RibbonBtn icon={<Group className="w-5 h-5" />} label="그룹화" onClick={onGroup} disabled={multiSelectCount < 2} title="Ctrl+G" />
               )}
-              <span className="text-[10px] text-muted-foreground self-center px-1 whitespace-nowrap">{multiSelectCount}개 선택</span>
+              <span className="text-xs text-muted-foreground self-center px-1 whitespace-nowrap">{multiSelectCount}개 선택</span>
             </RibbonSection>
           </>
         )}
@@ -299,8 +299,8 @@ export function Toolbar({
             <DropdownMenuTrigger asChild>
               <button className="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded
                 text-[13px] text-foreground hover:bg-accent transition-colors h-16 select-none min-w-[88px]">
-                <span className="text-xs font-semibold">{currentPreset.ratio}</span>
-                <span className="text-[9px] text-muted-foreground">{currentPreset.width}×{currentPreset.height}</span>
+                <span className="text-sm font-semibold">{currentPreset.ratio}</span>
+                <span className="text-[11px] text-muted-foreground">{currentPreset.width}×{currentPreset.height}</span>
                 <ChevronDown className="w-3 h-3 text-muted-foreground" />
               </button>
             </DropdownMenuTrigger>
