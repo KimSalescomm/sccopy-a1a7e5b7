@@ -82,7 +82,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
     zoomIn() {
       setIsManualZoom(true);
       setScale(prev => {
-        const next = Math.min(prev + 0.1, 2);
+        const next = Math.min(prev + 0.05, 1);
         onScaleChange?.(next);
         return next;
       });
@@ -90,7 +90,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
     zoomOut() {
       setIsManualZoom(true);
       setScale(prev => {
-        const next = Math.max(prev - 0.1, 0.1);
+        const next = Math.max(prev - 0.05, 0.5);
         onScaleChange?.(next);
         return next;
       });
@@ -109,8 +109,9 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
         onScaleChange?.(s);
       } else {
         setIsManualZoom(true);
-        setScale(value);
-        onScaleChange?.(value);
+        const clamped = Math.min(1, Math.max(0.5, value));
+        setScale(clamped);
+        onScaleChange?.(clamped);
       }
     },
     getScale() {
