@@ -288,70 +288,79 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
       onPaste={handlePaste}
     >
       <div className="min-w-max min-h-full flex items-start justify-center p-6">
+        {/* Sizer takes the scaled dimensions so layout/scrollbars are correct */}
         <div
-          ref={canvasContentRef}
-          data-canvas-content
-          className="relative shadow-2xl flex-shrink-0"
           style={{
-            width: canvasPreset.width,
-            height: canvasPreset.height,
-            transform: `scale(${scale})`,
-            transformOrigin: 'top center',
-            ...bgStyle,
+            width: canvasPreset.width * scale,
+            height: canvasPreset.height * scale,
+            flexShrink: 0,
           }}
-          onClick={e => e.stopPropagation()}
-          onMouseDown={handleCanvasMouseDown}
         >
-          {page.elements.map(el => (
-            <DesignElementRenderer
-              key={el.id}
-              element={el}
-              selected={selectedIds.includes(el.id)}
-              scale={scale}
-              onSelect={(id) => {
-                const lastEvent = window.event as KeyboardEvent | MouseEvent | null;
-                const additive = lastEvent && 'shiftKey' in lastEvent ? lastEvent.shiftKey : false;
-                onSelectElement(id, additive);
-              }}
-              onUpdate={onUpdateElement}
-              onDoubleClick={onDoubleClickElement}
-              editingId={editingId}
-              onTextChange={onTextChange}
-              onFinishEditing={onFinishEditing}
-              activeEditRef={activeEditRef}
-              activeTextRangeRef={activeTextRangeRef}
-              isExporting={isExporting}
-              onDragMove={handleElementDrag}
-              onDragEnd={handleDragEnd}
-              onDragStart={handleDragStart}
-            />
-          ))}
+          <div
+            ref={canvasContentRef}
+            data-canvas-content
+            className="relative shadow-2xl"
+            style={{
+              width: canvasPreset.width,
+              height: canvasPreset.height,
+              transform: `scale(${scale})`,
+              transformOrigin: 'top left',
+              ...bgStyle,
+            }}
+            onClick={e => e.stopPropagation()}
+            onMouseDown={handleCanvasMouseDown}
+          >
+            {page.elements.map(el => (
+              <DesignElementRenderer
+                key={el.id}
+                element={el}
+                selected={selectedIds.includes(el.id)}
+                scale={scale}
+                onSelect={(id) => {
+                  const lastEvent = window.event as KeyboardEvent | MouseEvent | null;
+                  const additive = lastEvent && 'shiftKey' in lastEvent ? lastEvent.shiftKey : false;
+                  onSelectElement(id, additive);
+                }}
+                onUpdate={onUpdateElement}
+                onDoubleClick={onDoubleClickElement}
+                editingId={editingId}
+                onTextChange={onTextChange}
+                onFinishEditing={onFinishEditing}
+                activeEditRef={activeEditRef}
+                activeTextRangeRef={activeTextRangeRef}
+                isExporting={isExporting}
+                onDragMove={handleElementDrag}
+                onDragEnd={handleDragEnd}
+                onDragStart={handleDragStart}
+              />
+            ))}
 
-          {/* Marquee selection overlay */}
-          {!isExporting && marqueeRect && marqueeRect.width > 2 && marqueeRect.height > 2 && (
-            <div
-              data-editing-ui
-              className="absolute pointer-events-none"
-              style={{
-                left: marqueeRect.left,
-                top: marqueeRect.top,
-                width: marqueeRect.width,
-                height: marqueeRect.height,
-                border: '1px dashed hsl(230, 65%, 55%)',
-                backgroundColor: 'hsla(230, 65%, 55%, 0.08)',
-                zIndex: 9999,
-              }}
-            />
-          )}
+            {/* Marquee selection overlay */}
+            {!isExporting && marqueeRect && marqueeRect.width > 2 && marqueeRect.height > 2 && (
+              <div
+                data-editing-ui
+                className="absolute pointer-events-none"
+                style={{
+                  left: marqueeRect.left,
+                  top: marqueeRect.top,
+                  width: marqueeRect.width,
+                  height: marqueeRect.height,
+                  border: '1px dashed hsl(230, 65%, 55%)',
+                  backgroundColor: 'hsla(230, 65%, 55%, 0.08)',
+                  zIndex: 9999,
+                }}
+              />
+            )}
 
-          {!isExporting && (
-            <AlignmentGuidesOverlay
-              guides={guides}
-              spacingLabels={spacingLabels}
-              canvasWidth={canvasPreset.width}
-              canvasHeight={canvasPreset.height}
-            />
-          )}
+            {!isExporting && (
+              <AlignmentGuidesOverlay
+                guides={guides}
+                spacingLabels={spacingLabels}
+                canvasWidth={canvasPreset.width}
+                canvasHeight={canvasPreset.height}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>
