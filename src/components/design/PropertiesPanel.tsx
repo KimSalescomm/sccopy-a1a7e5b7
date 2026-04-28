@@ -136,7 +136,7 @@ export function PropertiesPanel({
   if (!element) {
     return (
       <div className="w-[320px] border-l bg-card p-4 space-y-4 overflow-y-auto">
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">배경</h3>
+        <h3 className="text-base font-semibold text-muted-foreground uppercase tracking-wider">배경</h3>
         <div className="space-y-3">
           <div className="space-y-1">
             <Label className="text-base font-medium">유형</Label>
@@ -152,7 +152,7 @@ export function PropertiesPanel({
             <div className="space-y-1">
               <Label className="text-base font-medium">색상</Label>
               <div className="flex gap-2">
-                <input type="color" value={bgColor} onChange={e => onBgChange({ color: e.target.value })} className="w-10 h-9 rounded cursor-pointer border" />
+                <input type="color" value={bgColor} onChange={e => onBgChange({ color: e.target.value })} className="w-12 h-10 rounded cursor-pointer border" />
                 <Input value={bgColor} onChange={e => onBgChange({ color: e.target.value })} className="h-10 text-sm flex-1" />
               </div>
             </div>
@@ -161,14 +161,14 @@ export function PropertiesPanel({
               <div className="space-y-1">
                 <Label className="text-base font-medium">시작 색상</Label>
                 <div className="flex gap-2">
-                  <input type="color" value={bgGradientFrom ?? '#ffffff'} onChange={e => onBgChange({ gradientFrom: e.target.value })} className="w-10 h-9 rounded cursor-pointer border" />
+                  <input type="color" value={bgGradientFrom ?? '#ffffff'} onChange={e => onBgChange({ gradientFrom: e.target.value })} className="w-12 h-10 rounded cursor-pointer border" />
                   <Input value={bgGradientFrom ?? '#ffffff'} onChange={e => onBgChange({ gradientFrom: e.target.value })} className="h-10 text-sm flex-1" />
                 </div>
               </div>
               <div className="space-y-1">
                 <Label className="text-base font-medium">끝 색상</Label>
                 <div className="flex gap-2">
-                  <input type="color" value={bgGradientTo ?? '#eeeeee'} onChange={e => onBgChange({ gradientTo: e.target.value })} className="w-10 h-9 rounded cursor-pointer border" />
+                  <input type="color" value={bgGradientTo ?? '#eeeeee'} onChange={e => onBgChange({ gradientTo: e.target.value })} className="w-12 h-10 rounded cursor-pointer border" />
                   <Input value={bgGradientTo ?? '#eeeeee'} onChange={e => onBgChange({ gradientTo: e.target.value })} className="h-10 text-sm flex-1" />
                 </div>
               </div>
@@ -179,7 +179,7 @@ export function PropertiesPanel({
             </>
           )}
         </div>
-        <p className="text-xs text-muted-foreground mt-4">요소를 선택하면 속성을 편집할 수 있어요.</p>
+        <p className="text-sm text-muted-foreground mt-4">요소를 선택하면 속성을 편집할 수 있어요.</p>
       </div>
     );
   }
@@ -189,14 +189,14 @@ export function PropertiesPanel({
       <div className="p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+          <h3 className="text-base font-semibold text-muted-foreground uppercase tracking-wider">
             {element.type === 'text' ? '텍스트' : element.type === 'shape' ? '도형' : '이미지'}
           </h3>
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => onUpdate(element.id, { locked: !element.locked })}>
+            <Button variant="ghost" size="icon" className="h-10 w-10" onClick={() => onUpdate(element.id, { locked: !element.locked })}>
               {element.locked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
             </Button>
-            <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive" onClick={() => onDelete(element.id)}>
+            <Button variant="ghost" size="icon" className="h-10 w-10 text-destructive" onClick={() => onDelete(element.id)}>
               <Trash2 className="w-4 h-4" />
             </Button>
           </div>
@@ -207,11 +207,11 @@ export function PropertiesPanel({
           <Label className="text-base font-medium">위치</Label>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label className="text-xs text-muted-foreground">X</Label>
+              <Label className="text-sm text-muted-foreground">X</Label>
               <Input type="number" value={element.position.x} onChange={e => onUpdate(element.id, { position: { ...element.position, x: Number(e.target.value) } })} className="h-10 text-sm" />
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Y</Label>
+              <Label className="text-sm text-muted-foreground">Y</Label>
               <Input type="number" value={element.position.y} onChange={e => onUpdate(element.id, { position: { ...element.position, y: Number(e.target.value) } })} className="h-10 text-sm" />
             </div>
           </div>
@@ -222,11 +222,11 @@ export function PropertiesPanel({
           <Label className="text-base font-medium">크기</Label>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label className="text-xs text-muted-foreground">너비</Label>
+              <Label className="text-sm text-muted-foreground">너비</Label>
               <Input type="number" value={element.size.width} onChange={e => onUpdate(element.id, { size: { ...element.size, width: Number(e.target.value) } })} className="h-10 text-sm" />
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">높이</Label>
+              <Label className="text-sm text-muted-foreground">높이</Label>
               <Input type="number" value={element.size.height} onChange={e => onUpdate(element.id, { size: { ...element.size, height: Number(e.target.value) } })} className="h-10 text-sm" />
             </div>
           </div>
@@ -257,7 +257,7 @@ export function PropertiesPanel({
             </div>
             <div className="space-y-1">
               <Label className="text-base font-medium">색상</Label>
-              <p className="text-xs text-muted-foreground">텍스트를 드래그하면 선택 영역만 변경됩니다</p>
+              <p className="text-sm text-muted-foreground">텍스트를 드래그하면 선택 영역만 변경됩니다</p>
               <div className="flex gap-2">
                 <input
                   type="color"
@@ -266,7 +266,7 @@ export function PropertiesPanel({
                   onMouseDown={e => { e.stopPropagation(); beginColorSession(); }}
                   onFocus={beginColorSession}
                   onBlur={endColorSession}
-                  className="w-10 h-9 rounded cursor-pointer border"
+                  className="w-12 h-10 rounded cursor-pointer border"
                 />
                 <Input
                   value={element.textStyle.color}
@@ -280,12 +280,12 @@ export function PropertiesPanel({
             </div>
             <div className="space-y-1">
               <Label className="text-base font-medium">부분 서식</Label>
-              <p className="text-xs text-muted-foreground">텍스트를 드래그한 뒤 클릭하세요</p>
+              <p className="text-sm text-muted-foreground">텍스트를 드래그한 뒤 클릭하세요</p>
               <div className="flex gap-1">
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-9 w-9"
+                  className="h-10 w-10"
                   title="굵게 (선택 영역)"
                   onMouseDown={e => e.preventDefault()}
                   onClick={() => applyInlineStyle('bold')}
@@ -295,7 +295,7 @@ export function PropertiesPanel({
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-9 w-9"
+                  className="h-10 w-10"
                   title="밑줄 (선택 영역)"
                   onMouseDown={e => e.preventDefault()}
                   onClick={() => applyInlineStyle('underline')}
@@ -305,7 +305,7 @@ export function PropertiesPanel({
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-9 w-9"
+                  className="h-10 w-10"
                   title="형광펜 (선택 영역)"
                   onMouseDown={e => e.preventDefault()}
                   onClick={() => applyInlineStyle('highlight')}
@@ -322,7 +322,7 @@ export function PropertiesPanel({
                     key={align}
                     variant={element.textStyle!.textAlign === align ? 'default' : 'outline'}
                     size="icon"
-                    className="h-9 w-9"
+                    className="h-10 w-10"
                     onClick={() => onUpdate(element.id, { textStyle: { ...element.textStyle!, textAlign: align } })}
                   >
                     {align === 'left' ? <AlignLeft className="w-4 h-4" /> : align === 'center' ? <AlignCenter className="w-4 h-4" /> : <AlignRight className="w-4 h-4" />}
@@ -343,7 +343,7 @@ export function PropertiesPanel({
             <div className="space-y-1">
               <Label className="text-base font-medium">채우기 색상</Label>
               <div className="flex gap-2">
-                <input type="color" value={element.shapeStyle.fill} onChange={e => onUpdate(element.id, { shapeStyle: { ...element.shapeStyle!, fill: e.target.value } })} className="w-10 h-9 rounded cursor-pointer border" />
+                <input type="color" value={element.shapeStyle.fill} onChange={e => onUpdate(element.id, { shapeStyle: { ...element.shapeStyle!, fill: e.target.value } })} className="w-12 h-10 rounded cursor-pointer border" />
                 <Input value={element.shapeStyle.fill} onChange={e => onUpdate(element.id, { shapeStyle: { ...element.shapeStyle!, fill: e.target.value } })} className="h-10 text-sm flex-1" />
               </div>
             </div>
