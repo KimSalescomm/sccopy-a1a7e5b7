@@ -186,7 +186,7 @@ export function PropertiesPanel({
   }
 
   return (
-    <div className="w-[300px] border-l bg-card overflow-y-auto">
+    <div className="border-l bg-card overflow-y-auto flex-shrink-0" style={{ width }}>
       <div className="p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
