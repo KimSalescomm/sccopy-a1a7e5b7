@@ -101,6 +101,7 @@ function logEditorUiDebug() {
     leftPanel: '.editor-left-panel',
     rightPanel: '.editor-right-panel',
     zoomControl: '.zoom-control',
+    canvasArea: '.canvas-area',
     canvasWrapper: '.canvas-wrapper',
     canvasStage: '.canvas-stage',
   };
@@ -116,13 +117,15 @@ function logEditorUiDebug() {
       fontSize: styles.fontSize,
       zoom: styles.zoom || 'normal',
       transform: styles.transform,
-      width: styles.width,
-      height: styles.height,
-      rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+      width: Math.round(rect.width),
+      height: Math.round(rect.height),
+      x: Math.round(rect.x),
+      y: Math.round(rect.y),
     }];
   }));
 
-  console.log('[UI DEBUG]', {
+  console.log('[PUBLISHED UI CHECK]', {
+    href: window.location.href,
     devicePixelRatio: window.devicePixelRatio,
     windowInnerWidth: window.innerWidth,
     windowInnerHeight: window.innerHeight,

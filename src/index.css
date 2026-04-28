@@ -142,32 +142,59 @@
   .editor-layout,
   .editor-toolbar,
   .side-panel,
-  .zoom-control,
-  .canvas-wrapper {
+  .editor-left-panel,
+  .editor-right-panel,
+  .canvas-area,
+  .canvas-wrapper,
+  .canvas-stage,
+  .zoom-control {
     transform: none !important;
     zoom: 1 !important;
   }
 
+  .editor-app,
+  .editor-layout {
+    font-size: 16px !important;
+  }
+
   .editor-toolbar {
-    height: 64px;
-    min-height: 64px;
+    height: 64px !important;
+    min-height: 64px !important;
+    font-size: 15px !important;
+    line-height: 1 !important;
+  }
+
+  .editor-toolbar button {
+    min-height: 44px;
     font-size: 15px;
-    line-height: 1;
+  }
+
+  .editor-toolbar svg {
+    width: 22px;
+    height: 22px;
   }
 
   .editor-left-panel,
   .editor-right-panel {
-    font-size: 14px;
+    font-size: 14px !important;
   }
 
   .zoom-control {
-    font-size: 14px;
-    min-height: 42px;
-    max-height: 42px;
+    font-size: 14px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
   }
 
   .canvas-wrapper {
     background-color: hsl(var(--muted));
+    overflow: auto;
+  }
+
+  .canvas-area {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    box-sizing: border-box;
   }
 
   .canvas-stage:not([data-export-canvas]) {
