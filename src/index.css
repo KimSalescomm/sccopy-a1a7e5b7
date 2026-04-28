@@ -111,16 +111,73 @@
 
   /* 개발/배포 환경에서 UI 크기 일관성 보장 — 어떤 전역 scale/zoom도 금지 */
   html {
-    font-size: 16px;
+    font-size: 16px !important;
   }
-  html, body, #root {
+  html, body, #root, .app-shell, .editor-layout {
     transform: none !important;
     zoom: 1 !important;
+    font-size: 16px !important;
   }
 
   body {
     @apply bg-background text-foreground;
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    margin: 0;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  #root {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: initial !important;
+  }
+}
+
+@layer components {
+  .editor-app,
+  .editor-layout,
+  .editor-toolbar,
+  .side-panel,
+  .zoom-control,
+  .canvas-wrapper {
+    transform: none !important;
+    zoom: 1 !important;
+  }
+
+  .editor-toolbar {
+    height: 64px;
+    min-height: 64px;
+    font-size: 15px;
+    line-height: 1;
+  }
+
+  .editor-left-panel,
+  .editor-right-panel {
+    font-size: 14px;
+  }
+
+  .zoom-control {
+    font-size: 14px;
+    min-height: 42px;
+    max-height: 42px;
+  }
+
+  .canvas-wrapper {
+    background-color: hsl(var(--muted));
+  }
+
+  .canvas-stage:not([data-export-canvas]) {
+    transform: scale(var(--canvas-zoom)) !important;
+    zoom: 1 !important;
+  }
+
+  [data-export-canvas] {
+    transform: none !important;
+    zoom: 1 !important;
   }
 }
 

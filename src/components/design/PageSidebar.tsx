@@ -13,11 +13,11 @@ interface PageSidebarProps {
   width?: number;
 }
 
-export function PageSidebar({ pages, currentIndex, onSelectPage, onAddPage, onDeletePage, width = 240 }: PageSidebarProps) {
+export function PageSidebar({ pages, currentIndex, onSelectPage, onAddPage, onDeletePage, width = 220 }: PageSidebarProps) {
   return (
-    <div className="border-r bg-card flex flex-col flex-shrink-0" style={{ width }}>
+    <div data-left-panel className="editor-left-panel side-panel border-r bg-card flex flex-col flex-shrink-0" style={{ width }}>
       <div className="px-4 py-3.5 border-b">
-        <span className="text-base font-semibold text-muted-foreground uppercase tracking-wider">페이지</span>
+        <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">페이지</span>
       </div>
       <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
         {pages.map((page, i) => {

@@ -57,8 +57,8 @@ function ToolBtn({
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className="flex items-center gap-1.5 px-2.5 h-10 rounded-md
-        text-[14px] font-medium text-foreground hover:bg-accent disabled:opacity-40
+      className="flex items-center gap-1.5 px-3 h-11 rounded-md
+        text-[15px] font-medium text-foreground hover:bg-accent disabled:opacity-40
         disabled:cursor-not-allowed transition-colors select-none"
     >
       <span className="flex items-center justify-center">{icon}</span>
@@ -81,7 +81,7 @@ function IconBtn({
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className="flex items-center justify-center w-10 h-10 rounded-md
+      className="flex items-center justify-center w-11 h-11 rounded-md
         text-foreground hover:bg-accent disabled:opacity-40
         disabled:cursor-not-allowed transition-colors select-none"
     >
@@ -107,11 +107,11 @@ export function Toolbar({
     <TooltipProvider delayDuration={200}>
       {/* ── 단일 가로 툴바 (높이 64px) ─────────────────────────── */}
       <div
-        className="border-b bg-card flex items-center px-3 gap-1"
-        style={{ height: 64 }}
+        data-toolbar
+        className="editor-toolbar border-b bg-card flex items-center px-3 gap-3"
       >
         {/* 브랜드 */}
-        <div className="flex items-center gap-2 pr-2 mr-1 border-r border-border h-10">
+        <div className="flex items-center gap-2 pr-2 border-r border-border h-11">
           <div className="w-7 h-7 rounded bg-primary/10 flex items-center justify-center">
             <FileText className="w-4 h-4 text-primary" />
           </div>
@@ -132,7 +132,7 @@ export function Toolbar({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center gap-1.5 px-2.5 h-10 rounded-md text-[14px] font-medium text-foreground hover:bg-accent transition-colors select-none"
+              className="flex items-center gap-1.5 px-3 h-11 rounded-md text-[15px] font-medium text-foreground hover:bg-accent transition-colors select-none"
               title="도형 추가"
             >
               <Square className={ICON} />
@@ -158,7 +158,7 @@ export function Toolbar({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center gap-1.5 px-2.5 h-10 rounded-md text-[14px] font-medium text-foreground hover:bg-accent transition-colors select-none"
+              className="flex items-center gap-1.5 px-3 h-11 rounded-md text-[15px] font-medium text-foreground hover:bg-accent transition-colors select-none"
               title="템플릿 적용"
             >
               <LayoutTemplate className={ICON} />
@@ -202,7 +202,7 @@ export function Toolbar({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center gap-1.5 px-2.5 h-10 rounded-md text-[14px] font-medium text-foreground hover:bg-accent transition-colors select-none"
+              className="flex items-center gap-1.5 px-3 h-11 rounded-md text-[15px] font-medium text-foreground hover:bg-accent transition-colors select-none"
               title="내보내기"
             >
               <Download className={ICON} />
@@ -262,7 +262,7 @@ export function Toolbar({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center gap-1.5 px-2.5 h-10 rounded-md text-[14px] font-medium text-foreground hover:bg-accent transition-colors select-none ml-1"
+              className="flex items-center gap-1.5 px-3 h-11 rounded-md text-[15px] font-medium text-foreground hover:bg-accent transition-colors select-none ml-1"
               title="슬라이드 크기"
             >
               <span className="font-semibold">{currentPreset.ratio}</span>

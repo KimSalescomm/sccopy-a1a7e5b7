@@ -282,8 +282,8 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-auto relative"
-      style={{ backgroundColor: '#f5f6f8' }}
+      data-canvas-wrapper
+      className="canvas-wrapper flex-1 overflow-auto relative"
       onClick={() => { onSelectElement(null); onFinishEditing(); }}
       onPaste={handlePaste}
     >
@@ -299,14 +299,16 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas({
           <div
             ref={canvasContentRef}
             data-canvas-content
-            className="relative shadow-2xl"
+            data-canvas-stage
+            className="canvas-stage relative shadow-2xl"
             style={{
+              '--canvas-zoom': scale,
               width: canvasPreset.width,
               height: canvasPreset.height,
-              transform: `scale(${scale})`,
+              transform: 'scale(var(--canvas-zoom))',
               transformOrigin: 'top left',
               ...bgStyle,
-            }}
+            } as React.CSSProperties}
             onClick={e => e.stopPropagation()}
             onMouseDown={handleCanvasMouseDown}
           >

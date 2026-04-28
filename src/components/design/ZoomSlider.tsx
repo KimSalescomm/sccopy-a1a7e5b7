@@ -22,19 +22,21 @@ export function ZoomSlider({ scale, onChange, onFit, rightOffset }: ZoomSliderPr
   return (
     <div
       data-editing-ui
-      className="fixed bottom-6 z-40 flex items-center gap-2 bg-card/95 backdrop-blur border border-border rounded-full shadow-lg px-3 py-2"
+      data-zoom-control
+      className="zoom-control fixed bottom-6 z-40 flex h-[42px] w-[240px] items-center gap-1.5 bg-card/95 backdrop-blur border border-border rounded-full shadow-lg px-2 text-sm"
       style={{ right: rightOffset }}
     >
       <button
         onClick={() => onChange(clamp(scale - STEP))}
         title="축소"
-        className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent transition-colors"
+        className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent transition-colors flex-shrink-0"
       >
         <Minus className="w-4 h-4" />
       </button>
 
-      <div className="w-40 px-1">
+      <div className="w-14 px-1 flex-shrink-0">
         <Slider
+          className="[&>span:first-child]:h-1 [&_[role=slider]]:h-4 [&_[role=slider]]:w-4"
           value={[Math.round(clamp(scale) * 100)]}
           min={MIN * 100}
           max={MAX * 100}
@@ -46,19 +48,19 @@ export function ZoomSlider({ scale, onChange, onFit, rightOffset }: ZoomSliderPr
       <button
         onClick={() => onChange(clamp(scale + STEP))}
         title="확대"
-        className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent transition-colors"
+        className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent transition-colors flex-shrink-0"
       >
         <Plus className="w-4 h-4" />
       </button>
 
-      <span className="text-sm font-medium tabular-nums min-w-[44px] text-center select-none">
+      <span className="text-sm font-medium tabular-nums w-9 text-center select-none flex-shrink-0">
         {pct}%
       </span>
 
       <button
         onClick={onFit}
         title="화면에 맞추기"
-        className="flex items-center gap-1 h-8 px-3 rounded-full text-sm font-medium hover:bg-accent transition-colors border border-border/60"
+        className="flex items-center gap-1 h-8 px-1.5 rounded-full text-sm font-medium hover:bg-accent transition-colors border border-border/60 flex-shrink-0"
       >
         <Maximize2 className="w-3.5 h-3.5" />
         Fit
