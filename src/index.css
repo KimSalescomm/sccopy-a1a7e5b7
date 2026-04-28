@@ -109,14 +109,10 @@
     @apply border-border;
   }
 
-  /* Editor UI scale: Published 사이트에서만 UI를 1.2배 확대해 가독성을 맞춘다.
-     Preview/dev는 1.0 그대로 유지하고, export canvas에는 절대 적용되지 않는다
-     (별도 CSS rule 참조). data-env는 index.html의 inline script가 부여한다. */
+  /* Editor UI scale: Preview는 그대로, Published만 절대값으로 가독성 맞춤.
+     export canvas에는 적용되지 않음 (아래 [data-export-canvas] 규칙). */
   :root {
     --editor-ui-scale: 1;
-  }
-  html[data-env="published"] {
-    --editor-ui-scale: 1.2;
   }
 
   html {
@@ -165,34 +161,9 @@
     font-size: 1rem !important;
   }
 
-  /* Toolbar: editor-ui-scale 적용 (export canvas와 무관) */
+  /* Toolbar: 기본(Preview) 값 유지 */
   .editor-toolbar {
-    height: calc(64px * var(--editor-ui-scale)) !important;
-    min-height: calc(64px * var(--editor-ui-scale)) !important;
-    font-size: calc(15px * var(--editor-ui-scale)) !important;
     line-height: 1 !important;
-  }
-
-  .editor-toolbar button {
-    min-height: calc(44px * var(--editor-ui-scale));
-    min-width: calc(44px * var(--editor-ui-scale));
-    font-size: calc(15px * var(--editor-ui-scale));
-  }
-
-  .editor-toolbar svg {
-    width: calc(22px * var(--editor-ui-scale));
-    height: calc(22px * var(--editor-ui-scale));
-  }
-
-  .editor-left-panel,
-  .editor-right-panel {
-    font-size: calc(14px * var(--editor-ui-scale)) !important;
-  }
-
-  .zoom-control {
-    font-size: calc(14px * var(--editor-ui-scale)) !important;
-    min-height: calc(42px * var(--editor-ui-scale)) !important;
-    max-height: calc(42px * var(--editor-ui-scale)) !important;
   }
 
   .canvas-wrapper {
@@ -205,6 +176,54 @@
     justify-content: center;
     align-items: flex-start;
     box-sizing: border-box;
+  }
+}
+
+/* ============================================================
+   Published 전용 UI 스케일 (절대값)
+   - Preview/dev에는 영향 없음
+   - export canvas([data-export-canvas])에는 영향 없음
+   ============================================================ */
+@layer components {
+  html[data-env="published"] .editor-toolbar {
+    height: 76px !important;
+    min-height: 76px !important;
+    font-size: 18px !important;
+  }
+  html[data-env="published"] .editor-toolbar button {
+    height: 52px !important;
+    min-height: 52px !important;
+    padding: 0 14px !important;
+    font-size: 18px !important;
+  }
+  html[data-env="published"] .editor-toolbar svg {
+    width: 26px !important;
+    height: 26px !important;
+  }
+
+  html[data-env="published"] .editor-left-panel {
+    width: 240px !important;
+    flex-basis: 240px !important;
+    font-size: 16px !important;
+  }
+  html[data-env="published"] .editor-right-panel {
+    width: 320px !important;
+    flex-basis: 320px !important;
+    font-size: 16px !important;
+  }
+
+  html[data-env="published"] .zoom-control {
+    width: 240px !important;
+    font-size: 14px !important;
+  }
+
+  html[data-env="published"] .canvas-area {
+    padding-top: 56px !important;
+    padding-bottom: 96px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    background: #f5f6f8 !important;
   }
 
   .canvas-stage:not([data-export-canvas]) {
