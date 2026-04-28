@@ -109,14 +109,15 @@
     @apply border-border;
   }
 
-  /* 개발/배포 환경에서 UI 크기 일관성 보장 — 어떤 전역 scale/zoom도 금지 */
+  /* 개발/배포 환경에서 UI 크기 일관성 보장 — 전역 scale/zoom 금지.
+     단, 큰 모니터(>1440px)에서는 root font-size를 점진적으로 확대해
+     UI가 자연스럽게 함께 커지도록 한다. (1440 → 16px, 1920 → 18px, 2560 → 20px) */
   html {
-    font-size: 16px !important;
+    font-size: clamp(16px, 0.85rem + 0.32vw, 20px) !important;
   }
   html, body, #root, .app-shell, .editor-layout {
     transform: none !important;
     zoom: 1 !important;
-    font-size: 16px !important;
   }
 
   body {
@@ -154,29 +155,30 @@
 
   .editor-app,
   .editor-layout {
-    font-size: 16px !important;
+    font-size: 1rem !important;
   }
 
+  /* Toolbar: rem 기반으로 화면 폭에 따라 함께 확장 */
   .editor-toolbar {
-    height: 64px !important;
-    min-height: 64px !important;
-    font-size: 15px !important;
+    height: clamp(64px, 4rem + 0.5vw, 80px) !important;
+    min-height: clamp(64px, 4rem + 0.5vw, 80px) !important;
+    font-size: clamp(15px, 0.95rem, 18px) !important;
     line-height: 1 !important;
   }
 
   .editor-toolbar button {
-    min-height: 44px;
-    font-size: 15px;
+    min-height: clamp(44px, 2.75rem, 52px);
+    font-size: clamp(15px, 0.95rem, 18px);
   }
 
   .editor-toolbar svg {
-    width: 22px;
-    height: 22px;
+    width: clamp(22px, 1.4rem, 28px);
+    height: clamp(22px, 1.4rem, 28px);
   }
 
   .editor-left-panel,
   .editor-right-panel {
-    font-size: 14px !important;
+    font-size: clamp(14px, 0.9rem, 17px) !important;
   }
 
   .zoom-control {
