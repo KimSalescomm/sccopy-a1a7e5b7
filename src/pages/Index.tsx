@@ -696,14 +696,16 @@ const Index = () => {
         hasGroupInSelection={selectedIds.some(id => currentPage.elements.find(e => e.id === id)?.groupId)}
         onSetZoom={(v) => canvasRef.current?.setZoom(v)}
       />
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative">
         <PageSidebar
           pages={pages}
           currentIndex={currentPageIndex}
           onSelectPage={i => { setCurrentPageIndex(i); setSelectedIds([]); setEditingId(null); }}
           onAddPage={handleAddPage}
           onDeletePage={handleDeletePage}
+          width={leftPanelWidth}
         />
+        <ResizeHandle side="right" width={leftPanelWidth} min={160} max={320} onChange={setLeftPanelWidth} />
         <Canvas
           ref={canvasRef}
           page={currentPage}
@@ -722,6 +724,7 @@ const Index = () => {
           activeEditRef={activeEditRef}
           activeTextRangeRef={activeTextRangeRef}
         />
+        <ResizeHandle side="left" width={rightPanelWidth} min={240} max={420} onChange={setRightPanelWidth} />
         <PropertiesPanel
           element={selectedElement}
           onUpdate={handleUpdateElement}
@@ -734,15 +737,16 @@ const Index = () => {
           onBgChange={handleBgChange}
           activeEditRef={activeEditRef}
           activeTextRangeRef={activeTextRangeRef}
+          width={rightPanelWidth}
+        />
+        {/* 줌 슬라이더 — 우측 패널 옆 화면 우측 하단에 fixed */}
+        <ZoomSlider
+          scale={scale}
+          onChange={(v) => canvasRef.current?.setZoom(v)}
+          onFit={() => canvasRef.current?.setZoom('fit')}
+          rightOffset={rightPanelWidth + 24}
         />
       </div>
-      {/* PPT 스타일 하단 상태바 — 줌 컨트롤 오른쪽 하단 배치 */}
-      <StatusBar
-        scale={scale}
-        onZoomIn={() => canvasRef.current?.zoomIn()}
-        onZoomOut={() => canvasRef.current?.zoomOut()}
-        onFitToScreen={() => canvasRef.current?.fitToScreen()}
-      />
       <AlertDialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
