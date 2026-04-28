@@ -137,7 +137,7 @@ export function PropertiesPanel({
 
   if (!element) {
     return (
-      <div data-right-panel className="editor-right-panel side-panel border-l bg-card p-4 space-y-4 overflow-y-auto flex-shrink-0" style={{ width }}>
+      <div data-right-panel className="editor-right-panel side-panel border-l bg-card p-4 space-y-4 overflow-y-auto flex-shrink-0" style={{ width: effectiveWidth }}>
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">배경</h3>
         <div className="space-y-3">
           <div className="space-y-1">
@@ -187,7 +187,7 @@ export function PropertiesPanel({
   }
 
   return (
-    <div data-right-panel className="editor-right-panel side-panel border-l bg-card overflow-y-auto flex-shrink-0" style={{ width }}>
+    <div data-right-panel className="editor-right-panel side-panel border-l bg-card overflow-y-auto flex-shrink-0" style={{ width: effectiveWidth }}>
       <div className="p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
