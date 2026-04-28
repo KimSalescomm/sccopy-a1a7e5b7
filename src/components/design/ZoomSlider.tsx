@@ -9,7 +9,7 @@ interface ZoomSliderProps {
 }
 
 const MIN = 0.5;
-const MAX = 1.0;
+const MAX = 1.2;
 const STEP = 0.05;
 
 function clamp(v: number) {
