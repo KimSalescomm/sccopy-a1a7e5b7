@@ -135,13 +135,13 @@ export function PropertiesPanel({
 
   if (!element) {
     return (
-      <div className="w-[300px] border-l bg-card p-4 space-y-4 overflow-y-auto">
+      <div className="w-[320px] border-l bg-card p-4 space-y-4 overflow-y-auto">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">배경</h3>
         <div className="space-y-3">
           <div className="space-y-1">
-            <Label className="text-sm">유형</Label>
+            <Label className="text-base font-medium">유형</Label>
             <Select value={bgType} onValueChange={v => onBgChange({ type: v })}>
-              <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-10 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="solid">단색</SelectItem>
                 <SelectItem value="gradient">그라디언트</SelectItem>
@@ -150,30 +150,30 @@ export function PropertiesPanel({
           </div>
           {bgType === 'solid' ? (
             <div className="space-y-1">
-              <Label className="text-sm">색상</Label>
+              <Label className="text-base font-medium">색상</Label>
               <div className="flex gap-2">
                 <input type="color" value={bgColor} onChange={e => onBgChange({ color: e.target.value })} className="w-10 h-9 rounded cursor-pointer border" />
-                <Input value={bgColor} onChange={e => onBgChange({ color: e.target.value })} className="h-9 text-sm flex-1" />
+                <Input value={bgColor} onChange={e => onBgChange({ color: e.target.value })} className="h-10 text-sm flex-1" />
               </div>
             </div>
           ) : (
             <>
               <div className="space-y-1">
-                <Label className="text-sm">시작 색상</Label>
+                <Label className="text-base font-medium">시작 색상</Label>
                 <div className="flex gap-2">
                   <input type="color" value={bgGradientFrom ?? '#ffffff'} onChange={e => onBgChange({ gradientFrom: e.target.value })} className="w-10 h-9 rounded cursor-pointer border" />
-                  <Input value={bgGradientFrom ?? '#ffffff'} onChange={e => onBgChange({ gradientFrom: e.target.value })} className="h-9 text-sm flex-1" />
+                  <Input value={bgGradientFrom ?? '#ffffff'} onChange={e => onBgChange({ gradientFrom: e.target.value })} className="h-10 text-sm flex-1" />
                 </div>
               </div>
               <div className="space-y-1">
-                <Label className="text-sm">끝 색상</Label>
+                <Label className="text-base font-medium">끝 색상</Label>
                 <div className="flex gap-2">
                   <input type="color" value={bgGradientTo ?? '#eeeeee'} onChange={e => onBgChange({ gradientTo: e.target.value })} className="w-10 h-9 rounded cursor-pointer border" />
-                  <Input value={bgGradientTo ?? '#eeeeee'} onChange={e => onBgChange({ gradientTo: e.target.value })} className="h-9 text-sm flex-1" />
+                  <Input value={bgGradientTo ?? '#eeeeee'} onChange={e => onBgChange({ gradientTo: e.target.value })} className="h-10 text-sm flex-1" />
                 </div>
               </div>
               <div className="space-y-1">
-                <Label className="text-sm">방향 ({bgGradientDir ?? 180}°)</Label>
+                <Label className="text-base font-medium">방향 ({bgGradientDir ?? 180}°)</Label>
                 <Slider value={[bgGradientDir ?? 180]} min={0} max={360} step={15} onValueChange={([v]) => onBgChange({ gradientDirection: v })} />
               </div>
             </>
@@ -185,7 +185,7 @@ export function PropertiesPanel({
   }
 
   return (
-    <div className="w-[300px] border-l bg-card overflow-y-auto">
+    <div className="w-[320px] border-l bg-card overflow-y-auto">
       <div className="p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -204,30 +204,30 @@ export function PropertiesPanel({
 
         {/* Position */}
         <div className="space-y-2">
-          <Label className="text-sm">위치</Label>
+          <Label className="text-base font-medium">위치</Label>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <Label className="text-xs text-muted-foreground">X</Label>
-              <Input type="number" value={element.position.x} onChange={e => onUpdate(element.id, { position: { ...element.position, x: Number(e.target.value) } })} className="h-9 text-sm" />
+              <Input type="number" value={element.position.x} onChange={e => onUpdate(element.id, { position: { ...element.position, x: Number(e.target.value) } })} className="h-10 text-sm" />
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">Y</Label>
-              <Input type="number" value={element.position.y} onChange={e => onUpdate(element.id, { position: { ...element.position, y: Number(e.target.value) } })} className="h-9 text-sm" />
+              <Input type="number" value={element.position.y} onChange={e => onUpdate(element.id, { position: { ...element.position, y: Number(e.target.value) } })} className="h-10 text-sm" />
             </div>
           </div>
         </div>
 
         {/* Size */}
         <div className="space-y-2">
-          <Label className="text-sm">크기</Label>
+          <Label className="text-base font-medium">크기</Label>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <Label className="text-xs text-muted-foreground">너비</Label>
-              <Input type="number" value={element.size.width} onChange={e => onUpdate(element.id, { size: { ...element.size, width: Number(e.target.value) } })} className="h-9 text-sm" />
+              <Input type="number" value={element.size.width} onChange={e => onUpdate(element.id, { size: { ...element.size, width: Number(e.target.value) } })} className="h-10 text-sm" />
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">높이</Label>
-              <Input type="number" value={element.size.height} onChange={e => onUpdate(element.id, { size: { ...element.size, height: Number(e.target.value) } })} className="h-9 text-sm" />
+              <Input type="number" value={element.size.height} onChange={e => onUpdate(element.id, { size: { ...element.size, height: Number(e.target.value) } })} className="h-10 text-sm" />
             </div>
           </div>
         </div>
@@ -238,13 +238,13 @@ export function PropertiesPanel({
         {element.type === 'text' && element.textStyle && (
           <div className="space-y-3">
             <div className="space-y-1">
-              <Label className="text-sm">글꼴 크기</Label>
-              <Input type="number" value={element.textStyle.fontSize} onChange={e => onUpdate(element.id, { textStyle: { ...element.textStyle!, fontSize: Number(e.target.value) } })} className="h-9 text-sm" />
+              <Label className="text-base font-medium">글꼴 크기</Label>
+              <Input type="number" value={element.textStyle.fontSize} onChange={e => onUpdate(element.id, { textStyle: { ...element.textStyle!, fontSize: Number(e.target.value) } })} className="h-10 text-sm" />
             </div>
             <div className="space-y-1">
-              <Label className="text-sm">굵기</Label>
+              <Label className="text-base font-medium">굵기</Label>
               <Select value={String(element.textStyle.fontWeight)} onValueChange={v => onUpdate(element.id, { textStyle: { ...element.textStyle!, fontWeight: Number(v) } })}>
-                <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-10 text-sm"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="300">Light</SelectItem>
                   <SelectItem value="400">Regular</SelectItem>
@@ -256,7 +256,7 @@ export function PropertiesPanel({
               </Select>
             </div>
             <div className="space-y-1">
-              <Label className="text-sm">색상</Label>
+              <Label className="text-base font-medium">색상</Label>
               <p className="text-xs text-muted-foreground">텍스트를 드래그하면 선택 영역만 변경됩니다</p>
               <div className="flex gap-2">
                 <input
@@ -274,12 +274,12 @@ export function PropertiesPanel({
                   onMouseDown={e => { e.stopPropagation(); beginColorSession(); }}
                   onFocus={beginColorSession}
                   onBlur={endColorSession}
-                  className="h-9 text-sm flex-1"
+                  className="h-10 text-sm flex-1"
                 />
               </div>
             </div>
             <div className="space-y-1">
-              <Label className="text-sm">부분 서식</Label>
+              <Label className="text-base font-medium">부분 서식</Label>
               <p className="text-xs text-muted-foreground">텍스트를 드래그한 뒤 클릭하세요</p>
               <div className="flex gap-1">
                 <Button
@@ -315,7 +315,7 @@ export function PropertiesPanel({
               </div>
             </div>
             <div className="space-y-1">
-              <Label className="text-sm">정렬</Label>
+              <Label className="text-base font-medium">정렬</Label>
               <div className="flex gap-1">
                 {(['left', 'center', 'right'] as const).map(align => (
                   <Button
@@ -331,7 +331,7 @@ export function PropertiesPanel({
               </div>
             </div>
             <div className="space-y-1">
-              <Label className="text-sm">줄 높이</Label>
+              <Label className="text-base font-medium">줄 높이</Label>
               <Slider value={[element.textStyle.lineHeight]} min={1} max={3} step={0.1} onValueChange={([v]) => onUpdate(element.id, { textStyle: { ...element.textStyle!, lineHeight: v } })} />
             </div>
           </div>
@@ -341,18 +341,18 @@ export function PropertiesPanel({
         {element.type === 'shape' && element.shapeStyle && (
           <div className="space-y-3">
             <div className="space-y-1">
-              <Label className="text-sm">채우기 색상</Label>
+              <Label className="text-base font-medium">채우기 색상</Label>
               <div className="flex gap-2">
                 <input type="color" value={element.shapeStyle.fill} onChange={e => onUpdate(element.id, { shapeStyle: { ...element.shapeStyle!, fill: e.target.value } })} className="w-10 h-9 rounded cursor-pointer border" />
-                <Input value={element.shapeStyle.fill} onChange={e => onUpdate(element.id, { shapeStyle: { ...element.shapeStyle!, fill: e.target.value } })} className="h-9 text-sm flex-1" />
+                <Input value={element.shapeStyle.fill} onChange={e => onUpdate(element.id, { shapeStyle: { ...element.shapeStyle!, fill: e.target.value } })} className="h-10 text-sm flex-1" />
               </div>
             </div>
             <div className="space-y-1">
-              <Label className="text-sm">모서리 반경</Label>
+              <Label className="text-base font-medium">모서리 반경</Label>
               <Slider value={[element.shapeStyle.borderRadius]} min={0} max={100} step={1} onValueChange={([v]) => onUpdate(element.id, { shapeStyle: { ...element.shapeStyle!, borderRadius: v } })} />
             </div>
             <div className="space-y-1">
-              <Label className="text-sm">투명도</Label>
+              <Label className="text-base font-medium">투명도</Label>
               <Slider value={[element.shapeStyle.opacity]} min={0} max={1} step={0.05} onValueChange={([v]) => onUpdate(element.id, { shapeStyle: { ...element.shapeStyle!, opacity: v } })} />
             </div>
           </div>
@@ -362,9 +362,9 @@ export function PropertiesPanel({
         {element.type === 'image' && (
           <div className="space-y-3">
             <div className="space-y-1">
-              <Label className="text-sm">맞춤</Label>
+              <Label className="text-base font-medium">맞춤</Label>
               <Select value={element.objectFit ?? 'cover'} onValueChange={v => onUpdate(element.id, { objectFit: v as any })}>
-                <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-10 text-sm"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="cover">채우기</SelectItem>
                   <SelectItem value="contain">맞추기</SelectItem>
