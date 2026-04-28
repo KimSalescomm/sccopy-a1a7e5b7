@@ -135,7 +135,7 @@ export function PropertiesPanel({
 
   if (!element) {
     return (
-      <div className="w-[320px] border-l bg-card p-4 space-y-4 overflow-y-auto">
+      <div className="w-[300px] border-l bg-card p-4 space-y-4 overflow-y-auto">
         <h3 className="text-base font-semibold text-muted-foreground uppercase tracking-wider">배경</h3>
         <div className="space-y-3">
           <div className="space-y-1">
@@ -185,7 +185,7 @@ export function PropertiesPanel({
   }
 
   return (
-    <div className="w-[320px] border-l bg-card overflow-y-auto">
+    <div className="w-[300px] border-l bg-card overflow-y-auto">
       <div className="p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
