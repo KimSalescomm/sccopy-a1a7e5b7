@@ -117,6 +117,16 @@ const Index = () => {
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
   const [scale, setScale] = useState(0.5);
   const [isExporting, setIsExporting] = useState(false);
+  const [leftPanelWidth, setLeftPanelWidth] = useState<number>(() => {
+    const v = Number(localStorage.getItem('ui:leftPanelWidth'));
+    return Number.isFinite(v) && v >= 160 && v <= 320 ? v : 220;
+  });
+  const [rightPanelWidth, setRightPanelWidth] = useState<number>(() => {
+    const v = Number(localStorage.getItem('ui:rightPanelWidth'));
+    return Number.isFinite(v) && v >= 240 && v <= 420 ? v : 300;
+  });
+  useEffect(() => { localStorage.setItem('ui:leftPanelWidth', String(leftPanelWidth)); }, [leftPanelWidth]);
+  useEffect(() => { localStorage.setItem('ui:rightPanelWidth', String(rightPanelWidth)); }, [rightPanelWidth]);
   const canvasRef = useRef<CanvasHandle>(null);
   const activeEditRef = useRef<HTMLElement | null>(null);
   const activeTextRangeRef = useRef<Range | null>(null);
