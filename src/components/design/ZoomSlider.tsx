@@ -34,7 +34,7 @@ export function ZoomSlider({ scale, onChange, onFit, rightOffset }: ZoomSliderPr
         <Minus className="w-4 h-4" />
       </button>
 
-      <div className="w-[72px] px-1 flex-shrink-0">
+      <div className="w-14 px-1 flex-shrink-0">
         <Slider
           className="[&>span:first-child]:h-1 [&_[role=slider]]:h-4 [&_[role=slider]]:w-4"
           value={[Math.round(clamp(scale) * 100)]}
@@ -53,14 +53,14 @@ export function ZoomSlider({ scale, onChange, onFit, rightOffset }: ZoomSliderPr
         <Plus className="w-4 h-4" />
       </button>
 
-      <span className="text-sm font-medium tabular-nums w-10 text-center select-none flex-shrink-0">
+      <span className="text-sm font-medium tabular-nums w-9 text-center select-none flex-shrink-0">
         {pct}%
       </span>
 
       <button
         onClick={onFit}
         title="화면에 맞추기"
-        className="flex items-center gap-1 h-8 px-2 rounded-full text-sm font-medium hover:bg-accent transition-colors border border-border/60 flex-shrink-0"
+        className="flex items-center gap-1 h-8 px-1.5 rounded-full text-sm font-medium hover:bg-accent transition-colors border border-border/60 flex-shrink-0"
       >
         <Maximize2 className="w-3.5 h-3.5" />
         Fit
