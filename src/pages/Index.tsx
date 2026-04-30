@@ -817,34 +817,6 @@ const Index = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      {/* TEMP: 현재 작업 상태를 DB에 박제용으로 저장 */}
-      <button
-        onClick={async () => {
-          try {
-            const { supabase } = await import('@/integrations/supabase/client');
-            const payload = { pages, canvasPresetId: canvasPreset.id, savedAt: new Date().toISOString() };
-            const { data, error } = await supabase
-              .from('default_state_dump' as any)
-              .insert({ payload } as any)
-              .select('id')
-              .single();
-            if (error) throw error;
-            const sizeKb = Math.round(JSON.stringify(payload).length / 1024);
-            alert(`✅ DB 저장 완료!\nID: ${(data as any)?.id}\n크기: ${sizeKb}KB\n\n채팅에 "박제 완료"라고만 보내주세요.`);
-          } catch (e: any) {
-            console.error('[DefaultStateDump] 저장 실패', e);
-            alert('❌ 저장 실패: ' + (e?.message || String(e)));
-          }
-        }}
-        style={{
-          position: 'fixed', bottom: 16, left: 16, zIndex: 999999,
-          background: '#FD312E', color: '#fff', padding: '10px 16px',
-          borderRadius: 8, fontSize: 14, fontWeight: 600, border: 'none',
-          cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-        }}
-      >
-        💾 현재 상태를 DB에 박제 저장
-      </button>
     </div>
   );
 };
