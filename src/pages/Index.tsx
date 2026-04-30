@@ -13,6 +13,7 @@ import { PropertiesPanel } from '@/components/design/PropertiesPanel';
 import { toast } from '@/hooks/use-toast';
 import { useAutoSave, hasSavedData, loadSavedData, clearSavedData } from '@/hooks/use-auto-save';
 import { alignElements, type AlignAction } from '@/components/design/AlignmentGuides';
+import { PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from 'lucide-react';
 
 // When a text element's height changes, adjust sibling elements in the same card
 function syncLayoutAfterResize(
