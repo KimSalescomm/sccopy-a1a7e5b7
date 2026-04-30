@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Page, DesignElement, CanvasPreset, Position, Size } from '@/types/design';
 import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId, DEFAULT_PRESET, CANVAS_PRESETS, getElementImageSrc } from '@/types/design';
 import { getTemplatePages, getTemplatePresetId } from '@/lib/templates';
+import { DEFAULT_STATE } from '@/lib/default-state';
 import { Toolbar } from '@/components/design/Toolbar';
 import { PageSidebar } from '@/components/design/PageSidebar';
 import { Canvas, type CanvasHandle } from '@/components/design/Canvas';
@@ -151,13 +152,19 @@ function normalizeImageUpdates(oldEl: DesignElement | undefined, updates: Partia
 
 const Index = () => {
   const [pages, setPages] = useState<Page[]>(() => {
+    const dsPages = (DEFAULT_STATE as any)?.pages as Page[] | undefined;
+    if (dsPages && dsPages.length > 0) return dsPages as Page[];
     const tplPages = getTemplatePages('basic-usp');
     return tplPages.length > 0 ? tplPages : [createDefaultPage()];
   });
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [canvasPreset, setCanvasPreset] = useState<CanvasPreset>(DEFAULT_PRESET);
+  const [canvasPreset, setCanvasPreset] = useState<CanvasPreset>(() => {
+    const id = (DEFAULT_STATE as any)?.canvasPresetId;
+    const found = id ? CANVAS_PRESETS.find(p => p.id === id) : undefined;
+    return found ?? DEFAULT_PRESET;
+  });
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
   const [scale, setScale] = useState(0.5);
   const [isExporting, setIsExporting] = useState(false);
@@ -810,34 +817,6 @@ const Index = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      {/* TEMP: 현재 작업 상태를 DB에 박제용으로 저장 */}
-      <button
-        onClick={async () => {
-          try {
-            const { supabase } = await import('@/integrations/supabase/client');
-            const payload = { pages, canvasPresetId: canvasPreset.id, savedAt: new Date().toISOString() };
-            const { data, error } = await supabase
-              .from('default_state_dump' as any)
-              .insert({ payload } as any)
-              .select('id')
-              .single();
-            if (error) throw error;
-            const sizeKb = Math.round(JSON.stringify(payload).length / 1024);
-            alert(`✅ DB 저장 완료!\nID: ${(data as any)?.id}\n크기: ${sizeKb}KB\n\n채팅에 "박제 완료"라고만 보내주세요.`);
-          } catch (e: any) {
-            console.error('[DefaultStateDump] 저장 실패', e);
-            alert('❌ 저장 실패: ' + (e?.message || String(e)));
-          }
-        }}
-        style={{
-          position: 'fixed', bottom: 16, left: 16, zIndex: 999999,
-          background: '#FD312E', color: '#fff', padding: '10px 16px',
-          borderRadius: 8, fontSize: 14, fontWeight: 600, border: 'none',
-          cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-        }}
-      >
-        💾 현재 상태를 DB에 박제 저장
-      </button>
     </div>
   );
 };
