@@ -810,17 +810,28 @@ const Index = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      {/* TEMP: 현재 작업 상태를 JSON으로 다운로드 — default state 박제용 */}
+      {/* TEMP: 현재 작업 상태를 콘솔에 dump — default state 박제용 */}
       <button
-        onClick={() => {
+        onClick={async () => {
           const data = { pages, canvasPresetId: canvasPreset.id, savedAt: new Date().toISOString() };
-          const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'default-state.json';
-          a.click();
-          URL.revokeObjectURL(url);
+          const json = JSON.stringify(data);
+          // 1) 콘솔 출력 (전체)
+          console.log('===== DEFAULT STATE JSON START =====');
+          console.log(json);
+          console.log('===== DEFAULT STATE JSON END =====');
+          // 2) 클립보드 복사 시도
+          try {
+            await navigator.clipboard.writeText(json);
+            alert(`✅ 클립보드에 복사됨 (${json.length.toLocaleString()}자)\n채팅창에 그대로 붙여넣어 주세요.`);
+          } catch {
+            // 3) fallback: textarea 표시
+            const ta = document.createElement('textarea');
+            ta.value = json;
+            ta.style.cssText = 'position:fixed;top:10%;left:10%;width:80%;height:80%;z-index:9999999;font-size:12px;';
+            document.body.appendChild(ta);
+            ta.select();
+            alert('클립보드 복사 실패. 화면의 텍스트박스에서 전체 선택(Cmd/Ctrl+A) 후 복사(Cmd/Ctrl+C) 하세요. 닫으려면 다시 버튼 클릭.');
+          }
         }}
         style={{
           position: 'fixed', bottom: 16, left: 16, zIndex: 999999,
@@ -829,7 +840,7 @@ const Index = () => {
           cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
         }}
       >
-        ⬇ 현재 상태 JSON 다운로드 (default 박제용)
+        📋 현재 상태 JSON 복사 (default 박제용)
       </button>
     </div>
   );
