@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Page, DesignElement, CanvasPreset, Position, Size } from '@/types/design';
 import { createDefaultPage, createTextElement, createShapeElement, createImageElement, createId, DEFAULT_PRESET, CANVAS_PRESETS, getElementImageSrc } from '@/types/design';
 import { getTemplatePages, getTemplatePresetId } from '@/lib/templates';
+import { DEFAULT_STATE } from '@/lib/default-state';
 import { Toolbar } from '@/components/design/Toolbar';
 import { PageSidebar } from '@/components/design/PageSidebar';
 import { Canvas, type CanvasHandle } from '@/components/design/Canvas';
