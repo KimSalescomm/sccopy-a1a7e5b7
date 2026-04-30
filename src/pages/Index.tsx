@@ -178,6 +178,10 @@ const Index = () => {
   });
   useEffect(() => { localStorage.setItem('ui:leftPanelWidth', String(leftPanelWidth)); }, [leftPanelWidth]);
   useEffect(() => { localStorage.setItem('ui:rightPanelWidth', String(rightPanelWidth)); }, [rightPanelWidth]);
+  const [leftCollapsed, setLeftCollapsed] = useState<boolean>(() => localStorage.getItem('ui:leftCollapsed') === '1');
+  const [rightCollapsed, setRightCollapsed] = useState<boolean>(() => localStorage.getItem('ui:rightCollapsed') === '1');
+  useEffect(() => { localStorage.setItem('ui:leftCollapsed', leftCollapsed ? '1' : '0'); }, [leftCollapsed]);
+  useEffect(() => { localStorage.setItem('ui:rightCollapsed', rightCollapsed ? '1' : '0'); }, [rightCollapsed]);
   useEffect(() => {
     const id = window.setTimeout(logEditorUiDebug, 250);
     return () => window.clearTimeout(id);
