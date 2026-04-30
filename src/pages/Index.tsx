@@ -152,13 +152,19 @@ function normalizeImageUpdates(oldEl: DesignElement | undefined, updates: Partia
 
 const Index = () => {
   const [pages, setPages] = useState<Page[]>(() => {
+    const dsPages = (DEFAULT_STATE as any)?.pages as Page[] | undefined;
+    if (dsPages && dsPages.length > 0) return dsPages as Page[];
     const tplPages = getTemplatePages('basic-usp');
     return tplPages.length > 0 ? tplPages : [createDefaultPage()];
   });
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [canvasPreset, setCanvasPreset] = useState<CanvasPreset>(DEFAULT_PRESET);
+  const [canvasPreset, setCanvasPreset] = useState<CanvasPreset>(() => {
+    const id = (DEFAULT_STATE as any)?.canvasPresetId;
+    const found = id ? CANVAS_PRESETS.find(p => p.id === id) : undefined;
+    return found ?? DEFAULT_PRESET;
+  });
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
   const [scale, setScale] = useState(0.5);
   const [isExporting, setIsExporting] = useState(false);
