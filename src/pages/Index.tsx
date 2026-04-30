@@ -810,27 +810,23 @@ const Index = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      {/* TEMP: 현재 작업 상태를 콘솔에 dump — default state 박제용 */}
+      {/* TEMP: 현재 작업 상태를 DB에 박제용으로 저장 */}
       <button
         onClick={async () => {
-          const data = { pages, canvasPresetId: canvasPreset.id, savedAt: new Date().toISOString() };
-          const json = JSON.stringify(data);
-          // 1) 콘솔 출력 (전체)
-          console.log('===== DEFAULT STATE JSON START =====');
-          console.log(json);
-          console.log('===== DEFAULT STATE JSON END =====');
-          // 2) 클립보드 복사 시도
           try {
-            await navigator.clipboard.writeText(json);
-            alert(`✅ 클립보드에 복사됨 (${json.length.toLocaleString()}자)\n채팅창에 그대로 붙여넣어 주세요.`);
-          } catch {
-            // 3) fallback: textarea 표시
-            const ta = document.createElement('textarea');
-            ta.value = json;
-            ta.style.cssText = 'position:fixed;top:10%;left:10%;width:80%;height:80%;z-index:9999999;font-size:12px;';
-            document.body.appendChild(ta);
-            ta.select();
-            alert('클립보드 복사 실패. 화면의 텍스트박스에서 전체 선택(Cmd/Ctrl+A) 후 복사(Cmd/Ctrl+C) 하세요. 닫으려면 다시 버튼 클릭.');
+            const { supabase } = await import('@/integrations/supabase/client');
+            const payload = { pages, canvasPresetId: canvasPreset.id, savedAt: new Date().toISOString() };
+            const { data, error } = await supabase
+              .from('default_state_dump' as any)
+              .insert({ payload } as any)
+              .select('id')
+              .single();
+            if (error) throw error;
+            const sizeKb = Math.round(JSON.stringify(payload).length / 1024);
+            alert(`✅ DB 저장 완료!\nID: ${(data as any)?.id}\n크기: ${sizeKb}KB\n\n채팅에 "박제 완료"라고만 보내주세요.`);
+          } catch (e: any) {
+            console.error('[DefaultStateDump] 저장 실패', e);
+            alert('❌ 저장 실패: ' + (e?.message || String(e)));
           }
         }}
         style={{
@@ -840,7 +836,7 @@ const Index = () => {
           cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
         }}
       >
-        📋 현재 상태 JSON 복사 (default 박제용)
+        💾 현재 상태를 DB에 박제 저장
       </button>
     </div>
   );
