@@ -810,6 +810,27 @@ const Index = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {/* TEMP: 현재 작업 상태를 JSON으로 다운로드 — default state 박제용 */}
+      <button
+        onClick={() => {
+          const data = { pages, canvasPresetId: canvasPreset.id, savedAt: new Date().toISOString() };
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'default-state.json';
+          a.click();
+          URL.revokeObjectURL(url);
+        }}
+        style={{
+          position: 'fixed', bottom: 16, left: 16, zIndex: 999999,
+          background: '#FD312E', color: '#fff', padding: '10px 16px',
+          borderRadius: 8, fontSize: 14, fontWeight: 600, border: 'none',
+          cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+        }}
+      >
+        ⬇ 현재 상태 JSON 다운로드 (default 박제용)
+      </button>
     </div>
   );
 };
