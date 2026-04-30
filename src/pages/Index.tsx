@@ -800,16 +800,16 @@ const Index = () => {
           activeEditRef={activeEditRef}
           activeTextRangeRef={activeTextRangeRef}
         />
-        {/* 우측 패널 토글 버튼 */}
+        {/* 우측 패널 토글 — 패널 가장자리에 부착된 반원 탭 */}
         <button
           type="button"
           onClick={() => setRightCollapsed(v => !v)}
-          className="absolute top-3 z-30 h-8 w-8 flex items-center justify-center rounded-md border border-border bg-background/95 backdrop-blur shadow-sm hover:bg-accent transition-colors"
-          style={{ right: rightCollapsed ? 8 : rightPanelWidth + 4 }}
+          className="absolute top-1/2 -translate-y-1/2 z-30 h-12 w-5 flex items-center justify-center rounded-l-md border border-r-0 border-border bg-background text-muted-foreground hover:text-foreground hover:bg-accent shadow-sm transition-colors"
+          style={{ right: rightCollapsed ? 0 : rightPanelWidth }}
           title={rightCollapsed ? '속성 패널 펼치기' : '속성 패널 접기'}
           aria-label={rightCollapsed ? '속성 패널 펼치기' : '속성 패널 접기'}
         >
-          {rightCollapsed ? <PanelRightOpen className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}
+          {rightCollapsed ? <PanelRightOpen className="h-3.5 w-3.5" /> : <PanelRightClose className="h-3.5 w-3.5" />}
         </button>
         {!rightCollapsed && (
           <>
