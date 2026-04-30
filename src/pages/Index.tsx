@@ -758,15 +758,30 @@ const Index = () => {
         onSetZoom={(v) => canvasRef.current?.setZoom(v)}
       />
       <div className="editor-layout flex-1 flex overflow-hidden relative" data-editor-layout>
-        <PageSidebar
-          pages={pages}
-          currentIndex={currentPageIndex}
-          onSelectPage={i => { setCurrentPageIndex(i); setSelectedIds([]); setEditingId(null); }}
-          onAddPage={handleAddPage}
-          onDeletePage={handleDeletePage}
-          width={leftPanelWidth}
-        />
-        <ResizeHandle side="right" width={leftPanelWidth} min={160} max={320} onChange={setLeftPanelWidth} />
+        {!leftCollapsed && (
+          <>
+            <PageSidebar
+              pages={pages}
+              currentIndex={currentPageIndex}
+              onSelectPage={i => { setCurrentPageIndex(i); setSelectedIds([]); setEditingId(null); }}
+              onAddPage={handleAddPage}
+              onDeletePage={handleDeletePage}
+              width={leftPanelWidth}
+            />
+            <ResizeHandle side="right" width={leftPanelWidth} min={160} max={320} onChange={setLeftPanelWidth} />
+          </>
+        )}
+        {/* 좌측 패널 토글 버튼 */}
+        <button
+          type="button"
+          onClick={() => setLeftCollapsed(v => !v)}
+          className="absolute top-3 z-30 h-8 w-8 flex items-center justify-center rounded-md border border-border bg-background/95 backdrop-blur shadow-sm hover:bg-accent transition-colors"
+          style={{ left: leftCollapsed ? 8 : leftPanelWidth + 4 }}
+          title={leftCollapsed ? '페이지 패널 펼치기' : '페이지 패널 접기'}
+          aria-label={leftCollapsed ? '페이지 패널 펼치기' : '페이지 패널 접기'}
+        >
+          {leftCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+        </button>
         <Canvas
           ref={canvasRef}
           page={currentPage}
@@ -785,27 +800,42 @@ const Index = () => {
           activeEditRef={activeEditRef}
           activeTextRangeRef={activeTextRangeRef}
         />
-        <ResizeHandle side="left" width={rightPanelWidth} min={240} max={420} onChange={setRightPanelWidth} />
-        <PropertiesPanel
-          element={selectedElement}
-          onUpdate={handleUpdateElement}
-          onDelete={handleDeleteElement}
-          bgColor={currentPage.background.color}
-          bgType={currentPage.background.type}
-          bgGradientFrom={currentPage.background.gradientFrom}
-          bgGradientTo={currentPage.background.gradientTo}
-          bgGradientDir={currentPage.background.gradientDirection}
-          onBgChange={handleBgChange}
-          activeEditRef={activeEditRef}
-          activeTextRangeRef={activeTextRangeRef}
-          width={rightPanelWidth}
-        />
+        {/* 우측 패널 토글 버튼 */}
+        <button
+          type="button"
+          onClick={() => setRightCollapsed(v => !v)}
+          className="absolute top-3 z-30 h-8 w-8 flex items-center justify-center rounded-md border border-border bg-background/95 backdrop-blur shadow-sm hover:bg-accent transition-colors"
+          style={{ right: rightCollapsed ? 8 : rightPanelWidth + 4 }}
+          title={rightCollapsed ? '속성 패널 펼치기' : '속성 패널 접기'}
+          aria-label={rightCollapsed ? '속성 패널 펼치기' : '속성 패널 접기'}
+        >
+          {rightCollapsed ? <PanelRightOpen className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}
+        </button>
+        {!rightCollapsed && (
+          <>
+            <ResizeHandle side="left" width={rightPanelWidth} min={240} max={420} onChange={setRightPanelWidth} />
+            <PropertiesPanel
+              element={selectedElement}
+              onUpdate={handleUpdateElement}
+              onDelete={handleDeleteElement}
+              bgColor={currentPage.background.color}
+              bgType={currentPage.background.type}
+              bgGradientFrom={currentPage.background.gradientFrom}
+              bgGradientTo={currentPage.background.gradientTo}
+              bgGradientDir={currentPage.background.gradientDirection}
+              onBgChange={handleBgChange}
+              activeEditRef={activeEditRef}
+              activeTextRangeRef={activeTextRangeRef}
+              width={rightPanelWidth}
+            />
+          </>
+        )}
         {/* 줌 슬라이더 — 우측 패널 옆 화면 우측 하단에 fixed */}
         <ZoomSlider
           scale={scale}
           onChange={(v) => canvasRef.current?.setZoom(v)}
           onFit={() => canvasRef.current?.setZoom('fit')}
-          rightOffset={rightPanelWidth + 24}
+          rightOffset={(rightCollapsed ? 0 : rightPanelWidth) + 24}
         />
       </div>
       <AlertDialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
